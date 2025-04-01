@@ -1,0 +1,78 @@
+# Rider specific
+.idea/
+*.sln.iml
+
+# Build output
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+
+# Rider logs and workspace metadata
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/libraries/
+.idea/shelf/
+.idea/httpRequests/
+.idea/dataSources/
+.idea/dataSources.ids
+.idea/sqlDataSources.xml
+.idea/dictionaries/
+.idea/schemas/
+.idea/.idea_modules
+.idea/modules.xml
+.idea/uiDesigner.xml
+.idea/assetWizard.xml
+.idea/webServers.xml
+.idea/codeStyles/
+
+# Entity Framework Core migrations
+Migrations/
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+# Environment variables and secrets
+.env
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+
+# VS Code settings (if used)
+.vscode/
+*.code-workspace
+
+# NuGet packages
+**/packages/
+!**/packages/repositories.config
+
+# Logs
+logs/
+*.log
+
+# Coverage reports
+coverage/
+*.coverage
+*.coveragexml
+TestResults/
+
+# Temporary files
+*.tmp
+*.bak
+~$*
+
+# Resharper files
+_ReSharper.Caches/
+*.DotSettings.user
+
+# Rider's backend files
+.idea/httpRequests.xml
+
