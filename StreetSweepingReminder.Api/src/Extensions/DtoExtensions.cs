@@ -44,4 +44,12 @@ public static class DtoExtensions
             CreatedAt = DateTime.Now
         };
     }
+
+    public static StreetResponseDto StreetResponseDto(this Street source)
+    {
+        return new StreetResponseDto(
+            source.Id, 
+            source.StreetName, 
+            source.HouseNumber);
+    }
 }
