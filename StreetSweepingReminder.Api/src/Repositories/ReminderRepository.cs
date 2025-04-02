@@ -9,9 +9,16 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
     {
     }
     
-    public Task<int> CreateAsync(Reminder reminder)
+    public async Task<int> CreateAsync(Reminder reminder)
     {
-        throw new NotImplementedException();
+        const string sql = """
+                           INSERT INTO Reminders (UserId, Message, ScheduledDateTime, Status, PhoneNumber, StreetId, ModifiedAt) 
+                                               VALUES (@UserId, @Message, @ScheduledDateTime, @Status, @PhoneNumber, @StreetId, @ModifiedAt)
+                           """;
+
+        using var connection = CreateConnection();
+        var newId = await connection.ExecuteAsync(sql, reminder);
+        return newId;
     }
 
     public Task<Reminder> GetByIdAsync(int id)
