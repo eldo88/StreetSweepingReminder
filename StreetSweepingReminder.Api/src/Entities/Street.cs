@@ -6,4 +6,6 @@ public class Street
     public string UserId { get; set; } // FK to User
     public string StreetName { get; set; } = string.Empty;
     public int? HouseNumber { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? ModifiedAt { get; set; }
 }
