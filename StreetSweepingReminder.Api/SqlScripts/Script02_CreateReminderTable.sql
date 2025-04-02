@@ -1,5 +1,5 @@
 --Creates Reminders Table
---TODO add FK constraint to StreetId
+
 CREATE TABLE IF NOT EXISTS main.Reminders (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     UserId TEXT NOT NULL,
@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS main.Reminders (
     StreetId INTEGER NOT NULL,
     CreatedAt TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ', 'now')),
     ModifiedAt TEXT,
-    FOREIGN KEY (UserId) REFERENCES AspNetUsers (Id)
+    FOREIGN KEY (UserId) REFERENCES AspNetUsers (Id),
+    FOREIGN KEY (StreetId) REFERENCES Streets (Id)
 )
