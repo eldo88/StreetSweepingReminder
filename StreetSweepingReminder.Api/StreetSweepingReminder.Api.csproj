@@ -26,8 +26,4 @@
     <EmbeddedResource Include="SqlScripts\*.sql" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="src\Services\" />
-  </ItemGroup>
-
 </Project>

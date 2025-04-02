@@ -3,6 +3,7 @@ using DbUp;
 using Microsoft.EntityFrameworkCore;
 using StreetSweepingReminder.Api.DbContext;
 using StreetSweepingReminder.Api.Repositories;
+using StreetSweepingReminder.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
+builder.Services.AddScoped<IReminderService, ReminderService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
