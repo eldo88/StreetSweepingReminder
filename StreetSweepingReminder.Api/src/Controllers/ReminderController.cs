@@ -4,6 +4,7 @@ using StreetSweepingReminder.Api.DTOs;
 namespace StreetSweepingReminder.Api.Controllers;
 
 [ApiController]
+[Route("api/[controller]")]
 public class ReminderController : ControllerBase
 {
 
