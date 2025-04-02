@@ -45,7 +45,7 @@ public static class DtoExtensions
         };
     }
 
-    public static StreetResponseDto StreetResponseDto(this Street source)
+    public static StreetResponseDto ToStreetResponseDto(this Street source)
     {
         return new StreetResponseDto(
             source.Id, 
