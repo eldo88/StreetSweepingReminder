@@ -1,3 +1,5 @@
+using System.Reflection;
+using DbUp;
 using Microsoft.EntityFrameworkCore;
 using StreetSweepingReminder.Api.DbContext;
 using StreetSweepingReminder.Api.Repositories;
@@ -12,9 +14,37 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+                       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(connectionString));
+
+// DbUp
+var upgradeEngine = DeployChanges.To
+    .SqliteDatabase(connectionString)
+    .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+    .LogToConsole()
+    .Build();
+
+var result = upgradeEngine.PerformUpgrade();
+
+if (!result.Successful)
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("Database migration failed:");
+    Console.WriteLine(result.Error);
+    Console.ResetColor();
+    
+    throw new Exception("Database migration failed. Check logs for details.", result.Error);
+}
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine("Database migration successful!");
+Console.ResetColor();
+
+
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
