@@ -24,6 +24,7 @@ public static class DtoExtensions
     public static ReminderResponseDto ToReminderResponseDto(this Reminder source)
     {
         return new ReminderResponseDto(
+            source.Id,
             source.Message,
             source.ScheduledDateTimeUtc,
             source.Status,
