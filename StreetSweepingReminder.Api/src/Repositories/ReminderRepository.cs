@@ -3,14 +3,10 @@ using Dapper;
 
 namespace StreetSweepingReminder.Api.Repositories;
 
-public class ReminderRepository : IReminderRepository
+internal class ReminderRepository : RepositoryBase, IReminderRepository
 {
-    private readonly string _connectionString;
-
-    public ReminderRepository(IConfiguration configuration)
+    public ReminderRepository(IConfiguration configuration) : base(configuration)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection")
-                            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
     }
     
     public Task<int> CreateAsync(Reminder reminder)
