@@ -8,6 +8,8 @@ public class ReminderController : ControllerBase
 {
 
     [HttpPost]
+    [ProducesResponseType(typeof(ReminderResponse),StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateReminder([FromBody] CreateReminderDto createReminderDto)
     {
         if (createReminderDto! is null)
@@ -16,7 +18,7 @@ public class ReminderController : ControllerBase
         }
         try
         {
-            return Ok();
+            return CreatedAtAction("Test", new {}); // TODO finish the response
         }
         catch (Exception e)
         {
