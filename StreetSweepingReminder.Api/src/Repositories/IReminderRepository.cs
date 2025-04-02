@@ -2,7 +2,7 @@ using StreetSweepingReminder.Api.Entities;
 
 namespace StreetSweepingReminder.Api.Repositories;
 
-public interface IReminderRepository
+public interface IReminderRepository : ICrudOperations<Reminder>
 {
-    Task<int> CreateReminder(Reminder reminder);
+    
 }
