@@ -7,7 +7,7 @@ internal class RepositoryBase
 {
     private readonly string _connectionString;
 
-    public RepositoryBase(IConfiguration configuration)
+    protected RepositoryBase(IConfiguration configuration)
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection")
                             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
