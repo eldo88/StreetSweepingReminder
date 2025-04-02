@@ -8,7 +8,7 @@ public class ReminderController : ControllerBase
 {
 
     [HttpPost]
-    [ProducesResponseType(typeof(ReminderResponse),StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ReminderResponseDto),StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateReminder([FromBody] CreateReminderDto createReminderDto)
     {
