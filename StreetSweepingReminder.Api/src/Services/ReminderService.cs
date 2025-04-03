@@ -1,4 +1,5 @@
 using FluentResults;
+using FluentValidation;
 using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Extensions;
@@ -11,11 +12,13 @@ public class ReminderService : IReminderService
 {
     private readonly ILogger<ReminderService> _logger;
     private readonly IReminderRepository _reminderRepository;
+    private readonly IValidator<ReminderResponseDto> _reminderResponseValidator;
 
-    public ReminderService(ILogger<ReminderService> logger, IReminderRepository reminderRepository)
+    public ReminderService(ILogger<ReminderService> logger, IReminderRepository reminderRepository, IValidator<ReminderResponseDto> reminderResponseValidator)
     {
         _logger = logger;
         _reminderRepository = reminderRepository;
+        _reminderResponseValidator = reminderResponseValidator;
     }
     
     public async Task<Result<int>> CreateReminderAsync(CreateReminderDto command)
@@ -40,8 +43,17 @@ public class ReminderService : IReminderService
         }
     }
 
-    public Task<Result<ReminderResponseDto>> GetReminderByIdAsync(int id)
+    public async Task<Result<ReminderResponseDto>> GetReminderByIdAsync(int id)
     {
+        // Wrap in try catch, get obj from db, convert to DTO and validate, could also validate entity
+        ReminderResponseDto dto = new ReminderResponseDto(1, "test", DateTime.Now, "Test", "205-218-4134", 1);
+        var validationResult = await _reminderResponseValidator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            return validationResult.ToFluentResult();
+        }
+        
         throw new NotImplementedException();
     }
 
