@@ -14,7 +14,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         const string sql =
             """
             INSERT INTO Reminders (UserId, Message, ScheduledDateTime, Status, PhoneNumber, StreetId) 
-                                VALUES (@UserId, @Message, @ScheduledDateTime, @Status, @PhoneNumber, @StreetId)
+            VALUES (@UserId, @Message, @ScheduledDateTime, @Status, @PhoneNumber, @StreetId)
             """;
 
         using var connection = CreateConnection();
