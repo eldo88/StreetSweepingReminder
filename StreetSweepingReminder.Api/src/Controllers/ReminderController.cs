@@ -20,7 +20,6 @@ public class ReminderController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateReminder([FromBody] CreateReminderDto createReminderDto)
     {
@@ -30,18 +29,14 @@ public class ReminderController : ControllerBase
             var newId = result.Value;
             return CreatedAtAction(nameof(GetReminder), newId);
         }
-
-        if (result.HasError<ValidationError>(out var validationErrors))
-        {
-            foreach (var error in validationErrors)
-            {
-                ModelState.AddModelError(string.Empty, error.Message);
-            }
-
-            return ValidationProblem(ModelState);
-        }
         
         _logger.LogError("Failed to create reminder. Command: {@Command}, Errors: {Errors}", createReminderDto, result.Errors);
+
+        if (result.HasError<ApplicationError>())
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred while saving the reminder.");
+        }
+        
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
     }
     
@@ -52,24 +47,30 @@ public class ReminderController : ControllerBase
     public async Task<IActionResult> GetReminder(int id)
     {
         var result = await _reminderService.GetReminderByIdAsync(id);
-
-        // Check the result and map to IActionResult
+        
         if (result.IsSuccess)
         {
-            return Ok(result.Value); // Return the ReminderDto
+            return Ok(result.Value);
         }
-
-        // Handle specific errors for correct status codes
+        
         if (result.HasError<NotFoundError>())
         {
             // Optionally log result.Errors.First().Message
-            return NotFound(); // 404
+            return NotFound();
         }
+        
+        if (result.HasError<ValidationError>(out var validationErrors))
+        {
+            foreach (var error in validationErrors)
+            {
+                ModelState.AddModelError(string.Empty, error.Message);
+            }
 
-        // Log unexpected errors
-        _logger.LogError("Failed to get reminder {ReminderId}. Errors: {Errors}", id, result.Errors);
-
-        // Default catch-all for other errors
+            return ValidationProblem(ModelState);
+        }
+        
+        _logger.LogError("Failed to get reminder {Id}. Errors: {Errors}", id, result.Errors);
+        
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
     }
 }
