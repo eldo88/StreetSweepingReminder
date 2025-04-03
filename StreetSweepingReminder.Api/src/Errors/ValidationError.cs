@@ -2,16 +2,16 @@ namespace StreetSweepingReminder.Api.Errors;
 
 public class ValidationError : ApplicationError
 {
-    public List<string> ValidationMessages { get; }
-
-    public ValidationError(string message) : base(message)
-    {
-        ValidationMessages = new List<string>() { message };
-    }
+    public string? PropertyName { get; }
     
-    public ValidationError(List<string> messages) : base("Validation failed.")
+    public ValidationError(string message, string? propertyName = null) : base(message)
     {
-        ValidationMessages = messages;
-        Metadata.Add("ValidationErrors", string.Join("; ", messages));
+        PropertyName = propertyName;
+        
+        Metadata.Add("ErrorType", "Validation");
+        if (!string.IsNullOrEmpty(propertyName))
+        {
+            Metadata.Add("PropertyName", propertyName);
+        }
     }
 }
