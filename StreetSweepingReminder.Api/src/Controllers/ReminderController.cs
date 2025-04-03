@@ -55,8 +55,7 @@ public class ReminderController : ControllerBase
         
         if (result.HasError<NotFoundError>())
         {
-            // Optionally log result.Errors.First().Message
-            return NotFound();
+            return NotFound("No reminder found.");
         }
         
         if (result.HasError<ValidationError>(out var validationErrors))
