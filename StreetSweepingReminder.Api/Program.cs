@@ -6,6 +6,7 @@ using StreetSweepingReminder.Api.Repositories;
 using StreetSweepingReminder.Api.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using StreetSweepingReminder.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<GlobalExceptionHandler>();
 
 app.UseHttpsRedirection();
 
