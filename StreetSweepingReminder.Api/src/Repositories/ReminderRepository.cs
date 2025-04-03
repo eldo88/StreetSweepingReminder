@@ -32,7 +32,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
             """;
 
         using var connection = CreateConnection();
-        var reminder = await connection.QuerySingleOrDefaultAsync<Reminder>(sql, new { id = id });
+        var reminder = await connection.QuerySingleOrDefaultAsync<Reminder>(sql, new { id });
         return reminder;
     }
 
