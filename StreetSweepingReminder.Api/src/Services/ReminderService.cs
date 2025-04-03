@@ -43,13 +43,27 @@ public class ReminderService : IReminderService
 
     public async Task<Result<ReminderResponseDto>> GetReminderByIdAsync(int id)
     {
-        // Wrap in try catch, get obj from db, convert to DTO and validate, could also validate entity
-        ReminderResponseDto dto = new ReminderResponseDto(1, "test", DateTime.Now, "Test", "205-218-4134", 1);
-        var validationResult = await _reminderResponseValidator.ValidateAsync(dto);
-
-        if (!validationResult.IsValid)
+        try
         {
-            return validationResult.ToFluentResult();
+            var reminder = await _reminderRepository.GetByIdAsync(id);
+            if (reminder is null)
+            {
+                return Result.Fail<ReminderResponseDto>(new NotFoundError("No reminder found."));
+            }
+
+            var dto = reminder.ToReminderResponseDto();
+            var validationResult = await _reminderResponseValidator.ValidateAsync(dto);
+
+            if (!validationResult.IsValid)
+            {
+                return validationResult.ToFluentResult();
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error retrieving reminder.");
+            return Result.Fail<ReminderResponseDto>(
+                new ApplicationError($"An unexpected error occurred while retrieving the reminder: {e.Message}"));
         }
         
         throw new NotImplementedException();
