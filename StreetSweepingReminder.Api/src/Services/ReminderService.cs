@@ -23,8 +23,6 @@ public class ReminderService : IReminderService
     
     public async Task<Result<int>> CreateReminderAsync(CreateReminderDto command)
     {
-        // TODO create validation
-
         var reminder = command.ToReminderEntity();
         reminder.Status = ReminderStatus.Pending;
 
