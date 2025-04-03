@@ -17,6 +17,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
 builder.Services.AddScoped<IReminderService, ReminderService>();
+builder.Services.AddScoped<IStreetRepository, StreetRepository>();
 
 // Fluent Validation
 builder.Services.AddFluentValidationAutoValidation();
