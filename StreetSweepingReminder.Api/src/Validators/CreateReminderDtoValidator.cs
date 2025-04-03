@@ -10,13 +10,13 @@ public class CreateReminderDtoValidator : AbstractValidator<CreateReminderDto>
     {
         RuleFor(x => x.Message)
             .NotEmpty()
-            .WithMessage(ValidationMessages.MessageError)
+            .WithMessage(ValidationMessages.MessageInvalid)
             .MaximumLength(200)
-            .WithMessage(ValidationMessages.MessageLengthError);
+            .WithMessage(ValidationMessages.MessageTooLong);
         
         RuleFor(x => x.ScheduledDateTimeUtc)
             .GreaterThan(DateTime.UtcNow)
-            .WithMessage(ValidationMessages.ScheduledDateTimeInvalidDate);
+            .WithMessage(ValidationMessages.ScheduledDateTimeInvalid);
         
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()

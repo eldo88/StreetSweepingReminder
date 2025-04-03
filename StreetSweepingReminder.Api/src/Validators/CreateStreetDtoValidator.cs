@@ -9,8 +9,8 @@ public class CreateStreetDtoValidator : AbstractValidator<CreateStreetDto>
     public CreateStreetDtoValidator()
     {
         RuleFor(x => x.StreetName)
-            .NotEmpty().WithMessage(ValidationMessages.StreetNameError)
-            .MaximumLength(50).WithMessage(ValidationMessages.StreetNameTooLongError);
+            .NotEmpty().WithMessage(ValidationMessages.StreetNameInvalid)
+            .MaximumLength(50).WithMessage(ValidationMessages.StreetNameTooLong);
         
         RuleFor(x => x.HouseNumber)
             .GreaterThan(0).WithMessage(ValidationMessages.HouseNumberInvalid)
