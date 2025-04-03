@@ -58,6 +58,8 @@ public class ReminderService : IReminderService
             {
                 return validationResult.ToFluentResult();
             }
+
+            return Result.Ok(dto);
         }
         catch (Exception e)
         {
@@ -65,8 +67,6 @@ public class ReminderService : IReminderService
             return Result.Fail<ReminderResponseDto>(
                 new ApplicationError($"An unexpected error occurred while retrieving the reminder: {e.Message}"));
         }
-        
-        throw new NotImplementedException();
     }
 
     public Task<Result<IEnumerable<ReminderResponseDto>>> GetUserRemindersAsync(string userId)
