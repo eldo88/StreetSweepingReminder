@@ -11,10 +11,11 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
     
     public async Task<int> CreateAsync(Reminder reminder)
     {
-        const string sql = """
-                           INSERT INTO Reminders (UserId, Message, ScheduledDateTime, Status, PhoneNumber, StreetId, ModifiedAt) 
-                                               VALUES (@UserId, @Message, @ScheduledDateTime, @Status, @PhoneNumber, @StreetId, @ModifiedAt)
-                           """;
+        const string sql =
+            """
+            INSERT INTO Reminders (UserId, Message, ScheduledDateTime, Status, PhoneNumber, StreetId, ModifiedAt) 
+                                VALUES (@UserId, @Message, @ScheduledDateTime, @Status, @PhoneNumber, @StreetId, @ModifiedAt)
+            """;
 
         using var connection = CreateConnection();
         var newId = await connection.ExecuteAsync(sql, reminder);
