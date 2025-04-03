@@ -5,7 +5,7 @@ namespace StreetSweepingReminder.Api.Repositories;
 
 internal class StreetRepository : RepositoryBase, IStreetRepository
 {
-    protected StreetRepository(IConfiguration configuration) : base(configuration)
+    public StreetRepository(IConfiguration configuration) : base(configuration)
     {
     }
 
