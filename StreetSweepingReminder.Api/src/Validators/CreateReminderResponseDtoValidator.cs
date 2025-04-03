@@ -12,11 +12,11 @@ public class CreateReminderResponseDtoValidator : AbstractValidator<ReminderResp
             .GreaterThan(0).WithMessage("Error getting Reminder ID.");
         
         RuleFor(x => x.Message)
-            .NotEmpty().WithMessage(ValidationMessages.MessageError)
-            .MaximumLength(200).WithMessage(ValidationMessages.MessageLengthError);
+            .NotEmpty().WithMessage(ValidationMessages.MessageInvalid)
+            .MaximumLength(200).WithMessage(ValidationMessages.MessageTooLong);
         
         RuleFor(x => x.ScheduledDateTimeUtc)
-            .GreaterThan(DateTime.UtcNow).WithMessage(ValidationMessages.ScheduledDateTimeInvalidDate);
+            .GreaterThan(DateTime.UtcNow).WithMessage(ValidationMessages.ScheduledDateTimeInvalid);
 
         RuleFor(x => x.Status)
             .NotEmpty().WithMessage("Error with Reminder status.");
