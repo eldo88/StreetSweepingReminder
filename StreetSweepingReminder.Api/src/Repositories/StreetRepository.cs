@@ -22,7 +22,7 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
         return newId;
     }
 
-    public Task<Street> GetByIdAsync(int id)
+    public Task<Street?> GetByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
