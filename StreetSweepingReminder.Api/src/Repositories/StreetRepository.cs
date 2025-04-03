@@ -22,9 +22,18 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
         return newId;
     }
 
-    public Task<Street?> GetByIdAsync(int id)
+    public async Task<Street?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            SELECT *
+            FROM Streets
+            WHERE ID = @id
+            """;
+
+        using var connection = CreateConnection();
+        var street = await connection.QuerySingleOrDefaultAsync(sql, new { id });
+        return street;
     }
 
     public Task<IEnumerable<Street>> GetAllAsync()
