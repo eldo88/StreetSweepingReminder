@@ -22,9 +22,18 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         return newId;
     }
 
-    public Task<Reminder> GetByIdAsync(int id)
+    public async Task<Reminder?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            SELECT *
+            FROM Reminders
+            WHERE ID = @id           
+            """;
+
+        using var connection = CreateConnection();
+        var reminder = await connection.QuerySingleOrDefaultAsync<Reminder>(sql, new { id = id });
+        return reminder;
     }
 
     public Task<IEnumerable<Reminder>> GetAllAsync()
