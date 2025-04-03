@@ -41,6 +41,9 @@ public class StreetController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(ReminderResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetStreet(int id)
     {
         var result = await _streetService.GetStreetByIdAsync(id);
