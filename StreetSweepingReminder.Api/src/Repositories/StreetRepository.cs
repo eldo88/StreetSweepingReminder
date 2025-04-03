@@ -1,4 +1,5 @@
 using StreetSweepingReminder.Api.Entities;
+using Dapper;
 
 namespace StreetSweepingReminder.Api.Repositories;
 
@@ -8,9 +9,17 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
     {
     }
 
-    public Task<int> CreateAsync(Street obj)
+    public async Task<int> CreateAsync(Street street)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            INSERT INTO Streets (UserId, StreetName) 
+            VALUES (@UserId, @StreetName)
+            """;
+
+        using var connection = CreateConnection();
+        var newId = await connection.ExecuteAsync(sql, street);
+        return newId;
     }
 
     public Task<Street> GetByIdAsync(int id)
