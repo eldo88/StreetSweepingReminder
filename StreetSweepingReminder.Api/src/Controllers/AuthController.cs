@@ -53,7 +53,7 @@ public class AuthController : ControllerBase
         }
 
         var token = GenerateJwtToken(user);
-        return Ok(new AuthResponseDto(token, user.UserName, user.Email));
+        return Ok(new AuthResponseDto(token, user.UserName, user.Email, user.Id));
     }
 
     [HttpPost("login")]
@@ -65,9 +65,11 @@ public class AuthController : ControllerBase
         if (user is not null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
         {
             var token = GenerateJwtToken(user);
-            return Ok(new AuthResponseDto(token, 
+            return Ok(new AuthResponseDto(
+                token, 
                 user.UserName ?? throw new InvalidOperationException("Error looking up username."), 
-                user.Email ?? throw new InvalidOperationException("Error looking up email.")));
+                user.Email ?? throw new InvalidOperationException("Error looking up email."),
+                user.Id ?? throw new InvalidOperationException("Error looking up user ID.")));
         }
 
         return BadRequest("Invalid username or password.");
