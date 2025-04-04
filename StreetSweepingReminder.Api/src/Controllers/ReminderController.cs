@@ -1,3 +1,6 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Errors;
@@ -7,6 +10,7 @@ namespace StreetSweepingReminder.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class ReminderController : ControllerBase
 {
     private readonly ILogger<ReminderController> _logger;
@@ -23,11 +27,12 @@ public class ReminderController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateReminder([FromBody] CreateReminderDto createReminderDto)
     {
-        var result = await _reminderService.CreateReminderAsync(createReminderDto);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var result = await _reminderService.CreateReminderAsync(createReminderDto, userId);
         if (result.IsSuccess)
         {
             var newId = result.Value;
-            return CreatedAtAction(nameof(GetReminder), newId);
+            return CreatedAtAction(nameof(GetReminder), new { id = newId }, newId);
         }
         
         _logger.LogError("Failed to create reminder. Command: {@Command}, Errors: {Errors}", createReminderDto, result.Errors);

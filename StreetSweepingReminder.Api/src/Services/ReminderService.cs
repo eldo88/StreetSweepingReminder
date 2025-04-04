@@ -21,9 +21,10 @@ public class ReminderService : IReminderService
         _reminderResponseValidator = reminderResponseValidator;
     }
     
-    public async Task<Result<int>> CreateReminderAsync(CreateReminderDto command)
+    public async Task<Result<int>> CreateReminderAsync(CreateReminderDto command, string userId)
     {
         var reminder = command.ToReminderEntity();
+        reminder.UserId = userId;
         reminder.Status = ReminderStatus.Pending;
 
         try
