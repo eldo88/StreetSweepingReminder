@@ -14,11 +14,12 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         const string sql =
             """
             INSERT INTO Reminders (UserId, Message, ScheduledDateTime, Status, PhoneNumber, StreetId) 
-            VALUES (@UserId, @Message, @ScheduledDateTime, @Status, @PhoneNumber, @StreetId)
+            VALUES (@UserId, @Message, @ScheduledDateTimeUtc, @Status, @PhoneNumber, @StreetId);
+            SELECT last_insert_rowid();
             """;
 
         using var connection = CreateConnection();
-        var newId = await connection.ExecuteAsync(sql, reminder);
+        var newId = await connection.ExecuteScalarAsync<int>(sql, reminder);
         return newId;
     }
 
