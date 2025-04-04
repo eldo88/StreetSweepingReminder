@@ -23,7 +23,6 @@ public class StreetService : IStreetService
     public async Task<Result<int>> CreateStreetAsync(CreateStreetDto command, string userId)
     {
         var street = command.ToStreetEntity();
-        street.UserId = userId;
         try
         {
             var newId = await _streetRepository.CreateAsync(street);
