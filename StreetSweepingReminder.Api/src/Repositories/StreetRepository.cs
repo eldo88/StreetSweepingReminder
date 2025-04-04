@@ -36,19 +36,5 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
         var street = await connection.QuerySingleOrDefaultAsync(sql, new { id });
         return street;
     }
-
-    public Task<IEnumerable<Street>> GetAllAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> UpdateAsync(Street obj)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> DeleteAsync(int id)
-    {
-        throw new NotImplementedException();
-    }
+    
 }
