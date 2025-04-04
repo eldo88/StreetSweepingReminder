@@ -39,10 +39,8 @@ public static class DtoExtensions
         return new Street()
         {
             Id = 0,
-            UserId = string.Empty,
             StreetName = source.StreetName,
-            HouseNumber = source.HouseNumber,
-            CreatedAt = DateTime.Now
+            ZipCode = source.ZipCode
         };
     }
 
@@ -51,6 +49,6 @@ public static class DtoExtensions
         return new StreetResponseDto(
             source.Id, 
             source.StreetName, 
-            source.HouseNumber);
+            source.ZipCode);
     }
 }

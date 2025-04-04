@@ -1,3 +1,3 @@
 namespace StreetSweepingReminder.Api.DTOs;
 
-public record CreateStreetDto(string StreetName, int? HouseNumber);
+public record CreateStreetDto(string StreetName, int ZipCode);
