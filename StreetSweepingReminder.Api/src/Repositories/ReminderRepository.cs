@@ -37,7 +37,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         return reminder;
     }
 
-    public Task<IEnumerable<Reminder>> GetAllAsync()
+    public Task<IEnumerable<Reminder>> GetAllAsync(string userId)
     {
         throw new NotImplementedException();
     }
