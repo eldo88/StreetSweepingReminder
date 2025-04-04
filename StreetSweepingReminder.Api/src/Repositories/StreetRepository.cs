@@ -14,11 +14,12 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
         const string sql =
             """
             INSERT INTO Streets (UserId, StreetName) 
-            VALUES (@UserId, @StreetName)
+            VALUES (@UserId, @StreetName);
+            SELECT last_insert_rowid();
             """;
 
         using var connection = CreateConnection();
-        var newId = await connection.ExecuteAsync(sql, street);
+        var newId = await connection.ExecuteScalarAsync<int>(sql, street);
         return newId;
     }
 
