@@ -1,3 +1,6 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Errors;
@@ -7,6 +10,7 @@ namespace StreetSweepingReminder.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class StreetController : ControllerBase
 {
     private readonly ILogger<StreetController> _logger;
@@ -23,7 +27,8 @@ public class StreetController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateStreet([FromBody] CreateStreetDto createStreetDto)
     {
-        var result = await _streetService.CreateStreetAsync(createStreetDto);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var result = await _streetService.CreateStreetAsync(createStreetDto, userId);
         if (result.IsSuccess)
         {
             var newId = result.Value;
