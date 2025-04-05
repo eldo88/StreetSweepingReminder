@@ -59,7 +59,6 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
             SET Message = @Message, ScheduledDateTime = @ScheduledDateTimeUtc, Status = @Status, 
                 PhoneNumber = @PhoneNumber, StreetId = @StreetId, ModifiedAt = @ModifiedAt
             WHERE ID = @Id
-
             """;
 
         using var connection = CreateConnection();
