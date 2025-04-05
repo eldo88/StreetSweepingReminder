@@ -37,9 +37,18 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         return reminder;
     }
 
-    public Task<IEnumerable<Reminder>> GetAllAsync(string userId)
+    public async Task<IEnumerable<Reminder>> GetAllAsync(string userId)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            SELECT * 
+            FROM Reminders
+            WHERE UserId = @userId
+            """;
+
+        using var connection = CreateConnection();
+        var reminders = await connection.QueryAsync<Reminder>(sql, userId);
+        return reminders;
     }
 
     public async Task<bool> UpdateAsync(Reminder reminder)
