@@ -42,9 +42,20 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         throw new NotImplementedException();
     }
 
-    public Task<bool> UpdateAsync(Reminder obj)
+    public async Task<bool> UpdateAsync(Reminder reminder)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            UPDATE Reminders
+            SET Message = @Message, ScheduledDateTime = @ScheduledDateTimeUtc, Status = @Status, 
+                PhoneNumber = @PhoneNumber, StreetId = @StreetId, ModifiedAt = @ModifiedAt
+            WHERE ID = @Id
+
+            """;
+
+        using var connection = CreateConnection();
+        var recordsUpdate = await connection.ExecuteAsync(sql, reminder);
+        return recordsUpdate == 1;
     }
 
     public Task<bool> DeleteAsync(int id)
