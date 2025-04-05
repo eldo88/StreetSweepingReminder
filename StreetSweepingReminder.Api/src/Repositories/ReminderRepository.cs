@@ -67,8 +67,17 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         return recordsUpdate == 1;
     }
 
-    public Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            DELETE 
+            FROM Reminders
+            WHERE ID = @id
+            """;
+
+        using var connection = CreateConnection();
+        var result = await connection.ExecuteAsync(sql, id);
+        return result == 1;
     }
 }
