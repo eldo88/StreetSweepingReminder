@@ -31,6 +31,31 @@ public static class DtoExtensions
             source.PhoneNumber,
             source.StreetId);
     }
+
+    public static Reminder ToReminderEntity(this UpdateReminderDto source)
+    {
+        return new Reminder()
+        {
+            Id = source.Id,
+            Message = source.Message,
+            ScheduledDateTimeUtc = source.ScheduledDateTimeUtc,
+            Status = source.Status,
+            PhoneNumber = source.PhoneNumber,
+            StreetId = source.StreetId
+        };
+    }
+
+    public static UpdateReminderDto ToUpdateReminderDto(this Reminder source)
+    {
+        return new UpdateReminderDto(
+            source.Id,
+            source.Message,
+            source.ScheduledDateTimeUtc,
+            source.Status,
+            source.PhoneNumber,
+            source.StreetId,
+            source.ModifiedAt);
+    }
     
     /* Street Entity to DTO Mappings */
 
