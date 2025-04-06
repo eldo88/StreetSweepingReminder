@@ -294,4 +294,74 @@ public class ReminderRepositoryIntegrationTests
         Assert.That(fromDb, Is.Empty);
         Assert.That(fromDb, Has.Count.EqualTo(0));
     }
+
+    [Test]
+    public async Task UpdateAsync_WhenUpdatedReminderIsProvided_ShouldUpdateTheCorrectRecord()
+    {
+        // Arrange
+        var repository = new ReminderRepository(_configuration); 
+
+        var initialReminder = new Reminder
+        {
+            UserId = "test-user-update-123",
+            Message = "Original Message",
+            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
+            Status = ReminderStatus.Scheduled,
+            PhoneNumber = "+1987654321",
+            StreetId = 202
+        };
+        var newId = await repository.CreateAsync(initialReminder);
+        Assert.That(newId, Is.GreaterThan(0), "Setup failed: Could not create initial reminder.");
+        
+        var reminderBeforeUpdate = await repository.GetByIdAsync(newId);
+        Assert.That(reminderBeforeUpdate, Is.Not.Null, "Setup failed: Could not retrieve created reminder.");
+        
+        // Arrange >> Phase 2
+        var reminderWithUpdates = new Reminder
+        {
+            Id = newId, // set to newly created ID so same object is updated
+            UserId = reminderBeforeUpdate.UserId,
+            ScheduledDateTimeUtc = reminderBeforeUpdate.ScheduledDateTimeUtc,
+            PhoneNumber = reminderBeforeUpdate.PhoneNumber,
+            StreetId = reminderBeforeUpdate.StreetId,
+            CreatedAt = reminderBeforeUpdate.CreatedAt,
+
+            // Updates
+            Message = "Updated Message Successfully", 
+            Status = ReminderStatus.Scheduled,
+            ModifiedAt = DateTime.UtcNow.Truncate(TimeSpan.FromSeconds(1))
+        };
+        
+        // Act
+        var updateResult = await repository.UpdateAsync(reminderWithUpdates);
+
+        // Assert
+        Assert.That(updateResult, Is.True, "UpdateAsync should return true for a successful update.");
+        
+        var actualUpdatedReminder = await repository.GetByIdAsync(newId);
+        Assert.That(actualUpdatedReminder, Is.Not.Null, "Reminder should still exist after update.");
+        
+        Assert.Multiple(() =>
+        {
+        
+            Assert.That(actualUpdatedReminder.Message, Is.EqualTo(reminderWithUpdates.Message), "Message should be updated.");
+            Assert.That(actualUpdatedReminder.Status, Is.EqualTo(reminderWithUpdates.Status), "Status should be updated.");
+            
+            Assert.That(actualUpdatedReminder.UserId, Is.EqualTo(reminderWithUpdates.UserId), "UserId should not change.");
+            Assert.That(actualUpdatedReminder.PhoneNumber, Is.EqualTo(reminderWithUpdates.PhoneNumber), "PhoneNumber should not change.");
+            
+            var expectedModifiedAt = reminderWithUpdates.ModifiedAt.Value.Truncate(TimeSpan.FromMilliseconds(1));
+            if (actualUpdatedReminder.ModifiedAt != null)
+            {
+                var actualModifiedAt = actualUpdatedReminder.ModifiedAt.Value.Truncate(TimeSpan.FromMilliseconds(1));
+                Assert.That(actualModifiedAt, Is.EqualTo(expectedModifiedAt), "ModifiedAt should match the value passed in the update (truncated).");
+            }
+
+            var expectedCreatedAt = reminderBeforeUpdate.CreatedAt.Truncate(TimeSpan.FromMilliseconds(1));
+            var actualCreatedAt = actualUpdatedReminder.CreatedAt.Truncate(TimeSpan.FromMilliseconds(1));
+            Assert.That(actualCreatedAt, Is.EqualTo(expectedCreatedAt), "CreatedAt should not change during update.");
+            
+            Assert.That(actualUpdatedReminder.Id, Is.EqualTo(newId), "ID should remain the same.");
+        });
+    }
 }
