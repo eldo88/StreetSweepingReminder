@@ -132,4 +132,42 @@ public class ReminderRepositoryIntegrationTests
             Assert.That(ex.SqliteErrorCode, Is.EqualTo(19)); // SQLITE_CONSTRAINT error code is often 19
         });
     }
+
+    [Test]
+    public async Task GetByIdAsync_WhenValidIdIsProvided_ShouldReturnValidReminder()
+    {
+        // Arrange
+        var repository = new ReminderRepository(_configuration);
+
+        var reminderToCreate = new Reminder
+        {
+            UserId = "test-user-123",
+            Message = "Test sweeping reminder",
+            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+            Status = ReminderStatus.Scheduled, 
+            PhoneNumber = "+1234567890",
+            StreetId = 101
+        };
+        
+        var newId = await repository.CreateAsync(reminderToCreate);
+        
+        // Act
+        var reminderFromDb = await repository.GetByIdAsync(newId);
+        
+        // Assert
+        Assert.That(reminderFromDb, Is.Not.Null);
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(reminderToCreate.UserId, Is.EqualTo(reminderFromDb.UserId));
+            Assert.That(reminderToCreate.Message, Is.EqualTo(reminderFromDb.Message));
+            // truncate dates due to precision difference between .net and sqlite
+            var expectedDate = reminderToCreate.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
+            var actualDate = reminderFromDb.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
+            Assert.That(actualDate, Is.EqualTo(expectedDate), "ScheduledDateTimeUtc mismatch after truncating to milliseconds.");
+            Assert.That(reminderToCreate.Status, Is.EqualTo(reminderFromDb.Status));
+            Assert.That(reminderToCreate.PhoneNumber, Is.EqualTo(reminderFromDb.PhoneNumber));
+            Assert.That(reminderToCreate.StreetId, Is.EqualTo(reminderFromDb.StreetId));
+        });
+    }
 }
