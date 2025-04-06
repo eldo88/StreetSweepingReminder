@@ -13,7 +13,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
     {
         const string sql =
             """
-            INSERT INTO Reminders (UserId, Message, ScheduledDateTime, Status, PhoneNumber, StreetId) 
+            INSERT INTO Reminders (UserId, Message, ScheduledDateTimeUtc, Status, PhoneNumber, StreetId) 
             VALUES (@UserId, @Message, @ScheduledDateTimeUtc, @Status, @PhoneNumber, @StreetId);
             SELECT last_insert_rowid();
             """;
@@ -56,7 +56,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         const string sql =
             """
             UPDATE Reminders
-            SET Message = @Message, ScheduledDateTime = @ScheduledDateTimeUtc, Status = @Status, 
+            SET Message = @Message, ScheduledDateTimeUtc = @ScheduledDateTimeUtc, Status = @Status, 
             PhoneNumber = @PhoneNumber, StreetId = @StreetId, ModifiedAt = @ModifiedAt
             WHERE ID = @Id
             """;
