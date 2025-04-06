@@ -6,10 +6,10 @@ using StreetSweepingReminder.Api.Messages;
 using StreetSweepingReminder.Api.Repositories;
 using StreetSweepingReminder.Api.Tests.Helpers;
 
-namespace StreetSweepingReminder.Api.Tests.RepositoryTests.ReminderRepositoryIntegrationTests;
+namespace StreetSweepingReminder.Api.Tests.RepositoryTests;
 
 [TestFixture]
-public class CreateAsyncTests
+public class ReminderRepositoryIntegrationTests
 {
     private static readonly string DbIdentifier = $"file:memdb-{Guid.NewGuid()}?mode=memory&cache=shared";
     private readonly string _connectionString = $"DataSource={DbIdentifier}";
@@ -111,5 +111,32 @@ public class CreateAsyncTests
             Console.WriteLine(e);
             throw;
         }
+    }
+    
+    [Test]
+    public void CreateAsync_WhenUserIdIsNull_ShouldThrowSqliteException()
+    {
+        // Arrange
+        var repository = new ReminderRepository(_configuration);
+        var reminderWithNullUser = new Reminder
+        {
+            UserId = null,
+            Message = "Test message",
+            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+            Status = ReminderStatus.Scheduled,
+            PhoneNumber = "123456789",
+            StreetId = 1
+        };
+
+        // Act & Assert
+        var ex = Assert.ThrowsAsync<SqliteException>(
+            async () => await repository.CreateAsync(reminderWithNullUser));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ex.Message, Does.Contain("NOT NULL constraint failed").IgnoreCase.And.Contain("Reminders.UserId"),
+                "Exception message should indicate the specific NOT NULL constraint failure.");
+            Assert.That(ex.SqliteErrorCode, Is.EqualTo(19)); // SQLITE_CONSTRAINT error code is often 19
+        });
     }
 }
