@@ -17,18 +17,20 @@ public class ReminderRepositoryIntegrationTests
     private SqliteConnection _connection;
     
     // --- Table Schema ---
-    private const string CreateTableSql = @"
-            CREATE TABLE Reminders (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            UserId TEXT NOT NULL,
-            Message TEXT NOT NULL,
-            ScheduledDateTimeUtc TEXT NOT NULL,
-            Status TEXT NOT NULL,
-            PhoneNumber TEXT NOT NULL,
-            StreetId INTEGER NOT NULL,
-            CreatedAt TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ', 'now')),
-            ModifiedAt TEXT
-            );";
+    private const string CreateTableSql = 
+        """
+        CREATE TABLE Reminders (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        UserId TEXT NOT NULL,
+        Message TEXT NOT NULL,
+        ScheduledDateTimeUtc TEXT NOT NULL,
+        Status TEXT NOT NULL,
+        PhoneNumber TEXT NOT NULL,
+        StreetId INTEGER NOT NULL,
+        CreatedAt TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ', 'now')),
+        ModifiedAt TEXT
+        );
+        """;
     
     
     [OneTimeSetUp]
