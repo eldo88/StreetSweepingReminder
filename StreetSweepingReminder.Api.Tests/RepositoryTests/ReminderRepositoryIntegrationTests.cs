@@ -16,7 +16,7 @@ public class ReminderRepositoryIntegrationTests
     private IConfiguration _configuration;
     private SqliteConnection _connection;
     
-    // --- Database Schema ---
+    // --- Table Schema ---
     private const string CreateTableSql = @"
             CREATE TABLE Reminders (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,52 +65,45 @@ public class ReminderRepositoryIntegrationTests
     [Test]
     public async Task CreateAsync_WhenValidReminderProvided_ShouldInsertRecordAndReturnNewId()
     {
-        try
-        {
-            // Arrange
-           var repository = new ReminderRepository(_configuration);
-
-            var reminderToCreate = new Reminder
-            {
-                UserId = "test-user-123",
-                Message = "Test sweeping reminder",
-                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
-                Status = ReminderStatus.Scheduled, 
-                PhoneNumber = "+1234567890",
-                StreetId = 101
-            };
         
-            // Act
-            var newId = await repository.CreateAsync(reminderToCreate);
+        // Arrange
+        var repository = new ReminderRepository(_configuration);
 
-            // Assert
-            Assert.That(newId, Is.GreaterThan(0), "CreateAsync should return a positive ID.");
-        
-            const string selectSql = "SELECT * FROM Reminders WHERE ID = @id";
-            var insertedReminder = await _connection.QuerySingleOrDefaultAsync<Reminder>(selectSql, new { id = newId });
-
-            Assert.That(insertedReminder, Is.Not.Null, "Inserted reminder should be found in the database.");
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(insertedReminder.UserId, Is.EqualTo(reminderToCreate.UserId));
-                Assert.That(insertedReminder.Message, Is.EqualTo(reminderToCreate.Message));
-                // truncate dates due to precision difference between .net and sqlite
-                var expectedDate = reminderToCreate.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
-                var actualDate = insertedReminder.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
-                Assert.That(actualDate, Is.EqualTo(expectedDate), "ScheduledDateTimeUtc mismatch after truncating to milliseconds.");
-                Assert.That(insertedReminder.Status, Is.EqualTo(reminderToCreate.Status));
-                Assert.That(insertedReminder.PhoneNumber, Is.EqualTo(reminderToCreate.PhoneNumber));
-                Assert.That(insertedReminder.StreetId, Is.EqualTo(reminderToCreate.StreetId));
-                Assert.That(insertedReminder.CreatedAt, Is.Not.EqualTo(default(DateTime)));
-                Assert.That(insertedReminder.ModifiedAt, Is.Not.EqualTo(default(DateTime)));
-            });
-        }
-        catch (Exception e)
+        var reminderToCreate = new Reminder
         {
-            Console.WriteLine(e);
-            throw;
-        }
+            UserId = "test-user-123",
+            Message = "Test sweeping reminder",
+            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+            Status = ReminderStatus.Scheduled, 
+            PhoneNumber = "+1234567890",
+            StreetId = 101
+        };
+        
+        // Act
+        var newId = await repository.CreateAsync(reminderToCreate);
+
+        // Assert
+        Assert.That(newId, Is.GreaterThan(0), "CreateAsync should return a positive ID.");
+        
+        const string selectSql = "SELECT * FROM Reminders WHERE ID = @id";
+        var insertedReminder = await _connection.QuerySingleOrDefaultAsync<Reminder>(selectSql, new { id = newId });
+
+        Assert.That(insertedReminder, Is.Not.Null, "Inserted reminder should be found in the database.");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(insertedReminder.UserId, Is.EqualTo(reminderToCreate.UserId));
+            Assert.That(insertedReminder.Message, Is.EqualTo(reminderToCreate.Message));
+            // truncate dates due to precision difference between .net and sqlite
+            var expectedDate = reminderToCreate.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
+            var actualDate = insertedReminder.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
+            Assert.That(actualDate, Is.EqualTo(expectedDate), "ScheduledDateTimeUtc mismatch after truncating to milliseconds.");
+            Assert.That(insertedReminder.Status, Is.EqualTo(reminderToCreate.Status));
+            Assert.That(insertedReminder.PhoneNumber, Is.EqualTo(reminderToCreate.PhoneNumber));
+            Assert.That(insertedReminder.StreetId, Is.EqualTo(reminderToCreate.StreetId));
+            Assert.That(insertedReminder.CreatedAt, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(insertedReminder.ModifiedAt, Is.Not.EqualTo(default(DateTime)));
+        });
     }
     
     [Test]
