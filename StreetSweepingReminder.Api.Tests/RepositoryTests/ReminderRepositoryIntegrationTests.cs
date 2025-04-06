@@ -364,4 +364,28 @@ public class ReminderRepositoryIntegrationTests
             Assert.That(actualUpdatedReminder.Id, Is.EqualTo(newId), "ID should remain the same.");
         });
     }
+
+    [Test]
+    public async Task UpdateAsync_WhenInvalidIdIsProvided_ShouldReturnFalse()
+    {
+        // Arrange
+        var repository = new ReminderRepository(_configuration);
+
+        var invalidReminder = new Reminder()
+        {
+            Id = -2, //invalid id
+            UserId = "test-user-update-123",
+            Message = "Original Message",
+            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
+            Status = ReminderStatus.Scheduled,
+            PhoneNumber = "+1987654321",
+            StreetId = 202
+        };
+        
+        // Act
+        var result = await repository.UpdateAsync(invalidReminder);
+        
+        // Assert
+        Assert.That(result, Is.False);
+    }
 }
