@@ -388,4 +388,33 @@ public class ReminderRepositoryIntegrationTests
         // Assert
         Assert.That(result, Is.False);
     }
+
+    [Test]
+    public async Task DeleteAsync_WhenValidIdIsProvided_ShouldReturnTrue()
+    {
+        // Arrange
+        var repository = new ReminderRepository(_configuration);
+
+        var reminderToBeDeleted = new Reminder()
+        {
+            UserId = "test-user-update-123",
+            Message = "Original Message",
+            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
+            Status = ReminderStatus.Scheduled,
+            PhoneNumber = "+1987654321",
+            StreetId = 202
+        };
+
+        var newId = await repository.CreateAsync(reminderToBeDeleted);
+        Assert.That(newId, Is.GreaterThan(0), "Setup failed: Could not create initial reminder.");
+        
+        // Act
+        var result = await repository.DeleteAsync(newId);
+        
+        // Assert
+        Assert.That(result, Is.True);
+        
+        var shouldReturnNull = await repository.GetByIdAsync(newId);
+        Assert.That(shouldReturnNull, Is.Null);
+    }
 }
