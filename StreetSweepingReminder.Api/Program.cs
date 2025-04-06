@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using DbUp;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Middleware;
+
+[assembly: InternalsVisibleTo("StreetSweepingReminder.Api.Tests")]
 
 var builder = WebApplication.CreateBuilder(args);
 

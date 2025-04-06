@@ -29,4 +29,10 @@
     <EmbeddedResource Include="SqlScripts\*.sql" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>StreetSweepingReminder.Api.Tests</_Parameter1> <!-- Replace with your actual test project assembly name -->
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>
