@@ -184,4 +184,114 @@ public class ReminderRepositoryIntegrationTests
         // Assert
         Assert.That(reminderFromDb, Is.Null);
     }
+
+    [Test]
+    public async Task GetAllAsync_WhenValidUserIdIsProvided_ShouldReturnIEnumerableOfReminders()
+    {
+        // Arrange
+        var repository = new ReminderRepository(_configuration);
+
+        var remindersToCreate = new List<Reminder>()
+        {
+            new()
+            {
+                UserId = "test-user-123",
+                Message = "Test sweeping reminder",
+                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Status = ReminderStatus.Scheduled, 
+                PhoneNumber = "+1234567890",
+                StreetId = 101
+            },
+            new()
+            {
+                UserId = "test-user-123",
+                Message = "Test sweeping reminder, second entry",
+                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Status = ReminderStatus.Scheduled, 
+                PhoneNumber = "+1234567890",
+                StreetId = 101
+            },
+            new()
+            {
+                UserId = "test-user-123",
+                Message = "Test sweeping reminder, third entry",
+                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Status = ReminderStatus.Scheduled, 
+                PhoneNumber = "+1234567890",
+                StreetId = 101
+            }
+        };
+
+        foreach (var reminder in remindersToCreate)
+        {
+            await repository.CreateAsync(reminder);
+        }
+
+        const string validUserId = "test-user-123";
+        
+        // Act
+        var remindersFromDb = await repository.GetAllAsync(validUserId);
+        
+        // Assert
+        var fromDb = remindersFromDb.ToList();
+        Assert.That(fromDb, Is.Not.Null);
+        
+        Assert.That(fromDb, Is.Not.Empty);
+        Assert.That(fromDb, Has.Count.EqualTo(3));
+    }
+
+    [Test]
+    public async Task GetAllAsync_WhenInvalidUserIdIsProvided_ShouldReturnEmptyIEnumerableOfReminders()
+    {
+        // Arrange
+        var repository = new ReminderRepository(_configuration);
+
+        var remindersToCreate = new List<Reminder>()
+        {
+            new()
+            {
+                UserId = "test-user-123",
+                Message = "Test sweeping reminder",
+                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Status = ReminderStatus.Scheduled, 
+                PhoneNumber = "+1234567890",
+                StreetId = 101
+            },
+            new()
+            {
+                UserId = "test-user-123",
+                Message = "Test sweeping reminder, second entry",
+                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Status = ReminderStatus.Scheduled, 
+                PhoneNumber = "+1234567890",
+                StreetId = 101
+            },
+            new()
+            {
+                UserId = "test-user-123",
+                Message = "Test sweeping reminder, third entry",
+                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Status = ReminderStatus.Scheduled, 
+                PhoneNumber = "+1234567890",
+                StreetId = 101
+            }
+        };
+
+        foreach (var reminder in remindersToCreate)
+        {
+            await repository.CreateAsync(reminder);
+        }
+
+        const string validUserId = "test-user";
+        
+        // Act
+        var remindersFromDb = await repository.GetAllAsync(validUserId);
+        
+        // Assert
+        var fromDb = remindersFromDb.ToList();
+        Assert.That(fromDb, Is.Not.Null);
+        
+        Assert.That(fromDb, Is.Empty);
+        Assert.That(fromDb, Has.Count.EqualTo(0));
+    }
 }
