@@ -170,4 +170,18 @@ public class ReminderRepositoryIntegrationTests
             Assert.That(reminderToCreate.StreetId, Is.EqualTo(reminderFromDb.StreetId));
         });
     }
+
+    [Test]
+    public async Task GetByIdAsync_WhenInvalidIdIsProvided_ShouldReturnNullReminder()
+    {
+        // Arrange
+        var repository = new ReminderRepository(_configuration);
+        const int invalidId = 9999;
+        
+        // Act
+        var reminderFromDb = await repository.GetByIdAsync(invalidId);
+        
+        // Assert
+        Assert.That(reminderFromDb, Is.Null);
+    }
 }
