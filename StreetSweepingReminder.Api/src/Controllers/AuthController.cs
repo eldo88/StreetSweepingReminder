@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
                 user.Id ?? throw new InvalidOperationException("Error looking up user ID.")));
         }
 
-        return BadRequest("Invalid username or password.");
+        return BadRequest(new {ErrorMessage = "Invalid username or password."});
     }
     
     private string GenerateJwtToken(User user)
