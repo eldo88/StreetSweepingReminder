@@ -30,13 +30,13 @@ public class AuthController : ControllerBase
         var userName = await _userManager.FindByNameAsync(registerDto.Username);
         if (userName is not null)
         {
-            return BadRequest("Username already exists.");
+            return BadRequest(new AuthErrorDto("Username already exists."));
         }
 
         var email = await _userManager.FindByEmailAsync(registerDto.Email);
         if (email is not null)
         {
-            return BadRequest("Email already registered.");
+            return BadRequest(new AuthErrorDto("Email already registered."));
         }
         
         var user = new User()
@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
                 user.Id ?? throw new InvalidOperationException("Error looking up user ID.")));
         }
 
-        return BadRequest(new {ErrorMessage = "Invalid username or password."});
+        return BadRequest(new AuthErrorDto("Invalid username or password."));
     }
     
     private string GenerateJwtToken(User user)
