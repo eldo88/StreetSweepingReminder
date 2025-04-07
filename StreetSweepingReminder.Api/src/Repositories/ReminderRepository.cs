@@ -47,7 +47,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
             """;
 
         using var connection = CreateConnection();
-        var reminders = await connection.QueryAsync<Reminder>(sql, userId);
+        var reminders = await connection.QueryAsync<Reminder>(sql, new { userId });
         return reminders;
     }
 
@@ -76,7 +76,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
             """;
 
         using var connection = CreateConnection();
-        var recordsDeleted = await connection.ExecuteAsync(sql, id);
+        var recordsDeleted = await connection.ExecuteAsync(sql, new { id });
         return recordsDeleted == 1;
     }
 }
