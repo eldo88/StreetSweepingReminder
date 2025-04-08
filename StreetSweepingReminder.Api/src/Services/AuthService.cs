@@ -1,9 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using FluentResults;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Entities;
+using StreetSweepingReminder.Api.Errors;
+using StreetSweepingReminder.Api.Extensions;
 
 namespace StreetSweepingReminder.Api.Services;
 
@@ -11,11 +16,13 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly IConfiguration _configuration;
+    private readonly IValidator<AuthResponseDto> _authResponseValidator;
 
-    public AuthService(UserManager<User> userManager, IConfiguration configuration)
+    public AuthService(UserManager<User> userManager, IConfiguration configuration, IValidator<AuthResponseDto> authResponseValidator)
     {
         _userManager = userManager;
         _configuration = configuration;
+        _authResponseValidator = authResponseValidator;
     }
 
     public static int TokenExpirationInMinutes => 30;
@@ -38,6 +45,44 @@ public class AuthService : IAuthService
     public async Task<bool> CheckPasswordAsync(User user, string password)
     {
         return await _userManager.CheckPasswordAsync(user, password);
+    }
+
+    public async Task<Result<AuthResponseDto>> ValidateUserLogin(LoginDto loginDto)
+    {
+        var user = await _userManager.FindByNameAsync(loginDto.Username);
+        if (user is null)
+        {
+            return Result.Fail<AuthResponseDto>(new ValidationError($"No user found for {loginDto.Username}"));
+        }
+
+        if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
+        {
+            return Result.Fail<AuthResponseDto>(new ValidationError("Incorrect password"));
+        }
+
+        if (user.UserName is null || user.Email is null)
+        {
+            return Result.Fail<AuthResponseDto>(new ApplicationError("Username or email not found."));
+        }
+        
+        var token = GenerateJwtToken(user);
+        
+        var authResponseDto = new AuthResponseDto(
+            token,
+            user.UserName,
+            user.Email,
+            user.Id,
+            TokenExpirationInMinutes,
+            GetTokenExpirationTimeStamp());
+
+        var validatedResult = await _authResponseValidator.ValidateAsync(authResponseDto);
+
+        if (!validatedResult.IsValid)
+        {
+            return validatedResult.ToFluentResult();
+        }
+
+        return Result.Ok(authResponseDto);
     }
 
     public DateTime GetTokenExpirationTimeStamp()

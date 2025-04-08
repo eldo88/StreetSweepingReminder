@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Entities;
+using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Services;
 
 namespace StreetSweepingReminder.Api.Controllers;
@@ -59,15 +60,25 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login(LoginDto loginDto)
     {
-        var user = await _authService.FindByNameAsync(loginDto.Username);
-        if (user is not null && await _authService.CheckPasswordAsync(user, loginDto.Password))
+        var result = await _authService.ValidateUserLogin(loginDto);
+        if (result.IsSuccess)
         {
-            var token = _authService.GenerateJwtToken(user);
-            return Ok(new AuthResponseDto(
-                token, 
-                user.UserName?? throw new InvalidOperationException("Error looking up username."), 
-                user.Email ?? throw new InvalidOperationException("Error looking up email."),
-                user.Id ?? throw new InvalidOperationException("Error looking up user ID.")));
+            return Ok(result.Value);
+        }
+
+        if (result.HasError<ValidationError>(out var validationErrors))
+        {
+            foreach (var error in validationErrors)
+            {
+                ModelState.AddModelError(string.Empty, error.Message);
+            }
+
+            return ValidationProblem(ModelState);
+        }
+
+        if (result.HasError<ApplicationError>())
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
 
         return BadRequest(new AuthErrorDto("Invalid username or password."));
