@@ -25,14 +25,14 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(RegisterDto registerDto)
     {
-        var userName = await _authService.FindByNameAsync(registerDto.Username);
-        if (userName is not null)
+        var userByName = await _authService.FindByNameAsync(registerDto.Username);
+        if (userByName is not null)
         {
             return BadRequest(new AuthErrorDto("Username already exists."));
         }
 
-        var email = await _authService.FindByEmailAsync(registerDto.Email);
-        if (email is not null)
+        var userByEmail = await _authService.FindByEmailAsync(registerDto.Email);
+        if (userByEmail is not null)
         {
             return BadRequest(new AuthErrorDto("Email already registered."));
         }
