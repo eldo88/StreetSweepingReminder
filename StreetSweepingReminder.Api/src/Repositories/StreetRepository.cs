@@ -33,8 +33,21 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
             """;
 
         using var connection = CreateConnection();
-        var street = await connection.QuerySingleOrDefaultAsync(sql, new { id });
+        var street = await connection.QuerySingleOrDefaultAsync<Street>(sql, new { id });
         return street;
     }
     
+    public async Task<IEnumerable<Street>> GetByPartialStreetName(string partialStreetName)
+    {
+        const string sql =
+            """
+            SELECT *
+            FROM Streets
+            WHERE StreetName LIKE @partialStreetName
+            """;
+
+        using var connection = CreateConnection();
+        var street = await connection.QueryAsync<Street>(sql, partialStreetName);
+        return street;
+    }
 }
