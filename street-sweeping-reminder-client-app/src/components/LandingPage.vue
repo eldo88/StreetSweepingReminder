@@ -10,21 +10,34 @@ const login = () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-3">
-    <button
-      type="button"
-      @click="register"
-      class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
-    >
-      Register
-    </button>
+  <main class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div class="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md space-y-6 text-center">
+      <h1 class="text-3xl font-bold text-gray-900">Welcome to Street Sweeping Reminder</h1>
+      <p class="text-gray-500 text-sm">Never forget about a street sweeping day again</p>
 
-    <button
-      type="button"
-      @click="login"
-      class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
-    >
-      Login
-    </button>
-  </div>
+      <div class="space-y-3">
+        <button
+          @click="register"
+          class="w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-2 rounded-xl transition duration-150"
+        >
+          Register
+        </button>
+
+        <button
+          @click="login"
+          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition duration-150"
+        >
+          Login
+        </button>
+      </div>
+
+      <a
+        href="https://github.com/eldo88/StreetSweepingReminder"
+        target="_blank"
+        class="inline-block p-4 text-gray-500 hover:text-black transition duration-150"
+      >
+        <i class="fab fa-github text-2xl"></i>
+      </a>
+    </div>
+  </main>
 </template>
