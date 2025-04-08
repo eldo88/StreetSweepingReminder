@@ -1,34 +1,47 @@
 <script setup>
-import {registerUserAsync} from '@/services/authApi.js'
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import {useAuthStore} from "@/stores/auth.js";
+import router from "@/router/index.js";
 
 const username = ref('');
 const email = ref('');
 const password = ref('');
 
-const handleRegister = () => {
+const store = useAuthStore();
+  const handleRegister = async () => {
+    try {
+      await store.register({ username: username.value, email: email.value, password: password.value });
+      console.log('Registered and signed in!');
+      await router.push('/main')
+    } catch (error) {
+      console.error('Registration failed', error);
+      // Show error to user
+    }
+  };
 
-  registerUserAsync(username.value, email.value, password.value)
-    .then(response => {
-      console.log('Registration successful:', response);
-      // Add logic here for successful registration (e.g., redirect, show message)
-    })
-    .catch(error => {
-      console.error('Registration failed:', error);
-      // Add logic here for handling registration errors (e.g., show error message)
-    });
-}
+  const handleSignIn = () => {
+    store.login({username: username.value, password: password.value})
+      .then(async response => {
+        console.log('Sign-in successful', response)
+        await router.push('/main')
+      })
+      .catch(error => {
+        console.error('Login failed', error)
+      });
+  }
+
+  onMounted(() => {
+    store.initialize();
+  });
 </script>
 
 <template>
-
   <section class="bg-blue-50 py-10">
     <div class="container mx-auto max-w-md">
       <!-- Form Container -->
       <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
-        <!-- Optional: Add a title consistent with other sections -->
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
-          Create Account
+          Create Account or Sign In
         </h2>
 
         <form @submit.prevent="handleRegister">
@@ -77,17 +90,24 @@ const handleRegister = () => {
               placeholder="Enter your password"
               required
             />
-            <!-- Optional: Add password requirements info here -->
-            <!-- <p class="text-gray-600 text-xs italic">Must be at least 8 characters long.</p> -->
           </div>
 
-          <!-- Submit Button -->
-          <div class="flex items-center justify-between">
+          <!-- Button Group -->
+          <div class="flex flex-col gap-3">
             <button
-              type="submit"
+              type="button"
+              @click="handleRegister"
               class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
             >
               Register
+            </button>
+
+            <button
+              type="button"
+              @click="handleSignIn"
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+            >
+              Login
             </button>
           </div>
         </form>
@@ -95,6 +115,3 @@ const handleRegister = () => {
     </div>
   </section>
 </template>
-<style scoped>
-
-</style>

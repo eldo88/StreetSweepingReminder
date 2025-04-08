@@ -29,6 +29,7 @@ builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<IStreetRepository, StreetRepository>();
 builder.Services.AddScoped<IStreetService, StreetService>();
 builder.Services.AddScoped<IReminderScheduler, ReminderScheduler>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Fluent Validation
 builder.Services.AddFluentValidationAutoValidation();
