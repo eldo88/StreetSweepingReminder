@@ -25,26 +25,54 @@ public class AuthService : IAuthService
         _authResponseValidator = authResponseValidator;
     }
 
-    public static int TokenExpirationInMinutes => 30;
+    private static int TokenExpirationInMinutes => 30;
+    
 
-    public async Task<User?> FindByNameAsync(string username)
+    public async Task<Result<AuthResponseDto>> ValidateUserRegistration(RegisterDto registerDto)
     {
-        return await _userManager.FindByNameAsync(username);
-    }
+        var userByName = await _userManager.FindByNameAsync(registerDto.Username);
+        if (userByName is not null)
+        {
+            return Result.Fail<AuthResponseDto>(new ValidationError("Username already taken."));
+        }
 
-    public async Task<User?> FindByEmailAsync(string email)
-    {
-        return await _userManager.FindByEmailAsync(email);
-    }
+        var userByEmail = await _userManager.FindByEmailAsync(registerDto.Email);
+        if (userByEmail is not null)
+        {
+            return Result.Fail<AuthResponseDto>(new ValidationError("Email already registered."));
+        }
+        
+        var user = new User()
+        {
+            UserName = registerDto.Username,
+            Email = registerDto.Email,
+            SecurityStamp = Guid.NewGuid().ToString()
+        };
+        
+        var result = await _userManager.CreateAsync(user, registerDto.Password);
+        if (!result.Succeeded)
+        {
+            return Result.Fail<AuthResponseDto>(new ApplicationError("Error creating user's account."));
+        }
 
-    public async Task<IdentityResult> CreateAsync(User user, string password)
-    {
-        return await _userManager.CreateAsync(user, password);
-    }
+        var token = GenerateJwtToken(user);
+        
+        var authResponseDto = new AuthResponseDto(
+            token,
+            user.UserName,
+            user.Email,
+            user.Id,
+            TokenExpirationInMinutes,
+            GetTokenExpirationTimeStamp());
 
-    public async Task<bool> CheckPasswordAsync(User user, string password)
-    {
-        return await _userManager.CheckPasswordAsync(user, password);
+        var validatedResult = await _authResponseValidator.ValidateAsync(authResponseDto);
+
+        if (!validatedResult.IsValid)
+        {
+            return validatedResult.ToFluentResult();
+        }
+        
+        return Result.Ok(authResponseDto);
     }
 
     public async Task<Result<AuthResponseDto>> ValidateUserLogin(LoginDto loginDto)
@@ -141,7 +169,7 @@ public class AuthService : IAuthService
         return jwtAudience;
     }
     
-    private Claim[] GenerateClaims(User user)
+    private static Claim[] GenerateClaims(User user)
     {
         return
         [
@@ -154,7 +182,7 @@ public class AuthService : IAuthService
         ];
     }
 
-    private JwtSecurityToken GenerateJwtSecurityToken(string jwtIssuer, string jwtAudience, Claim[] claims, DateTime expires, SigningCredentials credentials)
+    private static JwtSecurityToken GenerateJwtSecurityToken(string jwtIssuer, string jwtAudience, Claim[] claims, DateTime expires, SigningCredentials credentials)
     {
         return new JwtSecurityToken(
             issuer: jwtIssuer,

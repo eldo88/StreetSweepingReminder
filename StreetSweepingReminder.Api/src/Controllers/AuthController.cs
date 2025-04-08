@@ -1,11 +1,5 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using StreetSweepingReminder.Api.DTOs;
-using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Services;
 
@@ -26,33 +20,28 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(RegisterDto registerDto)
     {
-        var userByName = await _authService.FindByNameAsync(registerDto.Username);
-        if (userByName is not null)
+        var result = await _authService.ValidateUserRegistration(registerDto);
+        if (result.IsSuccess)
         {
-            return BadRequest(new AuthErrorDto("Username already exists."));
+            return Ok(result.Value);
         }
 
-        var userByEmail = await _authService.FindByEmailAsync(registerDto.Email);
-        if (userByEmail is not null)
+        if (result.HasError<ValidationError>(out var validationErrors))
         {
-            return BadRequest(new AuthErrorDto("Email already registered."));
+            foreach (var error in validationErrors)
+            {
+                ModelState.AddModelError(string.Empty, error.Message);
+            }
+            
+            return ValidationProblem(ModelState);
+        }
+
+        if (result.HasError<ApplicationError>())
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Unexpected error creating user account.");
         }
         
-        var user = new User()
-        {
-            UserName = registerDto.Username,
-            Email = registerDto.Email,
-            SecurityStamp = Guid.NewGuid().ToString()
-        };
-
-        var result = await _authService.CreateAsync(user, registerDto.Password);
-        if (!result.Succeeded)
-        {
-            return BadRequest(new { result.Errors });
-        }
-
-        var token = _authService.GenerateJwtToken(user);
-        return Ok(new AuthResponseDto(token, user.UserName, user.Email, user.Id));
+        return BadRequest(new AuthErrorDto("Error creating user account."));
     }
 
     [HttpPost("login")]
