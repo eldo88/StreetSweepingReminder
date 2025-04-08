@@ -1,19 +1,31 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginOrRegisterView from "@/views/LoginOrRegisterView.vue";
-import MainView from "@/views/MainView.vue";
-import {useAuthStore} from "@/stores/auth.js";
+import RegisterPageView from '@/views/RegisterPageView.vue'
+import MainView from '@/views/MainView.vue'
+import { useAuthStore } from '@/stores/auth.js'
+import LoginPageView from '@/views/LoginPageView.vue'
+import LandingPageView from '@/views/LandingPageView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      redirect: '/login',
+      redirect: 'welcome',
+    },
+    {
+      path: '/welcome',
+      name: 'welcome',
+      component: LandingPageView,
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginOrRegisterView,
+      component: LoginPageView,
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterPageView,
     },
     {
       path: '/main',
@@ -25,10 +37,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  console.log('Navigating to:', to.path)
   const authStore = useAuthStore()
   const isLoggedIn = authStore.token !== null
 
-  if (/*to.meta.requiresAuth &&*/ !isLoggedIn) {
+  if (to.meta.requiresAuth && !isLoggedIn) {
     next('/login')
   } else {
     next()
