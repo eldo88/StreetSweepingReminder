@@ -6,7 +6,6 @@ import api from '@/services/api'
 
 export const useRemindersStore = defineStore('reminders', {
   state: () => ({
-    newReminder: Object,
     reminders: [],
   }),
 
