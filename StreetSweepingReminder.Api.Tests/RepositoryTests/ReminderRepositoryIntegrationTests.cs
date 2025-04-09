@@ -27,6 +27,7 @@ public class ReminderRepositoryIntegrationTests
             Status TEXT NOT NULL,
             PhoneNumber TEXT NOT NULL,
             StreetId INTEGER NOT NULL,
+            ScheduleId INTEGER NOT NULL,
             CreatedAt TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ', 'now')),
             ModifiedAt TEXT
         );
@@ -78,7 +79,8 @@ public class ReminderRepositoryIntegrationTests
             ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
             Status = ReminderStatus.Scheduled, 
             PhoneNumber = "+1234567890",
-            StreetId = 101
+            StreetId = 101,
+            ScheduleId = 1
         };
         
         // Act
@@ -103,6 +105,7 @@ public class ReminderRepositoryIntegrationTests
             Assert.That(insertedReminder.Status, Is.EqualTo(reminderToCreate.Status));
             Assert.That(insertedReminder.PhoneNumber, Is.EqualTo(reminderToCreate.PhoneNumber));
             Assert.That(insertedReminder.StreetId, Is.EqualTo(reminderToCreate.StreetId));
+            Assert.That(insertedReminder.ScheduleId, Is.EqualTo(reminderToCreate.ScheduleId));
             Assert.That(insertedReminder.CreatedAt, Is.Not.EqualTo(default(DateTime)));
             Assert.That(insertedReminder.ModifiedAt, Is.Not.EqualTo(default(DateTime)));
         });
@@ -120,7 +123,8 @@ public class ReminderRepositoryIntegrationTests
             ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "123456789",
-            StreetId = 1
+            StreetId = 1,
+            ScheduleId = 1
         };
 
         // Act & Assert
@@ -148,7 +152,8 @@ public class ReminderRepositoryIntegrationTests
             ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
             Status = ReminderStatus.Scheduled, 
             PhoneNumber = "+1234567890",
-            StreetId = 101
+            StreetId = 101,
+            ScheduleId = 1
         };
         
         var newId = await repository.CreateAsync(reminderToCreate);
@@ -170,6 +175,7 @@ public class ReminderRepositoryIntegrationTests
             Assert.That(reminderToCreate.Status, Is.EqualTo(reminderFromDb.Status));
             Assert.That(reminderToCreate.PhoneNumber, Is.EqualTo(reminderFromDb.PhoneNumber));
             Assert.That(reminderToCreate.StreetId, Is.EqualTo(reminderFromDb.StreetId));
+            Assert.That(reminderToCreate.ScheduleId, Is.EqualTo(reminderFromDb.ScheduleId));
         });
     }
 
@@ -202,7 +208,8 @@ public class ReminderRepositoryIntegrationTests
                 ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101
+                StreetId = 101,
+                ScheduleId = 1
             },
             new()
             {
@@ -211,7 +218,8 @@ public class ReminderRepositoryIntegrationTests
                 ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101
+                StreetId = 101,
+                ScheduleId = 1
             },
             new()
             {
@@ -220,7 +228,8 @@ public class ReminderRepositoryIntegrationTests
                 ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101
+                StreetId = 101,
+                ScheduleId = 1
             }
         };
 
@@ -257,7 +266,8 @@ public class ReminderRepositoryIntegrationTests
                 ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101
+                StreetId = 101,
+                ScheduleId = 1
             },
             new()
             {
@@ -266,7 +276,8 @@ public class ReminderRepositoryIntegrationTests
                 ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101
+                StreetId = 101,
+                ScheduleId = 1
             },
             new()
             {
@@ -275,7 +286,8 @@ public class ReminderRepositoryIntegrationTests
                 ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101
+                StreetId = 101,
+                ScheduleId = 1
             }
         };
 
@@ -310,7 +322,8 @@ public class ReminderRepositoryIntegrationTests
             ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "+1987654321",
-            StreetId = 202
+            StreetId = 202,
+            ScheduleId = 1
         };
         var newId = await repository.CreateAsync(initialReminder);
         Assert.That(newId, Is.GreaterThan(0), "Setup failed: Could not create initial reminder.");
@@ -326,6 +339,7 @@ public class ReminderRepositoryIntegrationTests
             ScheduledDateTimeUtc = reminderBeforeUpdate.ScheduledDateTimeUtc,
             PhoneNumber = reminderBeforeUpdate.PhoneNumber,
             StreetId = reminderBeforeUpdate.StreetId,
+            ScheduleId = reminderBeforeUpdate.ScheduleId,
             CreatedAt = reminderBeforeUpdate.CreatedAt,
 
             // Updates
@@ -381,7 +395,8 @@ public class ReminderRepositoryIntegrationTests
             ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "+1987654321",
-            StreetId = 202
+            StreetId = 202,
+            ScheduleId = 1
         };
         
         // Act
@@ -404,7 +419,8 @@ public class ReminderRepositoryIntegrationTests
             ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "+1987654321",
-            StreetId = 202
+            StreetId = 202,
+            ScheduleId = 1
         };
 
         var newId = await repository.CreateAsync(reminderToBeDeleted);
@@ -433,7 +449,8 @@ public class ReminderRepositoryIntegrationTests
             ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "+1987654321",
-            StreetId = 202
+            StreetId = 202,
+            ScheduleId = 1
         };
 
         var newId = await repository.CreateAsync(reminderThatShouldNotGetDeleted);
