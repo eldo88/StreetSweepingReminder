@@ -4,6 +4,7 @@ import MainView from '@/views/MainView.vue'
 import { useAuthStore } from '@/stores/auth.js'
 import LoginPageView from '@/views/LoginPageView.vue'
 import LandingPageView from '@/views/LandingPageView.vue'
+import ReminderPageView from '@/views/ReminderPageView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,12 @@ const router = createRouter({
       path: '/main',
       name: 'main',
       component: MainView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/reminders',
+      name: 'reminders',
+      component: ReminderPageView,
       meta: { requiresAuth: true },
     },
   ],
