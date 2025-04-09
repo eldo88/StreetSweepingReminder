@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     userIsLoggedIn: (state) => !!state.token,
-    getUser: (state) => state.user,
+    getUserId: (state) => state.userId,
   },
 
   actions: {
@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', {
         if (!response.ok) {
           throw new Error(data.message || 'Login failed')
         }
-
+        console.log(data)
         this.token = data.token
         this.username = data.username
         this.userId = data.userId
@@ -40,6 +40,8 @@ export const useAuthStore = defineStore('auth', {
         this.tokenExpirationInMinutes = data.tokenExpirationInMinutes
         this.tokenExpirationTimestamp = data.tokenExpirationTimestamp
         this.isLoggedIn = true
+
+        console.log('User id in auth store: ' + this.userId)
 
         localStorage.setItem('jwtToken', data.token)
       } catch (error) {
@@ -88,11 +90,7 @@ export const useAuthStore = defineStore('auth', {
         this.isLoggedIn = true
       }
     },
-
-    getUserId() {
-      if (this.userId) {
-        return this.userId
-      }
-    },
   },
+
+  persist: true,
 })
