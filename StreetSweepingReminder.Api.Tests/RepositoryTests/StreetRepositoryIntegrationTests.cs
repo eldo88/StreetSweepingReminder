@@ -82,4 +82,28 @@ public class StreetRepositoryIntegrationTests
         Assert.That(streetToCreate.StreetName, Is.EqualTo(insertedStreet.StreetName));
         Assert.That(streetToCreate.ZipCode, Is.EqualTo(insertedStreet.ZipCode));
     }
+
+    [Test]
+    public void CreateAsync_WhenStreetNameIsNull_ShouldThrowSqliteException()
+    {
+        // Arrange
+        var repository = new StreetRepository(_configuration);
+
+        var streetWithNullStreetName = new Street()
+        {
+            StreetName = null,
+            ZipCode = 35216
+        };
+        
+        // Act & Assert
+        var ex = Assert.ThrowsAsync<SqliteException>(
+            async () => await repository.CreateAsync(streetWithNullStreetName));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ex.Message, Does.Contain("NOT NULL constraint failed").IgnoreCase.And.Contain("Streets.StreetName"),
+                "Exception message should indicate the specific NOT NULL constraint failure.");
+            Assert.That(ex.SqliteErrorCode, Is.EqualTo(19)); // SQLITE_CONSTRAINT error code is 19
+        });
+    }
 }
