@@ -88,5 +88,11 @@ export const useAuthStore = defineStore('auth', {
         this.isLoggedIn = true
       }
     },
+
+    getUserId() {
+      if (this.userId) {
+        return this.userId
+      }
+    },
   },
 })
