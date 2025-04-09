@@ -3,9 +3,11 @@ import { defineStore } from 'pinia'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isLoggedIn: false,
-    username: null, // Optional: strongly type this
+    username: null,
     userId: null,
     email: null,
+    tokenExpirationInMinutes: null,
+    tokenExpirationTimestamp: null,
     token: localStorage.getItem('jwtToken') || null,
   }),
 
@@ -32,7 +34,11 @@ export const useAuthStore = defineStore('auth', {
         }
 
         this.token = data.token
-        this.user = data.user
+        this.username = data.username
+        this.userId = data.userId
+        this.email = data.email
+        this.tokenExpirationInMinutes = data.tokenExpirationInMinutes
+        this.tokenExpirationTimestamp = data.tokenExpirationTimestamp
         this.isLoggedIn = true
 
         localStorage.setItem('jwtToken', data.token)
