@@ -6,14 +6,30 @@ namespace StreetSweepingReminder.Api.Services;
 
 public class ReminderSchedulerService : IReminderScheduler
 {
+    private readonly ILogger<ReminderSchedulerService> _logger;
+
+    public ReminderSchedulerService(ILogger<ReminderSchedulerService> logger)
+    {
+        _logger = logger;
+    }
+
     public Task<Result> ScheduleNotificationJobAsync(int id, DateTime nextSweepTime)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command)
+    public async Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command)
     {
-        throw new NotImplementedException();
+        var interval = 2;
+        var startDateTime = command.ScheduledDateTimeUtc;
+
+        var reminderSchedule =  CalculateReminderSchedule(startDateTime, interval);
+
+        foreach (var reiminder in reminderSchedule)
+        {
+            _logger.Log(LogLevel.Debug, "Reminder: {r}", reiminder);
+        }
+        return Result.Ok();
     }
 
     private List<DateTime?> CalculateReminderSchedule(DateTime initialReminderDateTime, int interval)
@@ -31,7 +47,7 @@ public class ReminderSchedulerService : IReminderScheduler
             // Calc remaining for the year
             for (var i = month; i < 11; i++)
             {
-                var nextScheduledDate = initialReminderDateTime.AddMonths(i);
+                var nextScheduledDate = initialReminderDateTime.AddMonths(i); // bug here
                 var year = nextScheduledDate.Year;
                 var nextMonth = nextScheduledDate.Month;
                 var dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, nextMonth, dayOfWeek, interval);
