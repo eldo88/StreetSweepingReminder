@@ -8,8 +8,10 @@ CREATE TABLE IF NOT EXISTS main.Reminders (
     Status TEXT NOT NULL,
     PhoneNumber TEXT NOT NULL,
     StreetId INTEGER NOT NULL,
+    ScheduleId INTEGER NOT NULL, 
     CreatedAt TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ', 'now')),
     ModifiedAt TEXT,
     FOREIGN KEY (UserId) REFERENCES AspNetUsers (Id),
-    FOREIGN KEY (StreetId) REFERENCES Streets (Id)
+    FOREIGN KEY (StreetId) REFERENCES Streets (Id),
+    FOREIGN KEY (ScheduleId) REFERENCES ReminderSchedule (Id)
 )
