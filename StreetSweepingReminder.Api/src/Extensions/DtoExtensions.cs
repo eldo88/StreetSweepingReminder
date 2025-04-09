@@ -76,4 +76,23 @@ public static class DtoExtensions
             source.StreetName, 
             source.ZipCode);
     }
+    
+    /* CreateReminderDto to ReminderSchedule entity Mappings */
+
+    public static ReminderSchedule ToReminderScheduleEntity(this CreateReminderDto source, int reminderId)
+    {
+        return new ReminderSchedule()
+        {
+            Message = source.Message,
+            WeekOfMonth = source.WeekOfMonth,
+            StartMonth = source.ScheduledDateTimeUtc.Month,
+            ReminderDate = source.ScheduledDateTimeUtc,
+            DayOfWeek = source.ScheduledDateTimeUtc.DayOfWeek,
+            TimeOfDay = source.ScheduledDateTimeUtc.ToShortTimeString(),
+            TimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Denver").ToString(), // hard coded for now
+            EndMonth = 11, //hard coded for now
+            ReminderId = reminderId,
+            IsRecurring = source.IsRecurring
+        };
+    }
 }
