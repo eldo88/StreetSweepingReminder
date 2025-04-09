@@ -3,6 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS main.ReminderSchedule (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ReminderId INTEGER NOT NULL, 
     Message TEXT NOT NULL,
     DayOfWeek INTEGER NOT NULL,           -- 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     WeekOfMonth INTEGER NOT NULL,         -- 1 = First, 2 = Second, ..., -1 = Last
@@ -12,5 +13,6 @@ CREATE TABLE IF NOT EXISTS main.ReminderSchedule (
     TimeZone TEXT NOT NULL,               -- 'America/Denver'
     IsRecurring INTEGER,                  -- No boolean type in SQLite 
     CreatedAt TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ', 'now')),
-    ModifiedAt TEXT
+    ModifiedAt TEXT,
+    FOREIGN KEY (ReminderId) REFERENCES Reminders(id)
 );
