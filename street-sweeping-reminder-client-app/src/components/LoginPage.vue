@@ -1,38 +1,29 @@
 <script setup>
-import {onMounted, ref} from "vue";
-import {useAuthStore} from "@/stores/auth.js";
-import router from "@/router/index.js";
+import { onMounted, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth.js'
+import router from '@/router/index.js'
 
-const username = ref('');
-const email = ref('');
-const password = ref('');
+const username = ref('')
+const email = ref('')
+const password = ref('')
 
-const store = useAuthStore();
-  const handleRegister = async () => {
-    try {
-      await store.register({ username: username.value, email: email.value, password: password.value });
-      console.log('Registered and signed in!');
+const store = useAuthStore()
+
+const handleSignIn = () => {
+  store
+    .login({ username: username.value, password: password.value })
+    .then(async (response) => {
+      console.log('Sign-in successful', response)
       await router.push('/main')
-    } catch (error) {
-      console.error('Registration failed', error);
-      // Show error to user
-    }
-  };
+    })
+    .catch((error) => {
+      console.error('Login failed', error)
+    })
+}
 
-  const handleSignIn = () => {
-    store.login({username: username.value, password: password.value})
-      .then(async response => {
-        console.log('Sign-in successful', response)
-        await router.push('/main')
-      })
-      .catch(error => {
-        console.error('Login failed', error)
-      });
-  }
-
-  onMounted(() => {
-    store.initialize();
-  });
+onMounted(() => {
+  store.initialize()
+})
 </script>
 
 <template>
@@ -40,11 +31,9 @@ const store = useAuthStore();
     <div class="container mx-auto max-w-md">
       <!-- Form Container -->
       <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
-          Create Account or Sign In
-        </h2>
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Create Account or Sign In</h2>
 
-        <form @submit.prevent="handleRegister">
+        <form @submit.prevent="handleSignIn">
           <!-- Email Field -->
           <div class="mb-4">
             <label for="email" class="block text-gray-700 text-sm font-bold mb-2">
@@ -94,14 +83,6 @@ const store = useAuthStore();
 
           <!-- Button Group -->
           <div class="flex flex-col gap-3">
-            <button
-              type="button"
-              @click="handleRegister"
-              class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
-            >
-              Register
-            </button>
-
             <button
               type="button"
               @click="handleSignIn"
