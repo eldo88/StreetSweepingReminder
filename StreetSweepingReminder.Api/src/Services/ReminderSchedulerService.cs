@@ -38,22 +38,18 @@ public class ReminderSchedulerService : IReminderScheduler
         var dayOfWeek = initialReminderDateTime.DayOfWeek;
         var month = initialReminderDateTime.Month;
 
-        if (dayOfWeek != DayOfWeek.Saturday && dayOfWeek != DayOfWeek.Sunday && month is > 3 and < 11)
+        if (dayOfWeek is < DayOfWeek.Saturday and > DayOfWeek.Sunday && month is > 3 and < 12) // possible bug
         {   // set first days for reminder since that is provided by client
             scheduledDays.Add(initialReminderDateTime);
-            var nextDate = initialReminderDateTime.AddDays(interval);
-            scheduledDays.Add(nextDate);
             
             // Calc remaining for the year
-            DateTime? dateToAdd = nextDate;
+            DateTime? dateToAdd = initialReminderDateTime;
             for (var i = month; i < 11; i++)
             {
-                var increment = 1;
+                const int increment = 1;
                 if (dateToAdd is not null)
                 {
-                    var nextScheduledDate = dateToAdd.Value.AddMonths(increment);
-                    var year = nextScheduledDate.Year;
-                    var nextMonth = nextScheduledDate.Month;
+                    var (year, nextMonth, _) = dateToAdd.Value.AddMonths(increment); // need to extract time
                     dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, nextMonth, dayOfWeek, interval);
                 }
 
