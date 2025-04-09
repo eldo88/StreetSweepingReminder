@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
-    state: () => ({
-      isLoggedIn: false,
-      user: null, // Optional: strongly type this
-      token: localStorage.getItem('jwtToken') || null,
+  state: () => ({
+    isLoggedIn: false,
+    user: null, // Optional: strongly type this
+    token: localStorage.getItem('jwtToken') || null,
   }),
 
   getters: {
@@ -13,32 +13,32 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-      async login(credentials) {
-  try {
-    const response = await fetch('http://localhost:5010/api/Auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
+    async login(credentials) {
+      try {
+        const response = await fetch('http://localhost:5010/api/Auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(credentials),
+        })
 
-    const data = await response.json();
+        const data = await response.json()
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Login failed');
-    }
+        if (!response.ok) {
+          throw new Error(data.message || 'Login failed')
+        }
 
-    this.token = data.token;
-    this.user = data.user;
-    this.isLoggedIn = true;
+        this.token = data.token
+        this.user = data.user
+        this.isLoggedIn = true
 
-    localStorage.setItem('jwtToken', data.token);
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error; // Optionally re-throw to let the component handle it
-  }
-},
+        localStorage.setItem('jwtToken', data.token)
+      } catch (error) {
+        console.error('Login error:', error)
+        throw error // Optionally re-throw to let the component handle it
+      }
+    },
 
     async register({ username, email, password }) {
       try {
@@ -48,38 +48,37 @@ export const useAuthStore = defineStore('auth', {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ username, email, password }),
-        });
+        })
 
-        const data = await response.json();
+        const data = await response.json()
 
         if (!response.ok) {
-          throw new Error(data.message || 'Registration failed');
+          throw new Error(data.message || 'Registration failed')
         }
 
-        console.log('Registration successful', data);
+        console.log('Registration successful', data)
 
         // Optionally: log them in immediately
-        await this.login({ username, password });
+        await this.login({ username, password })
       } catch (error) {
-        console.error('Registration error:', error);
-        throw error;
+        console.error('Registration error:', error)
+        throw error
       }
     },
 
+    logout() {
+      this.token = null
+      this.user = null
+      this.isLoggedIn = false
+      localStorage.removeItem('jwtToken')
+    },
 
-logout() {
-  this.token = null;
-  this.user = null;
-  this.isLoggedIn = false;
-  localStorage.removeItem('jwtToken');
-},
-
-initialize() {
-  const token = localStorage.getItem('jwtToken');
-  if (token) {
-    this.token = token;
-    this.isLoggedIn = true;
-  }
-},
-},
-});
+    initialize() {
+      const token = localStorage.getItem('jwtToken')
+      if (token) {
+        this.token = token
+        this.isLoggedIn = true
+      }
+    },
+  },
+})
