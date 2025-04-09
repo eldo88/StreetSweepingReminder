@@ -23,16 +23,16 @@ public class ReminderSchedulerService : IReminderScheduler
         var interval = 2;
         var startDateTime = command.ScheduledDateTimeUtc;
 
-        var reminderSchedule =  CalculateReminderSchedule(startDateTime, interval);
+        var reminderSchedule =  CalculateRecurringReminderSchedule(startDateTime, interval);
 
-        foreach (var reiminder in reminderSchedule)
+        foreach (var reminder in reminderSchedule)
         {
-            _logger.Log(LogLevel.Debug, "Reminder: {r}", reiminder);
+            _logger.Log(LogLevel.Debug, "Reminder: {r}", reminder);
         }
         return Result.Ok();
     }
 
-    private List<DateTime?> CalculateReminderSchedule(DateTime initialReminderDateTime, int interval)
+    private List<DateTime?> CalculateRecurringReminderSchedule(DateTime initialReminderDateTime, int interval)
     { //TODO add validation for parameters
         var scheduledDays = new List<DateTime?>();
         var dayOfWeek = initialReminderDateTime.DayOfWeek;
@@ -45,12 +45,18 @@ public class ReminderSchedulerService : IReminderScheduler
             scheduledDays.Add(nextDate);
             
             // Calc remaining for the year
+            DateTime? dateToAdd = nextDate;
             for (var i = month; i < 11; i++)
             {
-                var nextScheduledDate = initialReminderDateTime.AddMonths(i); // bug here
-                var year = nextScheduledDate.Year;
-                var nextMonth = nextScheduledDate.Month;
-                var dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, nextMonth, dayOfWeek, interval);
+                var increment = 1;
+                if (dateToAdd is not null)
+                {
+                    var nextScheduledDate = dateToAdd.Value.AddMonths(increment);
+                    var year = nextScheduledDate.Year;
+                    var nextMonth = nextScheduledDate.Month;
+                    dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, nextMonth, dayOfWeek, interval);
+                }
+
                 if (dateToAdd is not null)
                 {
                     scheduledDays.Add(dateToAdd);
