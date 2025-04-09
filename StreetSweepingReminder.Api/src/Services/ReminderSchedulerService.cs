@@ -18,7 +18,7 @@ public class ReminderSchedulerService : IReminderScheduler
         throw new NotImplementedException();
     }
 
-    public async Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command)
+    public async Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command, int reminderId)
     {
         var interval = 2;
         var startDateTime = command.ScheduledDateTimeUtc;

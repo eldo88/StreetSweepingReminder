@@ -37,23 +37,22 @@ public class ReminderService : IReminderService
             {
                 Result.Fail<int>(new ApplicationError("Failed to save reminder to the database."));
             }
-             // calculate scheduling logic
-             var scheduledTime = reminder.ScheduledDateTimeUtc;
-             var scheduleResult = await _reminderScheduler.ScheduleNotificationJobAsync(newId, scheduledTime);
-             if (scheduleResult.IsFailed)
-             {
-                 _logger.LogError("Failed to schedule reminder {ReminderId} after creation. Error: {Error}", 
-                     newId, scheduleResult.Errors.FirstOrDefault());
-                 reminder.Status = ReminderStatus.SchedulingFailed;
-                 await _reminderRepository.UpdateAsync(reminder);
+            
+            var scheduleResult = await _reminderScheduler.CreateReminderNotificationSchedule(command, newId);
+            if (scheduleResult.IsFailed)
+            {
+                _logger.LogError("Failed to schedule reminder {ReminderId} after creation. Error: {Error}", 
+                    newId, scheduleResult.Errors.FirstOrDefault());
+                reminder.Status = ReminderStatus.SchedulingFailed;
+                await _reminderRepository.UpdateAsync(reminder);
                  
-                 return Result.Fail<int>(new ApplicationError(
-                         $"Reminder created (ID: {newId}) but scheduling failed. Status set to failed.")
-                     .CausedBy(scheduleResult.Errors));
-             }
+                return Result.Fail<int>(new ApplicationError(
+                        $"Reminder created (ID: {newId}) but scheduling failed. Status set to failed.")
+                    .CausedBy(scheduleResult.Errors));
+            }
              
-             _logger.LogInformation("Reminder {ReminderId} created and scheduled successfully.", newId);
-             return Result.Ok(newId);
+            _logger.LogInformation("Reminder {ReminderId} created and scheduled successfully.", newId);
+            return Result.Ok(newId);
         }
         catch (Exception e)
         {
