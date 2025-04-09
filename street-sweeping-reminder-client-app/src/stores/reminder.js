@@ -9,6 +9,7 @@ const authStore = useAuthStore()
 export const useRemindersStore = defineStore('reminders', {
   state: () => ({
     userId: authStore.getUserId(),
+    reminders: [],
   }),
 
   actions: {
@@ -18,6 +19,9 @@ export const useRemindersStore = defineStore('reminders', {
           .get('Reminder')
           .then((response) => {
             console.log('Data: ', response.data)
+            if (response) {
+              this.reminders = response
+            }
           })
           .catch((error) => {
             console.error('Error: ', error)
