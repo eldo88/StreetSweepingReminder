@@ -57,7 +57,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
             """
             UPDATE Reminders
             SET Message = @Message, ScheduledDateTimeUtc = @ScheduledDateTimeUtc, Status = @Status, 
-            PhoneNumber = @PhoneNumber, StreetId = @StreetId, ModifiedAt = @ModifiedAt
+            PhoneNumber = @PhoneNumber, StreetId = @StreetId, ModifiedAt = @ModifiedAt, ScheduleId = @ScheduleId
             WHERE ID = @Id
             """;
 
