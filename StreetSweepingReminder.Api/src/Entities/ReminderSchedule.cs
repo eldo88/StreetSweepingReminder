@@ -13,6 +13,6 @@ public class ReminderSchedule
     public string TimeOfDay { get; set; } = string.Empty;
     public string TimeZone { get; set; } = string.Empty;
     public bool IsRecurring { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
 }
