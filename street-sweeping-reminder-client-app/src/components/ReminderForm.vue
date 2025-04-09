@@ -4,11 +4,13 @@ import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import { useRemindersStore } from '@/stores/reminder'
 
 const schema = toTypedSchema(
   z.object({
     title: z.string().min(1, 'Title is required'),
     message: z.string().min(1, 'Message is required'),
+    phoneNumber: z.string().min(10, 'Phone number is required'),
     street: z.string().min(1, 'Street is required'),
     zip: z.string().regex(/^\d{5}$/, 'Must be a valid 5-digit ZIP code'),
     date: z.date({ required_error: 'Date is required' }),
@@ -17,6 +19,8 @@ const schema = toTypedSchema(
 
 function onSubmit(values) {
   console.log('Form submitted:', values)
+  const reminderStore = useRemindersStore()
+  reminderStore.createReminder(values)
 }
 </script>
 
@@ -37,6 +41,21 @@ function onSubmit(values) {
               name="title"
               type="text"
               placeholder="Reminder title"
+              class="input-field"
+            />
+            <ErrorMessage name="title" class="text-red-500 text-xs mt-1" />
+          </div>
+
+          <!--Phone Number-->
+          <div class="mb-4">
+            <label for="phoneNumber" class="block text-gray-700 text-sm font-bold mb-2">
+              Phone Number <span class="text-red-500">*</span>
+            </label>
+            <Field
+              id="phoneNumber"
+              name="phoneNumber"
+              type="phoneNumber"
+              placeholder="Phone Number"
               class="input-field"
             />
             <ErrorMessage name="title" class="text-red-500 text-xs mt-1" />
