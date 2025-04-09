@@ -2,6 +2,8 @@
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
+import Datepicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const schema = toTypedSchema(
   z.object({
@@ -9,6 +11,7 @@ const schema = toTypedSchema(
     message: z.string().min(1, 'Message is required'),
     street: z.string().min(1, 'Street is required'),
     zip: z.string().regex(/^\d{5}$/, 'Must be a valid 5-digit ZIP code'),
+    date: z.date({ required_error: 'Date is required' }),
   }),
 )
 
@@ -78,16 +81,21 @@ function onSubmit(values) {
             <ErrorMessage name="zip" class="text-red-500 text-xs mt-1" />
           </div>
 
-          <!-- Date Picker Placeholder -->
+          <!-- Date Picker -->
           <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2">
+            <label for="date" class="block text-gray-700 text-sm font-bold mb-2">
               Reminder Date <span class="text-red-500">*</span>
             </label>
-            <div
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 bg-gray-100 cursor-not-allowed"
-            >
-              (Date picker coming soon)
-            </div>
+            <Field name="date" v-slot="{ field, errors }">
+              <Datepicker
+                v-bind="field"
+                :model-value="field.value"
+                @update:model-value="field.onChange"
+                input-class-name="input-field"
+                placeholder="Pick a date"
+              />
+              <span class="text-red-500 text-xs mt-1 block">{{ errors[0] }}</span>
+            </Field>
           </div>
 
           <div class="flex flex-col gap-3">
@@ -104,8 +112,8 @@ function onSubmit(values) {
   </section>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 .input-field {
-  @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-green-500 focus:ring-1 focus:ring-green-500;
+  @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500;
 }
 </style>
