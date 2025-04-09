@@ -2,8 +2,6 @@ import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
 import api from '@/services/api'
 
-// int Id, string Message, DateTime ScheduledDateTimeUtc, string Status, string PhoneNumber, int StreetId
-
 export const useRemindersStore = defineStore('reminders', {
   state: () => ({
     reminders: [],
@@ -45,7 +43,7 @@ export const useRemindersStore = defineStore('reminders', {
           scheduledDateTimeUtc: formData.date.toISOString(),
           status: 'Pending',
           phoneNumber: formData.phoneNumber,
-          streetId: 1,
+          streetId: 1, // hard coded for now, need to implement api call
         }
 
         const response = await api.post('Reminder', payload)
