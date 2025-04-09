@@ -3,7 +3,9 @@ import { defineStore } from 'pinia'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isLoggedIn: false,
-    user: null, // Optional: strongly type this
+    username: null, // Optional: strongly type this
+    userId: null,
+    email: null,
     token: localStorage.getItem('jwtToken') || null,
   }),
 
