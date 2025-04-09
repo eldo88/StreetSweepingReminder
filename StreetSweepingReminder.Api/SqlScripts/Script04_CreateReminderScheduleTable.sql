@@ -1,7 +1,7 @@
 --Creates the ReminderSchedule Table
 
 
-CREATE TABLE IF NOT EXISTS main.RemindersSchedule (
+CREATE TABLE IF NOT EXISTS main.ReminderSchedule (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Message TEXT NOT NULL,
     DayOfWeek INTEGER NOT NULL,           -- 0 = Sunday, 1 = Monday, ..., 6 = Saturday
