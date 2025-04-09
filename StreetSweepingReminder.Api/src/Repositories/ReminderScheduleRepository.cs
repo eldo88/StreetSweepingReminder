@@ -1,3 +1,4 @@
+using Dapper;
 using StreetSweepingReminder.Api.Entities;
 
 namespace StreetSweepingReminder.Api.Repositories;
@@ -8,9 +9,17 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderRepository
     {
     }
 
-    public Task<int> CreateAsync(Reminder obj)
+    public Task<int> CreateAsync(Reminder reminder)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            INSERT INTO ReminderSchedule (ReminderId ,Message,DayOfWeek, ReminderDate, WeekOfMonth, StartMonth, EndMonth, TimeOfDay, TimeZone, IsRecurring)
+            VALUES (@ReminderId, @Message, @DayOfWeek, @ReminderDate, @WeekOfMonth, @StartMonth, @EndMonth, @TimeOfDay, @TimeZone, @IsRecurring);
+            SELECT last_insert_rowid();
+            """;
+        using var connection = CreateConnection();
+        var newId = connection.ExecuteScalarAsync<int>(sql, reminder);
+        return newId;
     }
 
     public Task<Reminder?> GetByIdAsync(int id)
