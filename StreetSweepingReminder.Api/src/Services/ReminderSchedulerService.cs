@@ -73,23 +73,23 @@ public class ReminderSchedulerService : IReminderScheduler
             return Result.Fail(new ExceptionalError("Unexpected error occurred saving reminder schedule.", e));
         }
     }
-    private List<DateTime> CalculateRecurringReminderSchedule(DateTime initialReminderDateTime, int interval)
-    { //TODO add validation for parameters
+    private List<DateTime> CalculateRecurringReminderSchedule(DateTime initialReminderDateTime, int weekOfMonth)
+    { 
         var scheduledDays = new List<DateTime>();
         var dayOfWeek = initialReminderDateTime.DayOfWeek;
-        var month = initialReminderDateTime.Month;
+        var startingMonth = initialReminderDateTime.Month;
 
-        if (dayOfWeek is < DayOfWeek.Saturday and > DayOfWeek.Sunday && month is > 3 and < 12) // possible bug
+        if (dayOfWeek is < DayOfWeek.Saturday and > DayOfWeek.Sunday && startingMonth is > 3 and < 12)
         {   // set first days for reminder since that is provided by client
             scheduledDays.Add(initialReminderDateTime);
             
             // Calc remaining for the year
             var dateToAdd = initialReminderDateTime;
-            for (var i = month; i < 11; i++)
+            for (var i = startingMonth; i < 11; i++)
             {
                 const int increment = 1;
-                var (year, nextMonth, _) = dateToAdd.AddMonths(increment); // need to extract time
-                dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, nextMonth, dayOfWeek, interval);
+                var (year, month, _) = dateToAdd.AddMonths(increment); // need to extract time
+                dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, month, dayOfWeek, weekOfMonth);
                 scheduledDays.Add(dateToAdd);
             }
         }
