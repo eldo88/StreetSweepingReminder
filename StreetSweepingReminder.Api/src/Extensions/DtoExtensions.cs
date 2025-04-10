@@ -14,6 +14,7 @@ public static class DtoExtensions
             UserId = string.Empty,
             Message = source.Message,
             ScheduledDateTimeUtc = source.ScheduledDateTimeUtc,
+            StreetSweepingDate = source.StreetSweepingDate,
             Status = string.Empty,
             PhoneNumber = source.PhoneNumber,
             StreetId = source.StreetId,
