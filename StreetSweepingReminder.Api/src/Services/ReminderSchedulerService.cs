@@ -60,7 +60,7 @@ public class ReminderSchedulerService : IReminderScheduler
         try
         {
             var newId = await _reminderScheduleRepository.CreateAsync(reminderSchedule);
-            if (newId >= 0)
+            if (newId <= 0)
             {
                 return Result.Fail(new ApplicationError("Invalid ID saved to the database"));
             }
@@ -79,7 +79,7 @@ public class ReminderSchedulerService : IReminderScheduler
         var dayOfWeek = initialReminderDateTime.DayOfWeek;
         var startingMonth = initialReminderDateTime.Month;
 
-        if (dayOfWeek is < DayOfWeek.Saturday and > DayOfWeek.Sunday && startingMonth is > 3 and < 12)
+        if (dayOfWeek is < DayOfWeek.Saturday and > DayOfWeek.Sunday && startingMonth is >= 4 and <= 11)
         {   // set first days for reminder since that is provided by client
             scheduledDays.Add(initialReminderDateTime);
             
@@ -87,8 +87,7 @@ public class ReminderSchedulerService : IReminderScheduler
             var dateToAdd = initialReminderDateTime;
             for (var i = startingMonth; i < 11; i++)
             {
-                const int increment = 1;
-                var (year, month, _) = dateToAdd.AddMonths(increment); // need to extract time
+                var (year, month, _) = dateToAdd.AddMonths(1); // need to extract time
                 dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, month, dayOfWeek, weekOfMonth);
                 scheduledDays.Add(dateToAdd);
             }
