@@ -9,16 +9,16 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
     {
     }
 
-    public Task<int> CreateAsync(ReminderSchedule reminder)
+    public Task<int> CreateAsync(ReminderSchedule reminderSchedule)
     {
         const string sql =
             """
-            INSERT INTO ReminderSchedule (ReminderId ,Message,DayOfWeek, ReminderDate, WeekOfMonth, StartMonth, EndMonth, TimeOfDay, TimeZone, IsRecurring)
-            VALUES (@ReminderId, @Message, @DayOfWeek, @ReminderDate, @WeekOfMonth, @StartMonth, @EndMonth, @TimeOfDay, @TimeZone, @IsRecurring);
+            INSERT INTO ReminderSchedule (ReminderId ,Message,DayOfWeek, ReminderDate, WeekOfMonth, StartMonth, EndMonth, TimeOfDay, TimeZone, IsRecurring, IsActive)
+            VALUES (@ReminderId, @Message, @DayOfWeek, @ReminderDate, @WeekOfMonth, @StartMonth, @EndMonth, @TimeOfDay, @TimeZone, @IsRecurring, @IsActive);
             SELECT last_insert_rowid();
             """;
         using var connection = CreateConnection();
-        var newId = connection.ExecuteScalarAsync<int>(sql, reminder);
+        var newId = connection.ExecuteScalarAsync<int>(sql, reminderSchedule);
         return newId;
     }
 
