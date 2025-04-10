@@ -1,5 +1,9 @@
 using FluentResults;
 using StreetSweepingReminder.Api.DTOs;
+using StreetSweepingReminder.Api.Entities;
+using StreetSweepingReminder.Api.Errors;
+using StreetSweepingReminder.Api.Extensions;
+using StreetSweepingReminder.Api.Repositories;
 using StreetSweepingReminder.Api.Services.Utils;
 
 namespace StreetSweepingReminder.Api.Services;
@@ -7,10 +11,12 @@ namespace StreetSweepingReminder.Api.Services;
 public class ReminderSchedulerService : IReminderScheduler
 {
     private readonly ILogger<ReminderSchedulerService> _logger;
+    private readonly IReminderScheduleRepository _reminderScheduleRepository;
 
-    public ReminderSchedulerService(ILogger<ReminderSchedulerService> logger)
+    public ReminderSchedulerService(ILogger<ReminderSchedulerService> logger, IReminderScheduleRepository reminderScheduleRepository)
     {
         _logger = logger;
+        _reminderScheduleRepository = reminderScheduleRepository;
     }
 
     public Task<Result> ScheduleNotificationJobAsync(int id, DateTime nextSweepTime)
@@ -20,21 +26,56 @@ public class ReminderSchedulerService : IReminderScheduler
 
     public async Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command, int reminderId)
     {
-        var interval = 2;
-        var startDateTime = command.ScheduledDateTimeUtc;
-
-        var reminderSchedule =  CalculateRecurringReminderSchedule(startDateTime, interval);
-
-        foreach (var reminder in reminderSchedule)
+        if (command.IsRecurring)
         {
-            _logger.Log(LogLevel.Debug, "Reminder: {r}", reminder);
+            var reminderDates =  CalculateRecurringReminderSchedule(command.ScheduledDateTimeUtc, command.WeekOfMonth);
+
+            foreach (var reminder in reminderDates)
+            {
+                //_logger.Log(LogLevel.Debug, "Reminder: {r}", reminder);
+                var reminderSchedule = command.ToReminderScheduleEntity(reminderId);
+                reminderSchedule.ReminderDate = reminder;
+                var result = await SaveReminderScheduleAsync(reminderSchedule);
+                if (result.IsFailed)
+                {
+                    return result;
+                }
+            }
         }
+        else
+        {
+            var reminderSchedule = command.ToReminderScheduleEntity(reminderId);
+            var result = await SaveReminderScheduleAsync(reminderSchedule);
+            if (result.IsFailed)
+            {
+                return result;
+            }
+        }
+        
         return Result.Ok();
     }
 
-    private List<DateTime?> CalculateRecurringReminderSchedule(DateTime initialReminderDateTime, int interval)
+    private async Task<Result> SaveReminderScheduleAsync(ReminderSchedule reminderSchedule)
+    {
+        try
+        {
+            var newId = await _reminderScheduleRepository.CreateAsync(reminderSchedule);
+            if (newId >= 0)
+            {
+                return Result.Fail(new ApplicationError("Invalid ID saved to the database"));
+            }
+
+            return Result.Ok();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error creating reminder schedule.");
+            return Result.Fail(new ExceptionalError("Unexpected error occurred saving reminder schedule.", e));
+        }
+    }
+    private List<DateTime> CalculateRecurringReminderSchedule(DateTime initialReminderDateTime, int interval)
     { //TODO add validation for parameters
-        var scheduledDays = new List<DateTime?>();
+        var scheduledDays = new List<DateTime>();
         var dayOfWeek = initialReminderDateTime.DayOfWeek;
         var month = initialReminderDateTime.Month;
 
@@ -43,20 +84,13 @@ public class ReminderSchedulerService : IReminderScheduler
             scheduledDays.Add(initialReminderDateTime);
             
             // Calc remaining for the year
-            DateTime? dateToAdd = initialReminderDateTime;
+            var dateToAdd = initialReminderDateTime;
             for (var i = month; i < 11; i++)
             {
                 const int increment = 1;
-                if (dateToAdd is not null)
-                {
-                    var (year, nextMonth, _) = dateToAdd.Value.AddMonths(increment); // need to extract time
-                    dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, nextMonth, dayOfWeek, interval);
-                }
-
-                if (dateToAdd is not null)
-                {
-                    scheduledDays.Add(dateToAdd);
-                }
+                var (year, nextMonth, _) = dateToAdd.AddMonths(increment); // need to extract time
+                dateToAdd = DateUtils.GetNthWeekdayOfMonth(year, nextMonth, dayOfWeek, interval);
+                scheduledDays.Add(dateToAdd);
             }
         }
 
