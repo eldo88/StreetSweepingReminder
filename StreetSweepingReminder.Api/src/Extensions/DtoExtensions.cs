@@ -40,6 +40,7 @@ public static class DtoExtensions
             Id = source.Id,
             Message = source.Message,
             ScheduledDateTimeUtc = source.ScheduledDateTimeUtc,
+            StreetSweepingDate = source.StreetSweepingDate,
             Status = source.Status,
             PhoneNumber = source.PhoneNumber,
             StreetId = source.StreetId
@@ -52,6 +53,7 @@ public static class DtoExtensions
             source.Id,
             source.Message,
             source.ScheduledDateTimeUtc,
+            source.StreetSweepingDate,
             source.Status,
             source.PhoneNumber,
             source.StreetId,
