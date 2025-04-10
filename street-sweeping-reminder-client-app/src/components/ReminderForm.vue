@@ -14,6 +14,7 @@ const schema = toTypedSchema(
     street: z.string().min(1, 'Street is required'),
     zip: z.string().regex(/^\d{5}$/, 'Must be a valid 5-digit ZIP code'),
     date: z.date({ required_error: 'Date is required' }),
+    isRecurring: z.boolean().default(true),
   }),
 )
 
@@ -28,7 +29,7 @@ function onSubmit(values) {
   <section class="bg-blue-50 py-10">
     <div class="container mx-auto max-w-md">
       <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Schedule Reminder</h2>
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Schedule Text Reminder</h2>
 
         <Form @submit="onSubmit" :validation-schema="schema">
           <!-- Title -->
@@ -115,6 +116,30 @@ function onSubmit(values) {
               />
               <span class="text-red-500 text-xs mt-1 block">{{ errors[0] }}</span>
             </Field>
+          </div>
+
+          <!-- Is Recurring Toggle Switch -->
+          <div class="mb-6">
+            <label for="isRecurring" class="flex items-center cursor-pointer">
+              <Field name="isRecurring" type="checkbox" v-slot="{ field }">
+                <input
+                  type="checkbox"
+                  v-bind="field"
+                  :checked="field.value ?? true"
+                  @change="field.onChange($event.target.checked)"
+                  class="sr-only peer"
+                  id="isRecurring"
+                />
+                <div
+                  class="w-11 h-6 bg-gray-300 peer-checked:bg-green-500 rounded-full relative transition-colors duration-300"
+                >
+                  <div
+                    class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-full"
+                  ></div>
+                </div>
+              </Field>
+              <span class="ml-3 text-sm font-medium text-gray-700">Recurring? (April - Nov)</span>
+            </label>
           </div>
 
           <div class="flex flex-col gap-3">
