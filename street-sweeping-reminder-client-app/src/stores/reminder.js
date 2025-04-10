@@ -40,12 +40,13 @@ export const useRemindersStore = defineStore('reminders', {
 
         const payload = {
           message: formData.message,
-          scheduledDateTimeUtc: formData.date.toISOString(),
+          scheduledDateTimeUtc: formData.reminderDate.toISOString(),
           status: 'Pending',
           phoneNumber: formData.phoneNumber,
           streetId: 1, // hard coded for now, need to implement api call
           isRecurring: formData.isRecurring,
           weekOfMonth: 2, // hard coded for now
+          streetSweepingDate: formData.streetSweepingDate.toISOString(),
         }
 
         const response = await api.post('Reminder', payload)

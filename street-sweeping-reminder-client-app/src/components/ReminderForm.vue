@@ -13,8 +13,9 @@ const schema = toTypedSchema(
     phoneNumber: z.string().min(10, 'Phone number is required'),
     street: z.string().min(1, 'Street is required'),
     zip: z.string().regex(/^\d{5}$/, 'Must be a valid 5-digit ZIP code'),
-    date: z.date({ required_error: 'Date is required' }),
+    reminderDate: z.date({ required_error: 'Reminder Date is required' }),
     isRecurring: z.boolean().default(true),
+    streetSweepingDate: z.date({ required_error: 'Street Sweeping Date is required' }),
   }),
 )
 
@@ -101,18 +102,35 @@ function onSubmit(values) {
             <ErrorMessage name="zip" class="text-red-500 text-xs mt-1" />
           </div>
 
-          <!-- Date Picker -->
+          <!-- Street Sweeping Date Picker -->
           <div class="mb-6">
-            <label for="date" class="block text-gray-700 text-sm font-bold mb-2">
-              Reminder Date <span class="text-red-500">*</span>
+            <label for="streetSweepingDate" class="block text-gray-700 text-sm font-bold mb-2">
+              First Street Sweeping Date <span class="text-red-500">*</span>
             </label>
-            <Field name="date" v-slot="{ field, errors }">
+            <Field name="streetSweepingDate" v-slot="{ field, errors }">
               <Datepicker
                 v-bind="field"
                 :model-value="field.value"
                 @update:model-value="field.onChange"
                 input-class-name="input-field"
-                placeholder="Pick a date"
+                placeholder="Pick a date for the first street sweeping day"
+              />
+              <span class="text-red-500 text-xs mt-1 block">{{ errors[0] }}</span>
+            </Field>
+          </div>
+
+          <!-- Reminder Date Picker -->
+          <div class="mb-6">
+            <label for="reminderDate" class="block text-gray-700 text-sm font-bold mb-2">
+              Reminder Date <span class="text-red-500">*</span>
+            </label>
+            <Field name="reminderDate" v-slot="{ field, errors }">
+              <Datepicker
+                v-bind="field"
+                :model-value="field.value"
+                @update:model-value="field.onChange"
+                input-class-name="input-field"
+                placeholder="Pick a date for the first reminder"
               />
               <span class="text-red-500 text-xs mt-1 block">{{ errors[0] }}</span>
             </Field>
