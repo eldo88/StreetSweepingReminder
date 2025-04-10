@@ -1,5 +1,15 @@
 <script setup>
 import logo from '@/assets/logo.svg'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+
+const auth = useAuthStore()
+const router = useRouter()
+
+function handleLogout() {
+  auth.logout()
+  router.push('/')
+}
 </script>
 
 <template>
@@ -31,6 +41,17 @@ import logo from '@/assets/logo.svg'
                 class="text-white hover:bg-green-900 hover:text-white rounded-md px-3 py-2"
                 >Add Job</a
               >
+            </div>
+          </div>
+          <div class="md:ml-auto">
+            <div class="flex space-x-2">
+              <a
+                href="#"
+                @click.prevent="handleLogout"
+                class="text-white bg-green-900 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+              >
+                Logout
+              </a>
             </div>
           </div>
         </div>
