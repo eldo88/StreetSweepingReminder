@@ -1,14 +1,7 @@
 <script setup>
-
-import NavBar from "@/components/NavBar.vue";
-import Hero from "@/components/Hero.vue";
+import MainPage from '@/components/MainPage.vue'
 </script>
 
 <template>
-  <NavBar/>
-  <Hero/>
+  <MainPage />
 </template>
-
-<style scoped>
-
-</style>
