@@ -3,13 +3,13 @@ using StreetSweepingReminder.Api.Entities;
 
 namespace StreetSweepingReminder.Api.Repositories;
 
-internal class ReminderScheduleRepository : RepositoryBase, IReminderRepository
+internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRepository
 {
-    protected ReminderScheduleRepository(IConfiguration configuration) : base(configuration)
+    public ReminderScheduleRepository(IConfiguration configuration) : base(configuration)
     {
     }
 
-    public Task<int> CreateAsync(Reminder reminder)
+    public Task<int> CreateAsync(ReminderSchedule reminder)
     {
         const string sql =
             """
@@ -22,17 +22,17 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderRepository
         return newId;
     }
 
-    public Task<Reminder?> GetByIdAsync(int id)
+    public Task<ReminderSchedule?> GetByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Reminder>> GetAllAsync(string userId)
+    public Task<IEnumerable<ReminderSchedule>> GetAllAsync(string userId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> UpdateAsync(Reminder obj)
+    public Task<bool> UpdateAsync(ReminderSchedule obj)
     {
         throw new NotImplementedException();
     }
