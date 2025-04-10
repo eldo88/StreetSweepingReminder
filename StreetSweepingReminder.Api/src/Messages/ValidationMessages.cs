@@ -13,5 +13,5 @@ public readonly struct ValidationMessages
     public static string StreetNumberInvalid => "Valid StreetId is required.";
     public static string StreetNameInvalid => "Street name must have a value.";
     public static string StreetNameTooLong => "Street name cannot exceed 50 characters.";
-    
+    public static string WeekOfMonthInvalid => "Week of month is invalid";
 }

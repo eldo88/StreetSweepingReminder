@@ -27,7 +27,7 @@ public class CreateReminderDtoValidator : AbstractValidator<CreateReminderDto>
             .GreaterThan(0).WithMessage(ValidationMessages.StreetNumberInvalid);
 
         RuleFor(x => x.WeekOfMonth)
-            .GreaterThan(0).WithMessage("Week of month must be greater than 0")
-            .LessThanOrEqualTo(4).WithMessage("Week of month must be less than or equal to 4.");
+            .GreaterThan(0).WithMessage(ValidationMessages.WeekOfMonthInvalid)
+            .LessThanOrEqualTo(4).WithMessage(ValidationMessages.WeekOfMonthInvalid);
     }
 }
