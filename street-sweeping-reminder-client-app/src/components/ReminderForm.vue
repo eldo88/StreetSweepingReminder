@@ -28,8 +28,10 @@ function onSubmit(values) {
 
 <template>
   <section class="bg-blue-50 py-10">
-    <div class="container mx-auto max-w-md">
-      <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+    <div
+      class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
+    >
+      <div class="bg-white shadow-md rounded-lg px-4 sm:px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Schedule Text Reminder</h2>
 
         <Form @submit="onSubmit" :validation-schema="schema">
