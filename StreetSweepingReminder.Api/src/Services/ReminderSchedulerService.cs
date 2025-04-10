@@ -35,6 +35,7 @@ public class ReminderSchedulerService : IReminderScheduler
                 //_logger.Log(LogLevel.Debug, "Reminder: {r}", reminder);
                 var reminderSchedule = command.ToReminderScheduleEntity(reminderId);
                 reminderSchedule.ReminderDate = reminder;
+                reminderSchedule.IsScheduled = true;
                 var result = await SaveReminderScheduleAsync(reminderSchedule);
                 if (result.IsFailed)
                 {

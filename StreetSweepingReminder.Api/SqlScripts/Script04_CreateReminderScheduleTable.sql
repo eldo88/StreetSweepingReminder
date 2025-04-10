@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS main.ReminderSchedule (
     TimeOfDay TEXT NOT NULL,              -- '07:00'
     TimeZone TEXT NOT NULL,               -- 'America/Denver'
     IsRecurring INTEGER,                  -- No boolean type in SQLite 
+    IsScheduled INTEGER,                  -- No boolean type in SQLite 
     CreatedAt TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ', 'now')),
     ModifiedAt TEXT,
     FOREIGN KEY (ReminderId) REFERENCES Reminders(id)
