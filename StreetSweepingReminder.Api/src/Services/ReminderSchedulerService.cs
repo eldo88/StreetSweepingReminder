@@ -32,7 +32,7 @@ public class ReminderSchedulerService : IReminderScheduler
 
             foreach (var reminder in reminderDates)
             {
-                //_logger.Log(LogLevel.Debug, "Reminder: {r}", reminder);
+                _logger.Log(LogLevel.Debug, "Reminder: {r}", reminder);
                 var reminderSchedule = command.ToReminderScheduleEntity(reminderId);
                 reminderSchedule.ReminderDate = reminder;
                 reminderSchedule.IsActive = true;
@@ -80,7 +80,7 @@ public class ReminderSchedulerService : IReminderScheduler
         var dayOfWeek = initialReminderDateTime.DayOfWeek;
         var startingMonth = initialReminderDateTime.Month;
 
-        if (dayOfWeek is < DayOfWeek.Saturday and > DayOfWeek.Sunday && startingMonth is >= 4 and <= 11)
+        if (startingMonth is >= 4 and <= 11)
         {   // set first days for reminder since that is provided by client
             scheduledDays.Add(initialReminderDateTime);
             
