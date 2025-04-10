@@ -14,6 +14,9 @@ public class CreateReminderDtoValidator : AbstractValidator<CreateReminderDto>
         
         RuleFor(x => x.ScheduledDateTimeUtc)
             .GreaterThan(DateTime.UtcNow).WithMessage(ValidationMessages.ScheduledDateTimeInvalid);
+
+        RuleFor(x => x.StreetSweepingDate)
+            .GreaterThan(DateTime.UtcNow).WithMessage(ValidationMessages.StreetSweepingDateInvalid);
         
         RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage(ValidationMessages.PhoneNumberRequired)
