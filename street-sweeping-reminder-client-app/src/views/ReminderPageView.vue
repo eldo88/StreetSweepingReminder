@@ -1,11 +1,11 @@
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import Hero from '@/components/Hero.vue'
+import HeroSection from '@/components/HeroSection.vue'
 import ReminderPage from '@/components/ReminderPage.vue'
 </script>
 
 <template>
   <NavBar />
-  <Hero />
+  <HeroSection />
   <ReminderPage />
 </template>

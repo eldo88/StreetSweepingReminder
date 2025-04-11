@@ -1,6 +1,6 @@
 <script setup>
 import NavBar from './NavBar.vue'
-import Hero from './Hero.vue'
+import HeroSection from './HeroSection.vue'
 import { useAuthStore } from '@/stores/auth'
 import { ref, onMounted } from 'vue'
 
@@ -14,7 +14,7 @@ onMounted(() => {
 
 <template>
   <NavBar />
-  <Hero :subtitle="displayName" />
+  <HeroSection :subtitle="displayName" />
 </template>
 
 <style scoped></style>
