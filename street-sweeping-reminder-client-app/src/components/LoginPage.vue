@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth.js'
 import router from '@/router/index.js'
 
-const username = ref('')
 const email = ref('')
 const password = ref('')
 
@@ -11,7 +10,7 @@ const store = useAuthStore()
 
 const handleSignIn = () => {
   store
-    .login({ username: username.value, password: password.value })
+    .login({ email: email.value, password: password.value })
     .then(async (response) => {
       console.log('Sign-in successful', response)
       await router.push('/main')
@@ -47,21 +46,6 @@ onMounted(() => {
               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-green-500 focus:ring-1 focus:ring-green-500"
               placeholder="Enter your email"
               required
-            />
-          </div>
-
-          <!-- Username Field -->
-          <div class="mb-4">
-            <label for="username" class="block text-gray-700 text-sm font-bold mb-2">
-              Username <span class="text-gray-500 text-xs">(Optional)</span>
-            </label>
-            <input
-              v-model="username"
-              type="text"
-              id="username"
-              name="username"
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-green-500 focus:ring-1 focus:ring-green-500"
-              placeholder="Choose a username"
             />
           </div>
 
