@@ -30,12 +30,6 @@ public class AuthService : IAuthService
 
     public async Task<Result<AuthResponseDto>> ValidateUserRegistration(RegisterDto registerDto)
     {
-        var userByName = await _userManager.FindByNameAsync(registerDto.Username);
-        if (userByName is not null)
-        {
-            return Result.Fail<AuthResponseDto>(new ValidationError("Username already taken."));
-        }
-
         var userByEmail = await _userManager.FindByEmailAsync(registerDto.Email);
         if (userByEmail is not null)
         {
@@ -44,7 +38,7 @@ public class AuthService : IAuthService
         
         var user = new User()
         {
-            UserName = registerDto.Username,
+            UserName = registerDto.Email,
             Email = registerDto.Email,
             SecurityStamp = Guid.NewGuid().ToString()
         };
@@ -59,7 +53,6 @@ public class AuthService : IAuthService
         
         var authResponseDto = new AuthResponseDto(
             token,
-            user.UserName,
             user.Email,
             user.Id,
             TokenExpirationInMinutes,
@@ -77,10 +70,10 @@ public class AuthService : IAuthService
 
     public async Task<Result<AuthResponseDto>> ValidateUserLogin(LoginDto loginDto)
     {
-        var user = await _userManager.FindByNameAsync(loginDto.Username);
+        var user = await _userManager.FindByEmailAsync(loginDto.Email);
         if (user is null)
         {
-            return Result.Fail<AuthResponseDto>(new ValidationError($"No user found for {loginDto.Username}"));
+            return Result.Fail<AuthResponseDto>(new ValidationError($"No account found for this email."));
         }
 
         if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
@@ -88,16 +81,15 @@ public class AuthService : IAuthService
             return Result.Fail<AuthResponseDto>(new ValidationError("Incorrect password"));
         }
 
-        if (user.UserName is null || user.Email is null)
+        if (user.Email is null)
         {
-            return Result.Fail<AuthResponseDto>(new ApplicationError("Username or email not found."));
+            return Result.Fail<AuthResponseDto>(new ApplicationError("Email not found."));
         }
         
         var token = GenerateJwtToken(user);
         
         var authResponseDto = new AuthResponseDto(
             token,
-            user.UserName,
             user.Email,
             user.Id,
             TokenExpirationInMinutes,
