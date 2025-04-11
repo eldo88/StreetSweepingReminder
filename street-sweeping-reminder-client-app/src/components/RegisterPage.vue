@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth.js'
 import router from '@/router/index.js'
 
@@ -17,10 +17,6 @@ const handleRegister = async () => {
     // Show error to user
   }
 }
-
-onMounted(() => {
-  store.initialize()
-})
 </script>
 
 <template>
