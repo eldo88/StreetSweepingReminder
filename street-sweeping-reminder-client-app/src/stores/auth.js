@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isLoggedIn: false,
-    username: null,
     userId: null,
     email: null,
     tokenExpirationInMinutes: null,
@@ -35,7 +34,6 @@ export const useAuthStore = defineStore('auth', {
         }
         console.log(data)
         this.token = data.token
-        this.username = data.username
         this.userId = data.userId
         this.email = data.email
         this.tokenExpirationInMinutes = data.tokenExpirationInMinutes
@@ -51,14 +49,14 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async register({ username, email, password }) {
+    async register({ email, password }) {
       try {
         const response = await fetch('http://localhost:5010/api/Auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ username, email, password }),
+          body: JSON.stringify({ email, password }),
         })
 
         const data = await response.json()
@@ -69,8 +67,7 @@ export const useAuthStore = defineStore('auth', {
 
         console.log('Registration successful', data)
 
-        // Optionally: log them in immediately
-        await this.login({ username, password })
+        await this.login({ email, password })
       } catch (error) {
         console.error('Registration error:', error)
         throw error
