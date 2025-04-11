@@ -79,4 +79,18 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
         var recordsDeleted = await connection.ExecuteAsync(sql, new { id });
         return recordsDeleted == 1;
     }
+
+    public async Task<IEnumerable<Reminder>> GetRemindersByUserIdAsync(string userId)
+    {
+        const string sql =
+            """
+            SELECT *
+            FROM Reminders
+            WHERE UserId = @userId
+            """;
+
+        using var connection = CreateConnection();
+        var reminders = await connection.QueryAsync<Reminder>(sql, userId);
+        return reminders;
+    }
 }
