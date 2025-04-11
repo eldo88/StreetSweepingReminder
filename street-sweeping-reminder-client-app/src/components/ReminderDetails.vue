@@ -1,6 +1,6 @@
 <script setup>
 defineProps({
-  reminder: Object,
+  reminder: [],
 })
 </script>
 
