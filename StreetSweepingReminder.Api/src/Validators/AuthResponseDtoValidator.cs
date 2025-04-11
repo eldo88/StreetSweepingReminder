@@ -16,9 +16,6 @@ public class AuthResponseDtoValidator : AbstractValidator<AuthResponseDto>
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("User ID cannot be empty");
 
-        RuleFor(x => x.Username)
-            .NotEmpty().WithMessage("Username cannot be empty.");
-
         RuleFor(x => x.TokenExpirationInMinutes)
             .GreaterThan(0).WithMessage("Token expiration cannot be 0.");
 
