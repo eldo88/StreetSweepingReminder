@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth.js'
 import router from '@/router/index.js'
 import { Form, Field, ErrorMessage } from 'vee-validate'
@@ -29,10 +29,6 @@ const handleSignIn = () => {
       console.error('Login failed', error)
     })
 }
-
-onMounted(() => {
-  store.initialize()
-})
 </script>
 
 <template>
