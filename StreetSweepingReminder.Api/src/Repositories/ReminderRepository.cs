@@ -90,7 +90,7 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
             """;
 
         using var connection = CreateConnection();
-        var reminders = await connection.QueryAsync<Reminder>(sql, userId);
+        var reminders = await connection.QueryAsync<Reminder>(sql, new {userId});
         return reminders;
     }
 }
