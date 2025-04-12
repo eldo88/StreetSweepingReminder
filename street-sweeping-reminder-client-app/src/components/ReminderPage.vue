@@ -13,7 +13,7 @@ onMounted(() => {
 
 <template>
   <ReminderForm />
-  <div class="space-y-4">
+  <div class="flex space-x-2 mb-5">
     <ReminderDetails v-for="r in remindersStore.reminders" :key="r.id" :reminder="r" />
   </div>
 </template>
