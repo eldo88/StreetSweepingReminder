@@ -18,7 +18,7 @@ export const useRemindersStore = defineStore('reminders', {
           return
         }
 
-        const response = await api.get('Reminder/${userId}')
+        const response = await api.get(`Reminder/${userId}`)
 
         if (response?.data) {
           this.reminders = response.data
