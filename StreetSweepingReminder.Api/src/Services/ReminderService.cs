@@ -97,13 +97,13 @@ public class ReminderService : IReminderService
         try
         {
             var result = await _reminderRepository.GetRemindersByUserIdAsync(userId);
-            var enumerable = result.ToList();
-            if (enumerable.Count == 0)
+            var reminderList = result.ToList();
+            if (reminderList.Count == 0)
             {
                 return Result.Fail<List<ReminderResponseDto>>(new NotFoundError("No reminders found for user."));
             }
 
-            var dtos = enumerable.ToIEnumerableReminderResponseDtos().ToList();
+            var dtos = reminderList.ToIEnumerableReminderResponseDtos().ToList();
 
             foreach (var dto in dtos)
             {
