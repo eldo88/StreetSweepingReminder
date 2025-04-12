@@ -77,4 +77,38 @@ public class ReminderController : ControllerBase
         
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
     }
+
+    [HttpGet("{userId}")]
+    [ProducesResponseType(typeof(List<ReminderResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetRemindersByUser(string userId)
+    {
+        _logger.LogDebug($"User id passed in: {userId}");
+        var result = await _reminderService.GetUserRemindersAsync(userId);
+        
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+        
+        if (result.HasError<NotFoundError>())
+        {
+            return NotFound("No reminder found.");
+        }
+        
+        if (result.HasError<ValidationError>(out var validationErrors))
+        {
+            foreach (var error in validationErrors)
+            {
+                ModelState.AddModelError(string.Empty, error.Message);
+            }
+
+            return ValidationProblem(ModelState);
+        }
+        
+        _logger.LogError("Failed to get reminders {userId}", userId);
+        
+        return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+    }
 }
