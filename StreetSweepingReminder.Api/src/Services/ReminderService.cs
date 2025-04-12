@@ -1,10 +1,12 @@
 using FluentResults;
 using FluentValidation;
 using StreetSweepingReminder.Api.DTOs;
+using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Extensions;
 using StreetSweepingReminder.Api.Messages;
 using StreetSweepingReminder.Api.Repositories;
+using Exception = System.Exception;
 
 namespace StreetSweepingReminder.Api.Services;
 
@@ -90,9 +92,37 @@ public class ReminderService : IReminderService
         }
     }
 
-    public Task<Result<IEnumerable<ReminderResponseDto>>> GetUserRemindersAsync(string userId)
+    public async Task<Result<List<ReminderResponseDto>>> GetUserRemindersAsync(string userId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await _reminderRepository.GetRemindersByUserIdAsync(userId);
+            var enumerable = result.ToList();
+            if (enumerable.Count == 0)
+            {
+                return Result.Fail<List<ReminderResponseDto>>(new NotFoundError("No reminders found for user."));
+            }
+
+            var dtos = enumerable.ToIEnumerableReminderResponseDtos().ToList();
+
+            foreach (var dto in dtos)
+            {
+                var validationResult = await _reminderResponseValidator.ValidateAsync(dto);
+                if (!validationResult.IsValid)
+                {
+                    return Result.Fail<List<ReminderResponseDto>>(
+                        new ValidationError("Error validating reminders."));
+                }
+            }
+
+            return Result.Ok(dtos);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error retrieving reminders.");
+            return Result.Fail<List<ReminderResponseDto>>(
+                new ApplicationError($"An unexpected error occurred while retrieving the reminders: {e.Message}"));
+        }
     }
 
     public async Task<Result> UpdateReminderAsync(UpdateReminderDto command)
