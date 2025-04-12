@@ -103,7 +103,7 @@ public class ReminderService : IReminderService
                 return Result.Fail<List<ReminderResponseDto>>(new NotFoundError("No reminders found for user."));
             }
 
-            var dtos = reminderList.ToIEnumerableReminderResponseDtos().ToList();
+            var dtos = reminderList.ToListOfReminderResponseDtos().ToList();
 
             foreach (var dto in dtos)
             {
