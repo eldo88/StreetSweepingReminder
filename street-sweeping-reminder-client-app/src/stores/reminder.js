@@ -5,6 +5,7 @@ import api from '@/services/api'
 export const useRemindersStore = defineStore('reminders', {
   state: () => ({
     reminders: [],
+    streets: [],
   }),
 
   actions: {
@@ -67,6 +68,17 @@ export const useRemindersStore = defineStore('reminders', {
         } else {
           throw error
         }
+      }
+    },
+
+    async getStreets() {
+      try {
+        const response = await api.get('Street/getAll')
+        if (response.data) {
+          this.streets = response.data
+        }
+      } catch (error) {
+        console.error('Failed to get streets' + error)
       }
     },
   },

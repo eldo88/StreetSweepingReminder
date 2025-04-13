@@ -7,6 +7,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import { useRemindersStore } from '@/stores/reminder'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import { onMounted } from 'vue'
 
 const schema = toTypedSchema(
   z.object({
@@ -37,6 +38,10 @@ async function onSubmit(values) {
     toast.error('Failed to create reminder. Please try again.')
   }
 }
+
+onMounted(() => {
+  reminderStore.getStreets()
+})
 </script>
 
 <template>
