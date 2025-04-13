@@ -17,6 +17,7 @@
     "@vee-validate/zod": "^4.15.0",
     "@vuepic/vue-datepicker": "^11.0.2",
     "axios": "^1.8.4",
+    "element-plus": "^2.9.7",
     "pinia": "^3.0.1",
     "pinia-plugin-persistedstate": "^4.2.0",
     "radix-vue": "^1.9.17",

@@ -8,7 +8,11 @@ import { useRemindersStore } from '@/stores/reminder'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+
+// Import Element Plus Select component and its CSS
+import { ElSelect, ElOption } from 'element-plus' // Import ElSelect and ElOption
+import 'element-plus/dist/index.css' // Import Element Plus styles (or use unplugin)
 
 const schema = toTypedSchema(
   z.object({
@@ -28,6 +32,16 @@ const router = useRouter()
 const reminderStore = useRemindersStore()
 
 const { streets } = storeToRefs(reminderStore)
+
+// --- Prepare streets for ElSelect ---
+// ElSelect often works best with { value: ..., label: ... } structure
+// Adjust 'value' and 'label' based on your actual street object properties (e.g., id, name)
+const streetOptions = computed(() => {
+  return streets.value.map((street) => ({
+    value: street.id, // The value to be submitted (e.g., the ID)
+    label: street.streetName, // The text to be displayed in the dropdown
+  }))
+})
 
 async function onSubmit(values) {
   try {
@@ -102,7 +116,7 @@ onMounted(() => {
           </div>
 
           <!-- Street -->
-          <div class="mb-4">
+          <!-- <div class="mb-4">
             <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
               Street Name <span class="text-red-500">*</span>
             </label>
@@ -114,7 +128,38 @@ onMounted(() => {
               class="input-field"
             />
             <ErrorMessage name="street" class="text-red-500 text-xs mt-1" />
+          </div> -->
+
+          <!-- Street (Searchable Dropdown using Element Plus) -->
+          <div class="mb-4">
+            <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
+              Street Name <span class="text-red-500">*</span>
+            </label>
+            <!-- Use VeeValidate Field component for validation -->
+            <Field name="street" v-slot="{ field, value }">
+              <el-select
+                v-bind="field"
+                :model-value="value"
+                @update:modelValue="field.onChange($event)"
+                placeholder="Select or search for a street"
+                filterable
+                clearable
+                class="w-full"
+                id="street"
+                :class="{ 'el-select-invalid': errors?.street }"
+              >
+                <el-option
+                  v-for="item in streetOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </Field>
+            <!-- Display validation error -->
+            <ErrorMessage name="street" class="text-red-500 text-xs mt-1" />
           </div>
+          <!-- End Street -->
 
           <!-- ZIP Code -->
           <div class="mb-4">
