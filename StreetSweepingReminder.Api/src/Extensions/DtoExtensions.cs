@@ -84,6 +84,11 @@ public static class DtoExtensions
             source.StreetName, 
             source.ZipCode);
     }
+
+    public static List<StreetResponseDto> ToListOfStreetResponseDtos(this IEnumerable<Street> source)
+    {
+        return source.Select(s => s.ToStreetResponseDto()).ToList();
+    }
     
     /* CreateReminderDto to ReminderSchedule entity Mappings */
 
