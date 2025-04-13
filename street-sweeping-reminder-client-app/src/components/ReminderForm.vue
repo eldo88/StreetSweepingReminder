@@ -5,6 +5,8 @@ import { toTypedSchema } from '@vee-validate/zod'
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useRemindersStore } from '@/stores/reminder'
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const schema = toTypedSchema(
   z.object({
@@ -19,10 +21,21 @@ const schema = toTypedSchema(
   }),
 )
 
-function onSubmit(values) {
-  console.log('Form submitted:', values)
-  const reminderStore = useRemindersStore()
-  reminderStore.createReminder(values)
+const toast = useToast()
+const router = useRouter()
+const reminderStore = useRemindersStore()
+
+async function onSubmit(values) {
+  try {
+    await reminderStore.createReminder(values)
+    toast.success('Reminder created successfully!')
+    setTimeout(() => {
+      router.push('/reminders')
+    }, 1000)
+  } catch (error) {
+    console.error('Reminder creation failed:', error)
+    toast.error('Failed to create reminder. Please try again.')
+  }
 }
 </script>
 
