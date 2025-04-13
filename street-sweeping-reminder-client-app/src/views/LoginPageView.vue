@@ -1,9 +1,9 @@
 <script setup>
 import HeroSection from '@/components/HeroSection.vue'
-import LoginPage from '@/components/LoginPage.vue'
+import LoginForm from '@/components/LoginForm.vue'
 </script>
 
 <template>
   <HeroSection title="Welcome Back" />
-  <LoginPage />
+  <LoginForm />
 </template>
