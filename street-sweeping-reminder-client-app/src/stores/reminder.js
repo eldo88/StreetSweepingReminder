@@ -57,10 +57,6 @@ export const useRemindersStore = defineStore('reminders', {
 
         const response = await api.post('Reminder', payload)
 
-        if (response?.data) {
-          this.reminders.push(response.data)
-        }
-
         return response.data
       } catch (error) {
         console.error('Failed to create reminder:', error)
