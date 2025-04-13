@@ -11,6 +11,10 @@ const props = defineProps({
     type: Boolean,
     default: true, // default is original behavior
   },
+  loginFormMessage: {
+    type: String,
+    default: 'Login',
+  },
 })
 
 const email = ref('')
@@ -50,7 +54,7 @@ const handleSignIn = () => {
     >
       <!-- Form Container -->
       <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">{{ loginFormMessage }}</h2>
 
         <Form @submit="handleSignIn" :validation-schema="schema">
           <!-- Email Field -->
