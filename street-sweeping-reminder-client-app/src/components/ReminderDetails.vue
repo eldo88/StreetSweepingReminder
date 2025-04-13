@@ -1,6 +1,9 @@
 <script setup>
 defineProps({
-  reminder: Object,
+  reminder: {
+    type: Object,
+    required: true,
+  },
 })
 </script>
 
