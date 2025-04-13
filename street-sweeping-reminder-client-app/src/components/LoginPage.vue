@@ -81,7 +81,7 @@ const handleSignIn = () => {
               type="submit"
               class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
             >
-              Register
+              Login
             </button>
           </div>
         </Form>
