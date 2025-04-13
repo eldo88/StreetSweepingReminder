@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted } from 'vue'
-import ReminderForm from './ReminderForm.vue'
 import ReminderDetails from './ReminderDetails.vue'
 import { useRemindersStore } from '@/stores/reminder.js'
 
@@ -12,7 +11,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <ReminderForm />
+  <div class="md:ml-auto">
+    <div class="flex h-20 items-center justify-center">
+      <a
+        href="/createReminder"
+        class="text-white bg-blue-600 hover:bg-gray-900 hover:text-white rounded-md px-6 py-2"
+        >Create New Reminder</a
+      >
+    </div>
+  </div>
 
   <ul class="space-y-4">
     <li

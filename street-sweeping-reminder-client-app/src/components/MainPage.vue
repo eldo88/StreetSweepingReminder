@@ -17,12 +17,16 @@ onMounted(() => {
   <HeroSection :subtitle="displayName" />
 
   <div class="md:ml-auto">
-    <div class="flex space-x-2 justify-evenly">
+    <div class="flex h-20 items-center justify-center gap-4 flex-wrap">
+      <a href="/reminders" class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2">
+        Reminders
+      </a>
       <a
-        href="/reminders"
-        class="text-white bg-blue-600 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-        >Reminders</a
+        href="/createReminder"
+        class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2"
       >
+        Create New Reminder
+      </a>
     </div>
   </div>
 </template>
