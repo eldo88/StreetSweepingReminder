@@ -110,8 +110,7 @@ public class ReminderService : IReminderService
                 var validationResult = await _reminderResponseValidator.ValidateAsync(dto);
                 if (!validationResult.IsValid)
                 {
-                    return Result.Fail<List<ReminderResponseDto>>(
-                        new ValidationError("Error validating reminders."));
+                    return validationResult.ToFluentResult();
                 }
             }
 
