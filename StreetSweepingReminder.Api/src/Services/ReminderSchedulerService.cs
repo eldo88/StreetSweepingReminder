@@ -18,12 +18,7 @@ public class ReminderSchedulerService : IReminderScheduler
         _logger = logger;
         _reminderScheduleRepository = reminderScheduleRepository;
     }
-
-    public Task<Result> ScheduleNotificationJobAsync(int id, DateTime nextSweepTime)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command, int reminderId)
     {
         if (command.IsRecurring)
@@ -46,6 +41,7 @@ public class ReminderSchedulerService : IReminderScheduler
         else
         {
             var reminderSchedule = command.ToReminderScheduleEntity(reminderId);
+            reminderSchedule.IsActive = true;
             var result = await SaveReminderScheduleAsync(reminderSchedule);
             if (result.IsFailed)
             {
