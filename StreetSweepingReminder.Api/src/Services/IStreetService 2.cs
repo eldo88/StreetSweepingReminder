@@ -7,6 +7,7 @@ public interface IStreetService
 {
     Task<Result<int>> CreateStreetAsync(CreateStreetDto command, string userId);
     Task<Result<StreetResponseDto>> GetStreetByIdAsync(int id);
+    Task<Result<List<StreetResponseDto>>> GetAllStreets();
     //Task<Result> UpdateStreetAsync(UpdateStreetDto command);
     //Task<Result> DeleteStreetAsync(int id);
 }

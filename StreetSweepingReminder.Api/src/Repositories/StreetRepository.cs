@@ -50,4 +50,17 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
         var street = await connection.QueryAsync<Street>(sql, partialStreetName);
         return street;
     }
+
+    public async Task<IEnumerable<Street>> GetAll()
+    {
+        const string sql =
+            """
+            SELECT *
+            FROM Streets
+            """;
+
+        using var connection = CreateConnection();
+        var streets = await connection.QueryAsync<Street>(sql);
+        return streets;
+    }
 }
