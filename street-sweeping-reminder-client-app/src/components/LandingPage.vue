@@ -34,7 +34,7 @@ const login = () => {
       <a
         href="https://github.com/eldo88/StreetSweepingReminder"
         target="_blank"
-        class="inline-block p-4 text-gray-500 hover:text-black transition duration-150"
+        class="inline-block p-4 black hover:text-gray-500 transition duration-150"
       >
         <i class="fab fa-github text-2xl"></i>
       </a>
