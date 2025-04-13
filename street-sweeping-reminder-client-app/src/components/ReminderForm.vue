@@ -5,6 +5,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useRemindersStore } from '@/stores/reminder'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { onMounted } from 'vue'
@@ -25,6 +26,8 @@ const schema = toTypedSchema(
 const toast = useToast()
 const router = useRouter()
 const reminderStore = useRemindersStore()
+
+const { streets } = storeToRefs(reminderStore)
 
 async function onSubmit(values) {
   try {
