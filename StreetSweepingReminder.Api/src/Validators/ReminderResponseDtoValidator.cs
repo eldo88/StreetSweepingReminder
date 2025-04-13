@@ -4,9 +4,9 @@ using StreetSweepingReminder.Api.Messages;
 
 namespace StreetSweepingReminder.Api.Validators;
 
-public class CreateReminderResponseDtoValidator : AbstractValidator<ReminderResponseDto>
+public class ReminderResponseDtoValidator : AbstractValidator<ReminderResponseDto>
 {
-    public CreateReminderResponseDtoValidator()
+    public ReminderResponseDtoValidator()
     {
         RuleFor(x => x.Id)
             .GreaterThan(0).WithMessage("Error getting Reminder ID.");
@@ -14,9 +14,6 @@ public class CreateReminderResponseDtoValidator : AbstractValidator<ReminderResp
         RuleFor(x => x.Message)
             .NotEmpty().WithMessage(ValidationMessages.MessageInvalid)
             .MaximumLength(200).WithMessage(ValidationMessages.MessageTooLong);
-        
-        RuleFor(x => x.ScheduledDateTimeUtc)
-            .GreaterThan(DateTime.UtcNow).WithMessage(ValidationMessages.ScheduledDateTimeInvalid);
 
         RuleFor(x => x.Status)
             .NotEmpty().WithMessage("Error with Reminder status.");
