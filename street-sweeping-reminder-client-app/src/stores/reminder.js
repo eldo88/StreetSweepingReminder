@@ -25,6 +25,12 @@ export const useRemindersStore = defineStore('reminders', {
         }
       } catch (error) {
         console.error('Failed to fetch reminders:', error)
+        if (error.response?.status === 401) {
+          // Show login modal
+          window.dispatchEvent(new CustomEvent('unauthorized'))
+        } else {
+          throw error
+        }
       }
     },
 
@@ -58,7 +64,13 @@ export const useRemindersStore = defineStore('reminders', {
         return response.data
       } catch (error) {
         console.error('Failed to create reminder:', error)
-        throw error
+        console.log(`Error code: ${error.response?.status}`)
+        if (error.response?.status === 401) {
+          // Show login modal
+          window.dispatchEvent(new CustomEvent('unauthorized'))
+        } else {
+          throw error
+        }
       }
     },
   },
