@@ -8,22 +8,27 @@ import { useRemindersStore } from '@/stores/reminder'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
+import _ from 'lodash'
 
-// Import Element Plus Select component and its CSS
-import { ElSelect, ElOption } from 'element-plus' // Import ElSelect and ElOption
-import 'element-plus/dist/index.css' // Import Element Plus styles (or use unplugin)
+import { ElSelect, ElOption } from 'element-plus'
+import 'element-plus/dist/index.css'
 
 const schema = toTypedSchema(
   z.object({
     title: z.string().min(1, 'Title is required'),
     message: z.string().min(1, 'Message is required'),
     phoneNumber: z.string().min(10, 'Phone number is required'),
-    street: z.string().min(1, 'Street is required'),
     zip: z.string().regex(/^\d{5}$/, 'Must be a valid 5-digit ZIP code'),
     reminderDate: z.date({ required_error: 'Reminder Date is required' }),
     isRecurring: z.boolean().default(true),
     streetSweepingDate: z.date({ required_error: 'Street Sweeping Date is required' }),
+    street: z
+      .number({
+        required_error: 'Street is required',
+        invalid_type_error: 'Street must be selected',
+      })
+      .positive('Street must be selected'),
   }),
 )
 
@@ -31,15 +36,12 @@ const toast = useToast()
 const router = useRouter()
 const reminderStore = useRemindersStore()
 
-const { streets } = storeToRefs(reminderStore)
+const { streets, isLoading } = storeToRefs(reminderStore)
 
-// --- Prepare streets for ElSelect ---
-// ElSelect often works best with { value: ..., label: ... } structure
-// Adjust 'value' and 'label' based on your actual street object properties (e.g., id, name)
 const streetOptions = computed(() => {
   return streets.value.map((street) => ({
-    value: street.id, // The value to be submitted (e.g., the ID)
-    label: street.streetName, // The text to be displayed in the dropdown
+    value: street.id,
+    label: street.streetName + `, ${street.zipCode}`,
   }))
 })
 
@@ -53,12 +55,18 @@ async function onSubmit(values) {
   } catch (error) {
     console.error('Reminder creation failed:', error)
     toast.error('Failed to create reminder. Please try again.')
+  } finally {
+    reminderStore.clearStreets()
   }
 }
 
-onMounted(() => {
-  reminderStore.getStreets()
-})
+const handleStreetSearch = _.debounce(async (query) => {
+  if (query) {
+    reminderStore.searchStreets(query)
+  } else {
+    reminderStore.clearStreets()
+  }
+}, 300)
 </script>
 
 <template>
@@ -115,34 +123,22 @@ onMounted(() => {
             <ErrorMessage name="message" class="text-red-500 text-xs mt-1" />
           </div>
 
-          <!-- Street -->
-          <!-- <div class="mb-4">
-            <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
-              Street Name <span class="text-red-500">*</span>
-            </label>
-            <Field
-              id="street"
-              name="street"
-              type="text"
-              placeholder="e.g. Main Street"
-              class="input-field"
-            />
-            <ErrorMessage name="street" class="text-red-500 text-xs mt-1" />
-          </div> -->
-
           <!-- Street (Searchable Dropdown using Element Plus) -->
           <div class="mb-4">
             <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
               Street Name <span class="text-red-500">*</span>
             </label>
             <!-- Use VeeValidate Field component for validation -->
-            <Field name="street" v-slot="{ field, value }">
+            <Field name="street" v-slot="{ field, value, errors }">
               <el-select
                 v-bind="field"
                 :model-value="value"
                 @update:modelValue="field.onChange($event)"
                 placeholder="Select or search for a street"
                 filterable
+                remote
+                :remote-method="handleStreetSearch"
+                :loading="isLoading"
                 clearable
                 class="w-full"
                 id="street"
