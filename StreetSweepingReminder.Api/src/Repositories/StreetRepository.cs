@@ -39,15 +39,24 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
     
     public async Task<IEnumerable<Street>> GetByPartialStreetName(string partialStreetName)
     {
+        if (string.IsNullOrWhiteSpace(partialStreetName)) // extra validation to avoid returning whole table of 4600+ items
+        {
+            return [];
+        }
+        
+        var searchPattern = $"%{partialStreetName}%";
+        
         const string sql =
             """
             SELECT *
             FROM Streets
-            WHERE StreetName LIKE @partialStreetName
+            WHERE upper(StreetName)LIKE upper(@searchPattern)
+            ORDER BY StreetName
+            LIMIT 50
             """;
 
         using var connection = CreateConnection();
-        var street = await connection.QueryAsync<Street>(sql, partialStreetName);
+        var street = await connection.QueryAsync<Street>(sql, new { searchPattern });
         return street;
     }
 
