@@ -77,38 +77,7 @@ public class StreetController : ControllerBase
         
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
     }
-
-    [HttpGet("getAll")]
-    [ProducesResponseType(typeof(List<ReminderResponseDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll()
-    {
-        var result = await _streetService.GetAllStreets();
-        if (result.IsSuccess)
-        {
-            return Ok(result.Value);
-        }
-
-        if (result.HasError<NotFoundError>())
-        {
-            return NotFound("No street found.");
-        }
-        
-        if (result.HasError<ValidationError>(out var validationErrors))
-        {
-            foreach (var error in validationErrors)
-            {
-                ModelState.AddModelError(string.Empty, error.Message);
-            }
-
-            return ValidationProblem(ModelState);
-        }
-        
-        _logger.LogError("Failed to get streets. Errors: {Errors}", result.Errors);
-        
-        return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-    }
+    
 
     [HttpGet("search")]
     [ProducesResponseType(typeof(List<StreetResponseDto>), StatusCodes.Status200OK)]

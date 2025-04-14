@@ -66,36 +66,6 @@ public class StreetService : IStreetService
         }
     }
 
-    public async Task<Result<List<StreetResponseDto>>> GetAllStreets()
-    {
-        try
-        {
-            var result = await _streetRepository.GetAll();
-            var streetList = result.ToList();
-            if (streetList.Count == 0)
-            {
-                return Result.Fail<List<StreetResponseDto>>(new NotFoundError("No streets found."));
-            }
-
-            var dtoList = streetList.ToListOfStreetResponseDtos();
-            foreach (var dto in dtoList)
-            {
-                var validationResult = await _streetResponseValidator.ValidateAsync(dto);
-                if (!validationResult.IsValid)
-                {
-                    return validationResult.ToFluentResult();
-                }
-            }
-
-            return Result.Ok(dtoList);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error retrieving street.");
-            return Result.Fail<List<StreetResponseDto>>(new ExceptionalError(e));
-        }
-    }
-
     public async Task<Result<List<StreetResponseDto>>> GetStreetsByPartialName(string streetName)
     {
         if (string.IsNullOrEmpty(streetName))
