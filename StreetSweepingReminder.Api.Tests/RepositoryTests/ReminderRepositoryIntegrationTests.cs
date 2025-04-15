@@ -22,12 +22,10 @@ public class ReminderRepositoryIntegrationTests
         CREATE TABLE Reminders (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             UserId TEXT NOT NULL,
-            Message TEXT NOT NULL,
-            ScheduledDateTimeUtc TEXT NOT NULL,
+            Title TEXT NOT NULL,
             Status TEXT NOT NULL,
             PhoneNumber TEXT NOT NULL,
-            StreetId INTEGER NOT NULL,
-            ScheduleId INTEGER NOT NULL,
+            StreetId INTEGER NOT NULL, 
             CreatedAt TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ', 'now')),
             ModifiedAt TEXT
         );
@@ -75,12 +73,10 @@ public class ReminderRepositoryIntegrationTests
         var reminderToCreate = new Reminder
         {
             UserId = "test-user-123",
-            Message = "Test sweeping reminder",
-            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+            Title = "Test sweeping reminder",
             Status = ReminderStatus.Scheduled, 
             PhoneNumber = "+1234567890",
             StreetId = 101,
-            ScheduleId = 1
         };
         
         // Act
@@ -97,15 +93,14 @@ public class ReminderRepositoryIntegrationTests
         Assert.Multiple(() =>
         {
             Assert.That(insertedReminder.UserId, Is.EqualTo(reminderToCreate.UserId));
-            Assert.That(insertedReminder.Message, Is.EqualTo(reminderToCreate.Message));
+            Assert.That(insertedReminder.Title, Is.EqualTo(reminderToCreate.Title));
             // truncate dates due to precision difference between .net and sqlite
-            var expectedDate = reminderToCreate.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
+            /*var expectedDate = reminderToCreate.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
             var actualDate = insertedReminder.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
-            Assert.That(actualDate, Is.EqualTo(expectedDate), "ScheduledDateTimeUtc mismatch after truncating to milliseconds.");
+            Assert.That(actualDate, Is.EqualTo(expectedDate), "ScheduledDateTimeUtc mismatch after truncating to milliseconds.");*/
             Assert.That(insertedReminder.Status, Is.EqualTo(reminderToCreate.Status));
             Assert.That(insertedReminder.PhoneNumber, Is.EqualTo(reminderToCreate.PhoneNumber));
             Assert.That(insertedReminder.StreetId, Is.EqualTo(reminderToCreate.StreetId));
-            Assert.That(insertedReminder.ScheduleId, Is.EqualTo(reminderToCreate.ScheduleId));
             Assert.That(insertedReminder.CreatedAt, Is.Not.EqualTo(default(DateTime)));
             Assert.That(insertedReminder.ModifiedAt, Is.Not.EqualTo(default(DateTime)));
         });
@@ -119,12 +114,10 @@ public class ReminderRepositoryIntegrationTests
         var reminderWithNullUser = new Reminder
         {
             UserId = null,
-            Message = "Test message",
-            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+            Title = "Test Title",
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "123456789",
-            StreetId = 1,
-            ScheduleId = 1
+            StreetId = 1
         };
 
         // Act & Assert
@@ -134,7 +127,7 @@ public class ReminderRepositoryIntegrationTests
         Assert.Multiple(() =>
         {
             Assert.That(ex.Message, Does.Contain("NOT NULL constraint failed").IgnoreCase.And.Contain("Reminders.UserId"),
-                "Exception message should indicate the specific NOT NULL constraint failure.");
+                "Exception Title should indicate the specific NOT NULL constraint failure.");
             Assert.That(ex.SqliteErrorCode, Is.EqualTo(19)); // SQLITE_CONSTRAINT error code is often 19
         });
     }
@@ -148,12 +141,10 @@ public class ReminderRepositoryIntegrationTests
         var reminderToCreate = new Reminder
         {
             UserId = "test-user-123",
-            Message = "Test sweeping reminder",
-            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+            Title = "Test sweeping reminder",
             Status = ReminderStatus.Scheduled, 
             PhoneNumber = "+1234567890",
             StreetId = 101,
-            ScheduleId = 1
         };
         
         var newId = await repository.CreateAsync(reminderToCreate);
@@ -167,15 +158,10 @@ public class ReminderRepositoryIntegrationTests
         Assert.Multiple(() =>
         {
             Assert.That(reminderToCreate.UserId, Is.EqualTo(reminderFromDb.UserId));
-            Assert.That(reminderToCreate.Message, Is.EqualTo(reminderFromDb.Message));
-            // truncate dates due to precision difference between .net and sqlite
-            var expectedDate = reminderToCreate.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
-            var actualDate = reminderFromDb.ScheduledDateTimeUtc.Truncate(TimeSpan.FromMilliseconds(1));
-            Assert.That(actualDate, Is.EqualTo(expectedDate), "ScheduledDateTimeUtc mismatch after truncating to milliseconds.");
+            Assert.That(reminderToCreate.Title, Is.EqualTo(reminderFromDb.Title));
             Assert.That(reminderToCreate.Status, Is.EqualTo(reminderFromDb.Status));
             Assert.That(reminderToCreate.PhoneNumber, Is.EqualTo(reminderFromDb.PhoneNumber));
             Assert.That(reminderToCreate.StreetId, Is.EqualTo(reminderFromDb.StreetId));
-            Assert.That(reminderToCreate.ScheduleId, Is.EqualTo(reminderFromDb.ScheduleId));
         });
     }
 
@@ -204,32 +190,26 @@ public class ReminderRepositoryIntegrationTests
             new()
             {
                 UserId = "test-user-123",
-                Message = "Test sweeping reminder",
-                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Title = "Test sweeping reminder",
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101,
-                ScheduleId = 1
+                StreetId = 101
             },
             new()
             {
                 UserId = "test-user-123",
-                Message = "Test sweeping reminder, second entry",
-                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Title = "Test sweeping reminder, second entry",
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101,
-                ScheduleId = 1
+                StreetId = 101
             },
             new()
             {
                 UserId = "test-user-123",
-                Message = "Test sweeping reminder, third entry",
-                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Title = "Test sweeping reminder, third entry",
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101,
-                ScheduleId = 1
+                StreetId = 101
             }
         };
 
@@ -262,32 +242,26 @@ public class ReminderRepositoryIntegrationTests
             new()
             {
                 UserId = "test-user-123",
-                Message = "Test sweeping reminder",
-                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Title = "Test sweeping reminder",
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101,
-                ScheduleId = 1
+                StreetId = 101
             },
             new()
             {
                 UserId = "test-user-123",
-                Message = "Test sweeping reminder, second entry",
-                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Title = "Test sweeping reminder, second entry",
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101,
-                ScheduleId = 1
+                StreetId = 101
             },
             new()
             {
                 UserId = "test-user-123",
-                Message = "Test sweeping reminder, third entry",
-                ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                Title = "Test sweeping reminder, third entry",
                 Status = ReminderStatus.Scheduled, 
                 PhoneNumber = "+1234567890",
-                StreetId = 101,
-                ScheduleId = 1
+                StreetId = 101
             }
         };
 
@@ -318,12 +292,10 @@ public class ReminderRepositoryIntegrationTests
         var initialReminder = new Reminder
         {
             UserId = "test-user-update-123",
-            Message = "Original Message",
-            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
+            Title = "Original Title",
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "+1987654321",
-            StreetId = 202,
-            ScheduleId = 1
+            StreetId = 202
         };
         var newId = await repository.CreateAsync(initialReminder);
         Assert.That(newId, Is.GreaterThan(0), "Setup failed: Could not create initial reminder.");
@@ -336,14 +308,12 @@ public class ReminderRepositoryIntegrationTests
         {
             Id = newId, // set to newly created ID so same object is updated
             UserId = reminderBeforeUpdate.UserId,
-            ScheduledDateTimeUtc = reminderBeforeUpdate.ScheduledDateTimeUtc,
             PhoneNumber = reminderBeforeUpdate.PhoneNumber,
             StreetId = reminderBeforeUpdate.StreetId,
-            ScheduleId = reminderBeforeUpdate.ScheduleId,
             CreatedAt = reminderBeforeUpdate.CreatedAt,
 
             // Updates
-            Message = "Updated Message Successfully", 
+            Title = "Updated Title Successfully", 
             Status = ReminderStatus.Scheduled,
             ModifiedAt = DateTime.UtcNow.Truncate(TimeSpan.FromSeconds(1))
         };
@@ -360,7 +330,7 @@ public class ReminderRepositoryIntegrationTests
         Assert.Multiple(() =>
         {
         
-            Assert.That(actualUpdatedReminder.Message, Is.EqualTo(reminderWithUpdates.Message), "Message should be updated.");
+            Assert.That(actualUpdatedReminder.Title, Is.EqualTo(reminderWithUpdates.Title), "Title should be updated.");
             Assert.That(actualUpdatedReminder.Status, Is.EqualTo(reminderWithUpdates.Status), "Status should be updated.");
             
             Assert.That(actualUpdatedReminder.UserId, Is.EqualTo(reminderWithUpdates.UserId), "UserId should not change.");
@@ -391,12 +361,11 @@ public class ReminderRepositoryIntegrationTests
         {
             Id = -2, //invalid id
             UserId = "test-user-update-123",
-            Message = "Original Message",
-            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
+            Title = "Original Title",
+            /*ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),*/
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "+1987654321",
-            StreetId = 202,
-            ScheduleId = 1
+            StreetId = 202
         };
         
         // Act
@@ -415,12 +384,10 @@ public class ReminderRepositoryIntegrationTests
         var reminderToBeDeleted = new Reminder()
         {
             UserId = "test-user-update-123",
-            Message = "Original Message",
-            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
+            Title = "Original Title",
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "+1987654321",
-            StreetId = 202,
-            ScheduleId = 1
+            StreetId = 202
         };
 
         var newId = await repository.CreateAsync(reminderToBeDeleted);
@@ -445,12 +412,10 @@ public class ReminderRepositoryIntegrationTests
         var reminderThatShouldNotGetDeleted = new Reminder()
         {
             UserId = "test-user-update-123",
-            Message = "Original Message",
-            ScheduledDateTimeUtc = DateTime.UtcNow.AddDays(2).Truncate(TimeSpan.FromSeconds(1)),
+            Title = "Original Title",
             Status = ReminderStatus.Scheduled,
             PhoneNumber = "+1987654321",
-            StreetId = 202,
-            ScheduleId = 1
+            StreetId = 202
         };
 
         var newId = await repository.CreateAsync(reminderThatShouldNotGetDeleted);
