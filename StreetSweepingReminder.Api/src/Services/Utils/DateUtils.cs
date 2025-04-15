@@ -34,4 +34,27 @@ public static class DateUtils
             return date;
         }
     }
+
+    public static List<DateTime> CalculateMonthlyRecurringSchedule(DateTime initialReminderDateTime, int weekOfMonth)
+    {
+        var scheduledDays = new List<DateTime>();
+        var dayOfWeek = initialReminderDateTime.DayOfWeek;
+        var startingMonth = initialReminderDateTime.Month;
+
+        if (startingMonth is >= 4 and <= 11)
+        {   // set first days for reminder since that is provided by client
+            scheduledDays.Add(initialReminderDateTime);
+            
+            // Calc remaining for the year
+            var dateToAdd = initialReminderDateTime;
+            for (var i = startingMonth; i < 11; i++)
+            {
+                var (year, month, _) = dateToAdd.AddMonths(1); // need to extract time
+                dateToAdd = GetNthWeekdayOfMonth(year, month, dayOfWeek, weekOfMonth);
+                scheduledDays.Add(dateToAdd);
+            }
+        }
+
+        return scheduledDays;
+    }
 }
