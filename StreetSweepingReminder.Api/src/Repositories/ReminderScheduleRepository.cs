@@ -9,7 +9,7 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
     {
     }
 
-    public Task<int> CreateAsync(ReminderSchedule reminderSchedule)
+    public async Task<int> CreateAsync(ReminderSchedule reminderSchedule)
     {
         const string sql =
             """
@@ -18,7 +18,7 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
             SELECT last_insert_rowid();
             """;
         using var connection = CreateConnection();
-        var newId = connection.ExecuteScalarAsync<int>(sql, reminderSchedule);
+        var newId = await connection.ExecuteScalarAsync<int>(sql, reminderSchedule);
         return newId;
     }
 
