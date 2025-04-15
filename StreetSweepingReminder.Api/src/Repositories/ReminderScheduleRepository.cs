@@ -13,8 +13,8 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
     {
         const string sql =
             """
-            INSERT INTO ReminderSchedule (ReminderId ,Message,DayOfWeek, ReminderDate, WeekOfMonth, StartMonth, EndMonth, TimeOfDay, TimeZone, IsRecurring, IsActive)
-            VALUES (@ReminderId, @Message, @DayOfWeek, @ReminderDate, @WeekOfMonth, @StartMonth, @EndMonth, @TimeOfDay, @TimeZone, @IsRecurring, @IsActive);
+            INSERT INTO ReminderSchedule (ReminderId ,Message,DayOfWeek, NextNotificationDate, WeekOfMonth, StartMonth, EndMonth, TimeOfDay, TimeZone, IsRecurring, IsActive)
+            VALUES (@ReminderId, @Message, @DayOfWeek, @NextNotificationDate, @WeekOfMonth, @StartMonth, @EndMonth, @TimeOfDay, @TimeZone, @IsRecurring, @IsActive);
             SELECT last_insert_rowid();
             """;
         using var connection = CreateConnection();
