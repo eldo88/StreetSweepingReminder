@@ -11,7 +11,7 @@ public class ReminderResponseDtoValidator : AbstractValidator<ReminderResponseDt
         RuleFor(x => x.Id)
             .GreaterThan(0).WithMessage("Error getting Reminder ID.");
         
-        RuleFor(x => x.Message)
+        RuleFor(x => x.Title)
             .NotEmpty().WithMessage(ValidationMessages.MessageInvalid)
             .MaximumLength(200).WithMessage(ValidationMessages.MessageTooLong);
 

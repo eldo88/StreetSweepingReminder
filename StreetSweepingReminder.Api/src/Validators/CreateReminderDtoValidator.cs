@@ -8,7 +8,7 @@ public class CreateReminderDtoValidator : AbstractValidator<CreateReminderDto>
 {
     public CreateReminderDtoValidator()
     {
-        RuleFor(x => x.Message)
+        RuleFor(x => x.Title)
             .NotEmpty().WithMessage(ValidationMessages.MessageInvalid)
             .MaximumLength(200).WithMessage(ValidationMessages.MessageTooLong);
         
