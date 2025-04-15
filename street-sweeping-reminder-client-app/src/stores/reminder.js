@@ -47,7 +47,7 @@ export const useRemindersStore = defineStore('reminders', {
         }
 
         const payload = {
-          message: formData.message,
+          title: formData.title,
           scheduledDateTimeUtc: formData.reminderDate.toISOString(),
           status: 'Pending',
           phoneNumber: formData.phoneNumber,
