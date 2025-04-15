@@ -1,13 +1,14 @@
 using FluentResults;
 using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Entities;
+using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Repositories;
 
 namespace StreetSweepingReminder.Api.Services;
 
 public interface IStreetSweepingSchedulerService
 {
-    Task<Result> CreateStreetSweepingSchedule(CreateReminderDto command, int reminderId);
+    Task<Result> CreateStreetSweepingSchedule(CreateReminderDto command, int streetId);
 }
 
 public class StreetSweepingSchedulerService : 
@@ -18,33 +19,43 @@ public class StreetSweepingSchedulerService :
     {
     }
     
-    public Task<Result> CreateStreetSweepingSchedule(CreateReminderDto command, int reminderId)
+    public Task<Result> CreateStreetSweepingSchedule(CreateReminderDto command, int streetId)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(command);
+        if (streetId <= 0)
+        {
+            _logger.LogWarning("Invalid streetId provided: {streetId}", streetId);
+            return Task.FromResult(Result.Fail(new ValidationError($"{nameof(streetId)} must be positive.")));
+        }
+
+        return CreateScheduleAsync(command, streetId);
     }
 
     protected override bool GetIsRecurring(CreateReminderDto command)
     {
-        throw new NotImplementedException();
+        return true; // always recurring
     }
 
     protected override DateTime GetBaseScheduleDate(CreateReminderDto command)
     {
-        throw new NotImplementedException();
+        return DateTime.SpecifyKind(command.StreetSweepingDate, DateTimeKind.Local); // modify here to get the first occurence in April
     }
 
     protected override object[] GetRecurringParameters(CreateReminderDto command)
     {
-        throw new NotImplementedException();
+        return [command.WeekOfMonth];
     }
 
     protected override StreetSweepingDates MapToEntity(CreateReminderDto command, int parentId)
     {
-        throw new NotImplementedException();
+        return new StreetSweepingDates
+        {
+            StreetId = parentId
+        };
     }
 
     protected override void SetScheduleDateOnEntity(StreetSweepingDates entity, DateTime scheduleDate)
     {
-        throw new NotImplementedException();
+        entity.StreetSweepingDate = scheduleDate;
     }
 }
