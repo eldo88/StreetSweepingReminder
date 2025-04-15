@@ -3,8 +3,7 @@ namespace StreetSweepingReminder.Api.DTOs;
 
 public record ReminderResponseDto(
     int Id, 
-    string Message, 
-    DateTime ScheduledDateTimeUtc, 
+    string Title, 
     string Status, 
     string PhoneNumber, 
     int StreetId);

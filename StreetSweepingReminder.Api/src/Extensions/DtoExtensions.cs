@@ -12,9 +12,7 @@ public static class DtoExtensions
         {
             Id = 0,
             UserId = string.Empty,
-            Message = source.Message,
-            ScheduledDateTimeUtc = source.ScheduledDateTimeUtc,
-            StreetSweepingDate = source.StreetSweepingDate,
+            Title = source.Title,
             Status = string.Empty,
             PhoneNumber = source.PhoneNumber,
             StreetId = source.StreetId,
@@ -26,8 +24,7 @@ public static class DtoExtensions
     {
         return new ReminderResponseDto(
             source.Id,
-            source.Message,
-            source.ScheduledDateTimeUtc,
+            source.Title,
             source.Status,
             source.PhoneNumber,
             source.StreetId);
@@ -43,9 +40,7 @@ public static class DtoExtensions
         return new Reminder()
         {
             Id = source.Id,
-            Message = source.Message,
-            ScheduledDateTimeUtc = source.ScheduledDateTimeUtc,
-            StreetSweepingDate = source.StreetSweepingDate,
+            Title = source.Title,
             Status = source.Status,
             PhoneNumber = source.PhoneNumber,
             StreetId = source.StreetId
@@ -56,9 +51,7 @@ public static class DtoExtensions
     {
         return new UpdateReminderDto(
             source.Id,
-            source.Message,
-            source.ScheduledDateTimeUtc,
-            source.StreetSweepingDate,
+            source.Title,
             source.Status,
             source.PhoneNumber,
             source.StreetId,
@@ -96,7 +89,7 @@ public static class DtoExtensions
     {
         return new ReminderSchedule()
         {
-            Message = source.Message,
+            Message = string.Empty,
             WeekOfMonth = source.WeekOfMonth,
             StartMonth = source.ScheduledDateTimeUtc.Month,
             ReminderDate = source.ScheduledDateTimeUtc,
