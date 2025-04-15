@@ -3,9 +3,7 @@
 CREATE TABLE IF NOT EXISTS main.Reminders (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     UserId TEXT NOT NULL,
-    Message TEXT NOT NULL,
-    ScheduledDateTimeUtc TEXT NOT NULL,
-    StreetSweepingDate TEXT NOT NULL, 
+    Title TEXT NOT NULL,
     Status TEXT NOT NULL,
     PhoneNumber TEXT NOT NULL,
     StreetId INTEGER NOT NULL, 
