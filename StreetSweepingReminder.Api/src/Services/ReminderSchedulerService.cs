@@ -4,70 +4,57 @@ using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Extensions;
 using StreetSweepingReminder.Api.Repositories;
-using StreetSweepingReminder.Api.Services.Utils;
 
 namespace StreetSweepingReminder.Api.Services;
 
-public class ReminderSchedulerService : IReminderScheduler
+public class ReminderSchedulerService :
+    SchedulerServiceBase<CreateReminderDto, ReminderSchedule, IReminderScheduleRepository, int, ReminderSchedulerService>,
+    IReminderScheduler
 {
-    private readonly ILogger<ReminderSchedulerService> _logger;
-    private readonly IReminderScheduleRepository _reminderScheduleRepository;
-
-    public ReminderSchedulerService(ILogger<ReminderSchedulerService> logger, IReminderScheduleRepository reminderScheduleRepository)
+    public ReminderSchedulerService(ILogger<ReminderSchedulerService> logger, IReminderScheduleRepository repository) : base(logger, repository)
     {
-        _logger = logger;
-        _reminderScheduleRepository = reminderScheduleRepository;
     }
-    
-    public async Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command, int reminderId)
-    {
-        if (command.IsRecurring)
-        {
-            var reminderDates =  DateUtils.CalculateMonthlyRecurringSchedule(command.ScheduledDateTimeUtc, command.WeekOfMonth);
 
-            foreach (var reminder in reminderDates)
-            {
-                _logger.Log(LogLevel.Debug, "Reminder: {r}", reminder);
-                var reminderSchedule = command.ToReminderScheduleEntity(reminderId);
-                reminderSchedule.ReminderDate = reminder;
-                reminderSchedule.IsActive = true;
-                var result = await SaveReminderScheduleAsync(reminderSchedule);
-                if (result.IsFailed)
-                {
-                    return result;
-                }
-            }
-        }
-        else
+    public Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command, int reminderId)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        if (reminderId <= 0)
         {
-            var reminderSchedule = command.ToReminderScheduleEntity(reminderId);
-            reminderSchedule.IsActive = true;
-            var result = await SaveReminderScheduleAsync(reminderSchedule);
-            if (result.IsFailed)
-            {
-                return result;
-            }
+            _logger.LogWarning("Invalid reminderId provided: {ReminderId}", reminderId);
+            return Task.FromResult(Result.Fail(new ValidationError($"{nameof(reminderId)} must be positive.")));
         }
         
-        return Result.Ok();
+        return CreateScheduleAsync(command, reminderId);
+    }
+    
+    protected override bool GetIsRecurring(CreateReminderDto command)
+    {
+        return command.IsRecurring;
     }
 
-    private async Task<Result> SaveReminderScheduleAsync(ReminderSchedule reminderSchedule)
+    protected override DateTime GetBaseScheduleDate(CreateReminderDto command)
     {
-        try
-        {
-            var newId = await _reminderScheduleRepository.CreateAsync(reminderSchedule);
-            if (newId <= 0)
-            {
-                return Result.Fail(new ApplicationError("Invalid ID saved to the database"));
-            }
+        return DateTime.SpecifyKind(command.ScheduledDateTimeUtc, DateTimeKind.Utc);
+    }
 
-            return Result.Ok();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error creating reminder schedule.");
-            return Result.Fail(new ExceptionalError("Unexpected error occurred saving reminder schedule.", e));
-        }
+    protected override object[] GetRecurringParameters(CreateReminderDto command)
+    {
+        return [command.WeekOfMonth];
+    }
+
+    protected override ReminderSchedule MapToEntity(CreateReminderDto command, int parentId)
+    {
+        return command.ToReminderScheduleEntity(parentId);
+    }
+
+    protected override void SetScheduleDateOnEntity(ReminderSchedule entity, DateTime scheduleDate)
+    {
+        entity.NextNotificationDate = scheduleDate;
+    }
+    
+    protected override void CustomizeEntityBeforeSave(ReminderSchedule entity, CreateReminderDto command)
+    {
+        // Set properties specific to ReminderSchedule just before saving
+        entity.IsActive = true;
     }
 }
