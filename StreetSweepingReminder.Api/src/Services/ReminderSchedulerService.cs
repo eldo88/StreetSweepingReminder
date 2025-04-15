@@ -34,7 +34,7 @@ public class ReminderSchedulerService :
 
     protected override DateTime GetBaseScheduleDate(CreateReminderDto command)
     {
-        return DateTime.SpecifyKind(command.ScheduledDateTimeUtc, DateTimeKind.Utc);
+        return DateTime.SpecifyKind(command.ScheduledDateTimeUtc, DateTimeKind.Local);
     }
 
     protected override object[] GetRecurringParameters(CreateReminderDto command)
