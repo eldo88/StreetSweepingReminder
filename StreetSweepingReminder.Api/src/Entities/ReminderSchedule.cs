@@ -5,7 +5,7 @@ public class ReminderSchedule
     public int Id { get; set; }
     public int ReminderId { get; set; }
     public string Message { get; set; } = string.Empty;
-    public DateTime ReminderDate { get; set; }
+    public DateTime NextNotificationDate { get; set; }
     public DayOfWeek DayOfWeek { get; set; }
     public int WeekOfMonth { get; set; }
     public int StartMonth { get; set; }

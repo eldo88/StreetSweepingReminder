@@ -92,7 +92,7 @@ public static class DtoExtensions
             Message = string.Empty,
             WeekOfMonth = source.WeekOfMonth,
             StartMonth = source.ScheduledDateTimeUtc.Month,
-            ReminderDate = source.ScheduledDateTimeUtc,
+            NextNotificationDate = source.ScheduledDateTimeUtc,
             DayOfWeek = source.ScheduledDateTimeUtc.DayOfWeek,
             TimeOfDay = source.ScheduledDateTimeUtc.ToShortTimeString(),
             TimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Denver").ToString(), // hard coded for now
