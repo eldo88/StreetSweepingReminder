@@ -1,7 +1,6 @@
 using FluentResults;
 using FluentValidation;
 using StreetSweepingReminder.Api.DTOs;
-using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Extensions;
 using StreetSweepingReminder.Api.Messages;
