@@ -82,6 +82,7 @@ public class StreetController : ControllerBase
     [HttpGet("search")]
     [ProducesResponseType(typeof(List<StreetResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByPartialStreetName([FromQuery(Name = "query")] string streetName)
     {
@@ -109,5 +110,37 @@ public class StreetController : ControllerBase
         _logger.LogError("Failed to get streets. Errors: {Errors}", result.Errors);
         
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+    }
+
+    [HttpPost("{streetId:int}/schedule")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateStreetSweepingSchedule([FromRoute] int streetId, [FromBody] CreateStreetSweepingScheduleDto dto)
+    {
+        var result = await _streetService.CreateStreetSweepingSchedule(dto, streetId);
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetStreetSweepingSchedule), new { streetId });
+        }
+        
+        if (result.HasError<ValidationError>(out var validationErrors))
+        {
+            foreach (var error in validationErrors)
+            {
+                ModelState.AddModelError(string.Empty, error.Message);
+            }
+
+            return ValidationProblem(ModelState);
+        }
+        
+        _logger.LogError("Failed to create street sweeping schedule. Errors: {Errors}", result.Errors);
+        
+        return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+    }
+
+    [HttpGet("{streetId:int}/getSchedule")]
+    public async Task<IActionResult> GetStreetSweepingSchedule([FromRoute] int streetId)
+    {
+        return Ok();
     }
 }
