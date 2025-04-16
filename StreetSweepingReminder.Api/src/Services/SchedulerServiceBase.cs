@@ -59,23 +59,21 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
         
         return DateUtils.CalculateMonthlyRecurringSchedule(baseDate, weekOfMonth);
     }
-    
-    public async Task<Result> CreateScheduleAsync(TCommand command, TParentId parentId)
+
+    protected async Task<Result> CreateScheduleAsync(TCommand command, TParentId parentId)
     {
         List<DateTime> scheduleDates;
         try
         {
             scheduleDates = CalculateScheduleDates(command);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            _logger.LogError(ex, "Error calculating schedule dates.");
-            // Provide a more specific error if possible
-            return Result.Fail(new ApplicationError("Failed to calculate schedule dates.").CausedBy(ex));
+            _logger.LogError(e, "Error calculating schedule dates.");
+            return Result.Fail(new ApplicationError("Failed to calculate schedule dates.").CausedBy(e));
         }
-
-
-        if (scheduleDates == null || !scheduleDates.Any())
+        
+        if (scheduleDates.Count == 0)
         {
             _logger.LogWarning("No schedule dates were generated for command associated with ParentId: {ParentId}", parentId);
             return Result.Ok().WithSuccess("No schedule dates generated based on input.");
@@ -97,17 +95,16 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
                 // 3. Allow customization (e.g., set IsActive)
                 CustomizeEntityBeforeSave(scheduleEntity, command);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                _logger.LogError(ex, "Error preparing entity for date {ScheduleDate} and ParentId {ParentId}.", scheduleDate, parentId);
-                return Result.Fail(new ApplicationError($"Failed to prepare schedule information for date {scheduleDate:yyyy-MM-dd}.").CausedBy(ex));
+                _logger.LogError(e, "Error preparing entity for date {ScheduleDate} and ParentId {ParentId}.", scheduleDate, parentId);
+                return Result.Fail(new ApplicationError($"Failed to prepare schedule information for date {scheduleDate:yyyy-MM-dd}.").CausedBy(e));
             }
 
             // 4. Save the fully prepared entity
             var saveResult = await SaveScheduleItemAsync(scheduleEntity);
             if (saveResult.IsFailed)
             {
-                // Add context about which date failed
                 return saveResult.WithError($"Failed during save operation for schedule date {scheduleDate:yyyy-MM-dd}.");
             }
         }
@@ -136,7 +133,7 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
         catch (Exception e)
         {
             _logger.LogError(e, "Error saving schedule entity to database.");
-            return Result.Fail(new ExceptionalError("Unexpected error occurred saving schedule entity.", e));
+            return Result.Fail(new ExceptionalError("Unexpected error occurred saving schedule entity.", e).CausedBy(e));
         }
     }
 }
