@@ -47,7 +47,7 @@ public class StreetController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(ReminderResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetStreet(int id)
     {
@@ -60,7 +60,7 @@ public class StreetController : ControllerBase
 
         if (result.HasError<NotFoundError>())
         {
-            return NotFound("No street found.");
+            return Ok();
         }
         
         if (result.HasError<ValidationError>(out var validationErrors))
@@ -81,7 +81,6 @@ public class StreetController : ControllerBase
 
     [HttpGet("search")]
     [ProducesResponseType(typeof(List<StreetResponseDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByPartialStreetName([FromQuery(Name = "query")] string streetName)
