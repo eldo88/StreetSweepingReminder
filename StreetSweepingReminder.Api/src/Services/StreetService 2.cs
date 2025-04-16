@@ -12,12 +12,14 @@ public class StreetService : IStreetService
     private readonly ILogger<StreetService> _logger;
     private readonly IStreetRepository _streetRepository;
     private readonly IValidator<StreetResponseDto> _streetResponseValidator;
+    private readonly IStreetSweepingSchedulerService _schedulerService;
 
-    public StreetService(IStreetRepository streetRepository, ILogger<StreetService> logger, IValidator<StreetResponseDto> streetResponseValidator)
+    public StreetService(IStreetRepository streetRepository, ILogger<StreetService> logger, IValidator<StreetResponseDto> streetResponseValidator, IStreetSweepingSchedulerService schedulerService)
     {
         _streetRepository = streetRepository;
         _logger = logger;
         _streetResponseValidator = streetResponseValidator;
+        _schedulerService = schedulerService;
     }
 
     public async Task<Result<int>> CreateStreetAsync(CreateStreetDto command, string userId)
@@ -98,6 +100,26 @@ public class StreetService : IStreetService
         {
             _logger.LogError(e, "Error retrieving street.");
             return Result.Fail<List<StreetResponseDto>>(new ExceptionalError(e));
+        }
+    }
+
+    public async Task<Result> CreateStreetSweepingSchedule(CreateStreetSweepingScheduleDto dto, int streetId)
+    {
+        try
+        {
+            var result = await _schedulerService.CreateStreetSweepingSchedule(dto, streetId);
+            if (result.IsFailed)
+            {
+                _logger.LogWarning("Creating street sweeping schedule for street ID: {streetId} failed", streetId);
+                return result;
+            }
+
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error creating street sweeping schedule for {streetId}", streetId);
+            return Result.Fail(new ApplicationError("An unexpected error occurred creating street sweeping schedule."));
         }
     }
 }
