@@ -106,7 +106,7 @@ public class StreetService : IStreetService
     public async Task<Result> CreateStreetSweepingSchedule(CreateStreetSweepingScheduleDto dto, int streetId)
     {
         try
-        {
+        { //TODO add check to see if schedule exists
             var result = await _schedulerService.CreateStreetSweepingSchedule(dto, streetId);
             if (result.IsFailed)
             {
