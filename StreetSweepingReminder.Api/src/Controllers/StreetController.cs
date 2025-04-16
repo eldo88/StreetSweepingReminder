@@ -113,6 +113,7 @@ public class StreetController : ControllerBase
     }
 
     [HttpPost("{streetId:int}/schedule")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateStreetSweepingSchedule([FromRoute] int streetId, [FromBody] CreateStreetSweepingScheduleDto dto)
