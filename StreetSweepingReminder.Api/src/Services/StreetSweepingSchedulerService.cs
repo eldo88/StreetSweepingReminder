@@ -3,23 +3,24 @@ using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Repositories;
+using StreetSweepingReminder.Api.Services.Utils;
 
 namespace StreetSweepingReminder.Api.Services;
 
 public interface IStreetSweepingSchedulerService
 {
-    Task<Result> CreateStreetSweepingSchedule(CreateReminderDto command, int streetId);
+    Task<Result> CreateStreetSweepingSchedule(CreateStreetSweepingScheduleDto command, int streetId);
 }
 
 public class StreetSweepingSchedulerService : 
-    SchedulerServiceBase<CreateReminderDto, StreetSweepingDates, IStreetSweepingDatesRepository, int,StreetSweepingSchedulerService>,
+    SchedulerServiceBase<CreateStreetSweepingScheduleDto, StreetSweepingDates, IStreetSweepingDatesRepository, int,StreetSweepingSchedulerService>,
     IStreetSweepingSchedulerService
 {
     public StreetSweepingSchedulerService(ILogger<StreetSweepingSchedulerService> logger, IStreetSweepingDatesRepository repository) : base(logger, repository)
     {
     }
     
-    public Task<Result> CreateStreetSweepingSchedule(CreateReminderDto command, int streetId)
+    public Task<Result> CreateStreetSweepingSchedule(CreateStreetSweepingScheduleDto command, int streetId)
     {
         ArgumentNullException.ThrowIfNull(command);
         if (streetId <= 0)
@@ -31,22 +32,26 @@ public class StreetSweepingSchedulerService :
         return CreateScheduleAsync(command, streetId);
     }
 
-    protected override bool GetIsRecurring(CreateReminderDto command)
+    protected override bool GetIsRecurring(CreateStreetSweepingScheduleDto command)
     {
         return true; // always recurring
     }
 
-    protected override DateTime GetBaseScheduleDate(CreateReminderDto command)
+    protected override DateTime GetBaseScheduleDate(CreateStreetSweepingScheduleDto command)
     {
-        return DateTime.SpecifyKind(command.StreetSweepingDate, DateTimeKind.Local); // modify here to get the first occurence in April
+        var year = command.StreetSweepingDate.Year;
+        var dayOfWeek = command.StreetSweepingDate.DayOfWeek;
+        const int month = 4; // street sweeping starts in April
+        var baseStreetSweepingDate = DateUtils.GetNthWeekdayOfMonth(year, month, dayOfWeek, command.WeekOfMonth);
+        return DateTime.SpecifyKind(baseStreetSweepingDate, DateTimeKind.Local);
     }
 
-    protected override object[] GetRecurringParameters(CreateReminderDto command)
+    protected override object[] GetRecurringParameters(CreateStreetSweepingScheduleDto command)
     {
         return [command.WeekOfMonth];
     }
 
-    protected override StreetSweepingDates MapToEntity(CreateReminderDto command, int parentId)
+    protected override StreetSweepingDates MapToEntity(CreateStreetSweepingScheduleDto command, int parentId)
     {
         return new StreetSweepingDates
         {
