@@ -51,7 +51,7 @@ export const useRemindersStore = defineStore('reminders', {
           phoneNumber: formData.phoneNumber,
           streetId: 1, // hard coded for now, need to implement api call
           isRecurring: formData.isRecurring,
-          weekOfMonth: 2, // hard coded for now
+          weekOfMonth: 3, // hard coded for now
           streetSweepingDate: formData.streetSweepingDate.toISOString(),
         }
 
