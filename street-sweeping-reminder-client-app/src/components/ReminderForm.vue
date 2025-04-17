@@ -5,6 +5,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useRemindersStore } from '@/stores/reminder'
+import { useStreetsStore } from '@/stores/streets'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
@@ -35,8 +36,9 @@ const schema = toTypedSchema(
 const toast = useToast()
 const router = useRouter()
 const reminderStore = useRemindersStore()
+const streetsStore = useStreetsStore()
 
-const { streets, isLoading } = storeToRefs(reminderStore)
+const { streets, isLoading } = storeToRefs(streetsStore)
 
 const streetOptions = computed(() => {
   return streets.value.map((street) => ({
@@ -62,9 +64,9 @@ async function onSubmit(values) {
 
 const handleStreetSearch = _.debounce(async (query) => {
   if (query) {
-    reminderStore.searchStreets(query)
+    streetsStore.searchStreets(query)
   } else {
-    reminderStore.clearStreets()
+    streetsStore.clearStreets()
   }
 }, 300)
 </script>
