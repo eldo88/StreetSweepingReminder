@@ -120,7 +120,7 @@ public class StreetController : ControllerBase
         var result = await _streetService.CreateStreetSweepingSchedule(dto, streetId);
         if (result.IsSuccess)
         {
-            return CreatedAtAction(nameof(GetStreetSweepingSchedule), new { Id = streetId }, streetId);
+            return CreatedAtAction(nameof(GetStreetSweepingSchedule), new { streetId = streetId }, streetId);
         }
         
         if (result.HasError<ValidationError>(out var validationErrors))
