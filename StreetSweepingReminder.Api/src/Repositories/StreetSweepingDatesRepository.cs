@@ -51,4 +51,18 @@ internal class StreetSweepingDatesRepository : RepositoryBase, IStreetSweepingDa
     {
         throw new NotImplementedException();
     }
+
+    public async Task<IEnumerable<StreetSweepingDates>> GetStreetSweepingScheduleByStreetId(int streetId)
+    {
+        const string sql = 
+            """
+            SELECT Id, StreetId, StreetSweepingDate
+            FROM StreetSweepingDates
+            WHERE StreetId = @streetId
+            """;
+
+        using var connection = CreateConnection();
+        var streetSweepingDates = await connection.QueryAsync<StreetSweepingDates>(sql, new { streetId });
+        return streetSweepingDates;
+    }
 }
