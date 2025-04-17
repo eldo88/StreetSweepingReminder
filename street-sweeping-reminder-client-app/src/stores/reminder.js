@@ -5,8 +5,6 @@ import api from '@/services/api'
 export const useRemindersStore = defineStore('reminders', {
   state: () => ({
     reminders: [],
-    streets: [],
-    isLoading: false,
   }),
 
   actions: {
@@ -70,48 +68,6 @@ export const useRemindersStore = defineStore('reminders', {
           throw error
         }
       }
-    },
-
-    async getStreets() {
-      try {
-        if (this.streets.length === 0) {
-          console.log(`Streets len: ${this.streets.length}`)
-          const response = await api.get('Street/getAll')
-          if (response.data) {
-            this.streets = response.data
-          }
-        }
-      } catch (error) {
-        console.error('Failed to get streets' + error)
-      }
-    },
-
-    async searchStreets(query = '') {
-      if (!query.trim()) {
-        this.streets = []
-        return
-      }
-      this.isLoading = true
-      try {
-        const encodedQuery = encodeURIComponent(query)
-        const response = await api.get(`Street/search?query=${encodedQuery}`)
-
-        if (response.data) {
-          this.streets = response.data
-        } else {
-          this.streets = []
-        }
-      } catch (error) {
-        console.error('Failed to get streets' + error)
-        this.streets = []
-      } finally {
-        this.isLoading = false
-      }
-    },
-
-    clearStreets() {
-      this.streets = []
-      this.isLoading = false
     },
   },
 })
