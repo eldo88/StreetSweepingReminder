@@ -49,6 +49,8 @@ const streetOptions = computed(() => {
 
 async function onSubmit(values) {
   try {
+    console.log(`SS time: ${values.streetSweepingDate}`)
+    await streetsStore.getOrCreateSchedule(values.street, values.streetSweepingDate)
     await reminderStore.createReminder(values)
     toast.success('Reminder created successfully!')
     setTimeout(() => {
