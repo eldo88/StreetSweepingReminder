@@ -32,7 +32,7 @@ export const useStreetsStore = defineStore('streets', {
       }
     },
 
-    async getOrCreateSchedule(id, streetSweepingDate) {
+    async createSchedule(id, streetSweepingDate) {
       try {
         console.log(`SS date in store: ${streetSweepingDate}`)
         const payload = {
