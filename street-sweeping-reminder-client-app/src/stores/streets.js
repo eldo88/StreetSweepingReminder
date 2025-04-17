@@ -5,6 +5,7 @@ export const useStreetsStore = defineStore('streets', {
   state: () => ({
     streets: [],
     isLoading: false,
+    schedule: [],
   }),
 
   actions: {
@@ -28,6 +29,24 @@ export const useStreetsStore = defineStore('streets', {
         this.streets = []
       } finally {
         this.isLoading = false
+      }
+    },
+
+    async getOrCreateSchedule(id, streetSweepingDate) {
+      try {
+        console.log(`SS date in store: ${streetSweepingDate}`)
+        const payload = {
+          streetSweepingDate: streetSweepingDate,
+          weekOfMonth: 3,
+        }
+        const reponse = await api.post(`Street/${id}/schedule`, payload)
+        if (reponse.data) {
+          this.schedule = reponse.data
+        } else {
+          this.schedule = []
+        }
+      } catch (error) {
+        console.log('Failed to create schedule' + error)
       }
     },
 
