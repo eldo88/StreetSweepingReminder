@@ -58,7 +58,7 @@ async function onSubmit(values) {
     console.error('Reminder creation failed:', error)
     toast.error('Failed to create reminder. Please try again.')
   } finally {
-    reminderStore.clearStreets()
+    streetsStore.clearStreets()
   }
 }
 
