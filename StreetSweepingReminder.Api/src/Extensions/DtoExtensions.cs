@@ -110,7 +110,12 @@ public static class DtoExtensions
         List<StreetSweepingScheduleResponseDto> dtos = [];
         foreach (var entity in source)
         {
-            var dto = new StreetSweepingScheduleResponseDto(entity.Id, entity.StreetId, entity.StreetSweepingDate);
+            var dto = new StreetSweepingScheduleResponseDto(
+                entity.Id, 
+                entity.StreetId, 
+                entity.StreetSweepingDate, 
+                entity.StreetSweepingDate.DayOfWeek);
+            
             dtos.Add(dto);
         }
 
