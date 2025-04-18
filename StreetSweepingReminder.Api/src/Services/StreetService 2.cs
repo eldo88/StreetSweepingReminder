@@ -14,14 +14,16 @@ public class StreetService : IStreetService
     private readonly IValidator<StreetResponseDto> _streetResponseValidator;
     private readonly IStreetSweepingSchedulerService _schedulerService;
     private readonly IStreetSweepingDatesRepository _streetSweepingDatesRepository;
+    private readonly IValidator<StreetSweepingScheduleResponseDto> _streetSweepingScheduleResponseValidator;
 
-    public StreetService(IStreetRepository streetRepository, ILogger<StreetService> logger, IValidator<StreetResponseDto> streetResponseValidator, IStreetSweepingSchedulerService schedulerService, IStreetSweepingDatesRepository streetSweepingDatesRepository)
+    public StreetService(IStreetRepository streetRepository, ILogger<StreetService> logger, IValidator<StreetResponseDto> streetResponseValidator, IStreetSweepingSchedulerService schedulerService, IStreetSweepingDatesRepository streetSweepingDatesRepository, IValidator<StreetSweepingScheduleResponseDto> streetSweepingScheduleResponseValidator)
     {
         _streetRepository = streetRepository;
         _logger = logger;
         _streetResponseValidator = streetResponseValidator;
         _schedulerService = schedulerService;
         _streetSweepingDatesRepository = streetSweepingDatesRepository;
+        _streetSweepingScheduleResponseValidator = streetSweepingScheduleResponseValidator;
     }
 
     public async Task<Result<int>> CreateStreetAsync(CreateStreetDto command, string userId)
@@ -136,6 +138,15 @@ public class StreetService : IStreetService
         {
             var result = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
             var resultList = result.ToSweepingScheduleResponseDtos();
+
+            foreach (var dto in resultList)
+            {
+                var validationResult = await _streetSweepingScheduleResponseValidator.ValidateAsync(dto);
+                if (!validationResult.IsValid)
+                {
+                    return validationResult.ToFluentResult();
+                }
+            }
             
             return Result.Ok(resultList);
         }
