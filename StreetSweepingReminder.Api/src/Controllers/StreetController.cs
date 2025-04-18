@@ -139,8 +139,29 @@ public class StreetController : ControllerBase
     }
 
     [HttpGet("{streetId:int}/getSchedule")]
+    [ProducesResponseType(typeof(List<StreetSweepingScheduleResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetStreetSweepingSchedule([FromRoute] int streetId)
     {
-        return Ok();
+        var result = await _streetService.GetScheduleByStreetId(streetId);
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+        
+        if (result.HasError<ValidationError>(out var validationErrors))
+        {
+            foreach (var error in validationErrors)
+            {
+                ModelState.AddModelError(string.Empty, error.Message);
+            }
+
+            return ValidationProblem(ModelState);
+        }
+        
+        _logger.LogError("Failed to retrieve street sweeping schedule. Errors: {Errors}", result.Errors);
+        
+        return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
     }
 }
