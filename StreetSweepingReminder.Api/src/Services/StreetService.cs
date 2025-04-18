@@ -141,7 +141,7 @@ public class StreetService : IStreetService
         }
         catch (Exception e)
         {
-            _logger.LogError("Error retriving street sweeping schedule for {streetId}", streetId);
+            _logger.LogError("Error retrieving street sweeping schedule for {streetId}", streetId);
             return Result.Fail(new ApplicationError($"An unexpected error occurred retrieving street sweeping schedule: {e.Message}"));
         }
     }
