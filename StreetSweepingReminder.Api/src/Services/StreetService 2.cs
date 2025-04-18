@@ -13,13 +13,15 @@ public class StreetService : IStreetService
     private readonly IStreetRepository _streetRepository;
     private readonly IValidator<StreetResponseDto> _streetResponseValidator;
     private readonly IStreetSweepingSchedulerService _schedulerService;
+    private readonly IStreetSweepingDatesRepository _streetSweepingDatesRepository;
 
-    public StreetService(IStreetRepository streetRepository, ILogger<StreetService> logger, IValidator<StreetResponseDto> streetResponseValidator, IStreetSweepingSchedulerService schedulerService)
+    public StreetService(IStreetRepository streetRepository, ILogger<StreetService> logger, IValidator<StreetResponseDto> streetResponseValidator, IStreetSweepingSchedulerService schedulerService, IStreetSweepingDatesRepository streetSweepingDatesRepository)
     {
         _streetRepository = streetRepository;
         _logger = logger;
         _streetResponseValidator = streetResponseValidator;
         _schedulerService = schedulerService;
+        _streetSweepingDatesRepository = streetSweepingDatesRepository;
     }
 
     public async Task<Result<int>> CreateStreetAsync(CreateStreetDto command, string userId)
@@ -119,7 +121,28 @@ public class StreetService : IStreetService
         catch (Exception e)
         {
             _logger.LogError("Error creating street sweeping schedule for {streetId}", streetId);
-            return Result.Fail(new ApplicationError("An unexpected error occurred creating street sweeping schedule."));
+            return Result.Fail(new ApplicationError($"An unexpected error occurred creating street sweeping schedule: {e.Message}"));
+        }
+    }
+
+    public async Task<Result<List<StreetSweepingScheduleResponseDto>>> GetScheduleByStreetId(int streetId)
+    {
+        if (streetId <= 0)
+        {
+            return Result.Fail(new ValidationError("Invalid Street ID."));
+        }
+        
+        try
+        {
+            var result = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
+            var resultList = result.ToSweepingScheduleResponseDtos();
+            
+            return Result.Ok(resultList);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error retriving street sweeping schedule for {streetId}", streetId);
+            return Result.Fail(new ApplicationError($"An unexpected error occurred retrieving street sweeping schedule: {e.Message}"));
         }
     }
 }
