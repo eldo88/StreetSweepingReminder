@@ -101,4 +101,19 @@ public static class DtoExtensions
             IsRecurring = source.IsRecurring
         };
     }
+    
+    /* StreetSweepingDates entity to StreetSweepingScheduleResponseDto Mappings */
+
+    public static List<StreetSweepingScheduleResponseDto> ToSweepingScheduleResponseDtos(
+        this IEnumerable<StreetSweepingDates> source)
+    {
+        List<StreetSweepingScheduleResponseDto> dtos = [];
+        foreach (var entity in source)
+        {
+            var dto = new StreetSweepingScheduleResponseDto(entity.Id, entity.StreetId, entity.StreetSweepingDate);
+            dtos.Add(dto);
+        }
+
+        return dtos;
+    }
 }
