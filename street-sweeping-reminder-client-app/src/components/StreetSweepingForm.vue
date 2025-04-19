@@ -20,17 +20,6 @@ defineProps({
 
 const emit = defineEmits(['update:isReminderFormVisible'])
 
-const schema = toTypedSchema(
-  z.object({
-    street: z
-      .number({
-        required_error: 'Street is required',
-        invalid_type_error: 'Street must be selected',
-      })
-      .positive('Street must be selected'),
-  }),
-)
-
 const toast = useToast()
 const streetsStore = useStreetsStore()
 
@@ -66,7 +55,55 @@ const yearOptions = ref(
   })),
 )
 
+const schema = toTypedSchema(
+  z.object({
+    street: z
+      .number({
+        required_error: 'Street is required',
+        invalid_type_error: 'Street must be selected',
+      })
+      .positive('Street must be selected'),
+    weekOfMonth: z
+      .number({
+        required_error: 'Week of month is required',
+        invalid_type_error: 'Week of month must be selected',
+      })
+      .int()
+      .min(1, 'Week must be selected')
+      .max(4),
+    dayOfWeek: z
+      .number({
+        required_error: 'Day of week is required',
+        invalid_type_error: 'Day of week must be selected',
+      })
+      .int()
+      .min(1, 'Day must be selected')
+      .max(5),
+    year: z
+      .number({
+        required_error: 'Year is required',
+        invalid_type_error: 'Year must be selected',
+      })
+      .int()
+      .min(currentYear, 'Year must be current or future'),
+  }),
+)
+
 async function onSubmit(values) {
+  console.log('Form submitted with:', values)
+  const { street: streetId, weekOfMonth, dayOfWeek, year } = values
+
+  if (
+    streetId === undefined ||
+    weekOfMonth === undefined ||
+    dayOfWeek === undefined ||
+    year === undefined
+  ) {
+    console.error('Form values are incomplete:', values)
+    toast.error('Please fill out all required fields.')
+    return
+  }
+
   try {
     const streetId = values.street
     const getSchedule = await streetsStore.getSchedule(streetId)
@@ -74,8 +111,12 @@ async function onSubmit(values) {
       toast.success('Street Sweeping Schedule retrieved successfully!')
       emit('update:isReminderFormVisible', true)
     } else {
-      const date = new Date(2025, 3, 14)
-      const createSchedule = await streetsStore.createSchedule(streetId, date)
+      const createSchedule = await streetsStore.createSchedule(
+        streetId,
+        weekOfMonth,
+        dayOfWeek,
+        year,
+      )
       if (createSchedule > 0) {
         await streetsStore.getSchedule(createSchedule)
         toast.success('Street Sweeping Schedule created successfully!')

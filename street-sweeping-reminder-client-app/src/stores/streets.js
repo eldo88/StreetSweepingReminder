@@ -33,12 +33,12 @@ export const useStreetsStore = defineStore('streets', {
       }
     },
 
-    async createSchedule(id, streetSweepingDate) {
+    async createSchedule(id, weekOfMonth, dayOfWeek, year) {
       try {
-        console.log(`SS date in store: ${streetSweepingDate}`)
         const payload = {
-          streetSweepingDate: streetSweepingDate,
-          weekOfMonth: 3,
+          weekOfMonth: weekOfMonth,
+          dayOfWeek: dayOfWeek,
+          year: year,
         }
         const reponse = await api.post(`Street/${id}/schedule`, payload)
         if (reponse.data > 0) {
