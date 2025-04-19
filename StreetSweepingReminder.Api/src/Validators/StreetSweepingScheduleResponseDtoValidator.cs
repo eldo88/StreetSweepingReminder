@@ -8,15 +8,21 @@ public class StreetSweepingScheduleResponseDtoValidator : AbstractValidator<Stre
     public StreetSweepingScheduleResponseDtoValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0).WithMessage("Invalid Id.");
+            .GreaterThan(0).WithMessage("{PropertyName} is invalid.");
 
         RuleFor(x => x.StreetId)
-            .GreaterThan(0).WithMessage("Invalid Street ID.");
+            .GreaterThan(0).WithMessage("{PropertyName} is invalid.");
 
         RuleFor(x => x.StreetSweepingDate)
-            .NotEmpty().WithMessage("Invalid street sweeping date.");
+            .NotEmpty().WithMessage("{PropertyName} is invalid.");
 
         RuleFor(x => x.DayOfWeek)
-            .NotEmpty().WithMessage("Invalid day of week.");
+            .NotEmpty().WithMessage("{PropertyName} is invalid.")
+            .Must(DayOfWeekIsValid).WithMessage("{PropertyName} must be equal to the date.");
+    }
+
+    private static bool DayOfWeekIsValid(StreetSweepingScheduleResponseDto ctx, DayOfWeek dayOfWeekToValidate)
+    {
+        return ctx.StreetSweepingDate.DayOfWeek == dayOfWeekToValidate;
     }
 }
