@@ -2,7 +2,7 @@
 import { useStreetsStore } from '@/stores/streets'
 import { storeToRefs } from 'pinia'
 import { useToast } from 'vue-toastification'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import _ from 'lodash'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { z } from 'zod'
@@ -42,6 +42,29 @@ const streetOptions = computed(() => {
     label: street.streetName + `, ${street.zipCode}`,
   }))
 })
+
+const weekOptions = ref([
+  { value: 1, label: '1st Week' },
+  { value: 2, label: '2nd Week' },
+  { value: 3, label: '3rd Week' },
+  { value: 4, label: '4th Week' },
+])
+
+const dayOptions = ref([
+  { value: 1, label: 'Monday' },
+  { value: 2, label: 'Tuesday' },
+  { value: 3, label: 'Wednesday' },
+  { value: 4, label: 'Thursday' },
+  { value: 5, label: 'Friday' },
+])
+
+const currentYear = new Date().getFullYear()
+const yearOptions = ref(
+  Array.from({ length: 6 }, (_, i) => ({
+    value: currentYear + i,
+    label: String(currentYear + i),
+  })),
+)
 
 async function onSubmit(values) {
   try {
@@ -118,12 +141,87 @@ const handleStreetSearch = _.debounce(async (query) => {
           </div>
           <!-- End Street -->
 
+          <div class="mb-4">
+            <label for="weekOfMonth" class="block text-gray-700 text-sm font-bold mb-2">
+              Week of Month <span class="text-red-500">*</span>
+            </label>
+            <Field name="weekOfMonth" v-slot="{ field, value, errors }">
+              <el-select
+                :model-value="value"
+                @update:modelValue="field.onChange($event)"
+                placeholder="Select Week"
+                clearable
+                class="w-full"
+                id="weekOfMonth"
+                :class="{ 'el-select-invalid': errors?.length }"
+              >
+                <el-option
+                  v-for="item in weekOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </Field>
+            <ErrorMessage name="weekOfMonth" class="text-red-500 text-xs mt-1" />
+          </div>
+
+          <div class="mb-4">
+            <label for="dayOfWeek" class="block text-gray-700 text-sm font-bold mb-2">
+              Day of Week <span class="text-red-500">*</span>
+            </label>
+            <Field name="dayOfWeek" v-slot="{ field, value, errors }">
+              <el-select
+                :model-value="value"
+                @update:modelValue="field.onChange($event)"
+                placeholder="Select Day"
+                clearable
+                class="w-full"
+                id="dayOfWeek"
+                :class="{ 'el-select-invalid': errors?.length }"
+              >
+                <el-option
+                  v-for="item in dayOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </Field>
+            <ErrorMessage name="dayOfWeek" class="text-red-500 text-xs mt-1" />
+          </div>
+
+          <div class="mb-4">
+            <label for="year" class="block text-gray-700 text-sm font-bold mb-2">
+              Year <span class="text-red-500">*</span>
+            </label>
+            <Field name="year" v-slot="{ field, value, errors }">
+              <el-select
+                :model-value="value"
+                @update:modelValue="field.onChange($event)"
+                placeholder="Select Year"
+                clearable
+                class="w-full"
+                id="year"
+                :class="{ 'el-select-invalid': errors?.length }"
+              >
+                <el-option
+                  v-for="item in yearOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </Field>
+            <ErrorMessage name="year" class="text-red-500 text-xs mt-1" />
+          </div>
+
           <div class="flex flex-col gap-3">
             <button
               type="submit"
               class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
             >
-              Save Reminder
+              Find or Create Schedule
             </button>
           </div>
         </Form>
