@@ -65,14 +65,16 @@ public static class DateUtils
         var month = date.Month;
         var weekCount = 1;
         
+        var firstDayOfTheMonth = new DateTime(year, month, 1);
 
         for (var i = 0; i < day; i++)
         {
-            var firstDayOfTheMonth = new DateTime(year, month, 1);
             if (firstDayOfTheMonth.DayOfWeek == DayOfWeek.Sunday)
             {
                 weekCount++;
             }
+
+            firstDayOfTheMonth = firstDayOfTheMonth.AddDays(1);
         }
 
         return weekCount;
