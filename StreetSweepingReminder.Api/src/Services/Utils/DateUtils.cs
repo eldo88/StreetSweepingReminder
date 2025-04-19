@@ -57,4 +57,24 @@ public static class DateUtils
 
         return scheduledDays;
     }
+
+    public static int GetWeekOfMonth(DateTime date)
+    {
+        var day = date.Day;
+        var year = date.Year;
+        var month = date.Month;
+        var weekCount = 1;
+        
+
+        for (var i = 0; i < day; i++)
+        {
+            var firstDayOfTheMonth = new DateTime(year, month, 1);
+            if (firstDayOfTheMonth.DayOfWeek == DayOfWeek.Sunday)
+            {
+                weekCount++;
+            }
+        }
+
+        return weekCount;
+    }
 }
