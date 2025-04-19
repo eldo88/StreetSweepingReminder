@@ -50,6 +50,20 @@ export const useStreetsStore = defineStore('streets', {
       }
     },
 
+    async getSchedule(id) {
+      try {
+        const response = await api.get(`Street/${id}/getSchedule`)
+        if (response.data) {
+          this.schedule = response.data
+        } else {
+          this.schedule = []
+        }
+      } catch (error) {
+        console.error('Failed to get schedule' + error)
+        this.schedule = []
+      }
+    },
+
     clearStreets() {
       this.streets = []
       this.isLoading = false
