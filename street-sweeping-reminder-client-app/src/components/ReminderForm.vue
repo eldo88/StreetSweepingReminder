@@ -5,15 +5,8 @@ import { toTypedSchema } from '@vee-validate/zod'
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useRemindersStore } from '@/stores/reminder'
-import { useStreetsStore } from '@/stores/streets'
-import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import { computed } from 'vue'
-import _ from 'lodash'
-
-import { ElSelect, ElOption } from 'element-plus'
-import 'element-plus/dist/index.css'
 
 const schema = toTypedSchema(
   z.object({
@@ -23,7 +16,6 @@ const schema = toTypedSchema(
     zip: z.string().regex(/^\d{5}$/, 'Must be a valid 5-digit ZIP code'),
     reminderDate: z.date({ required_error: 'Reminder Date is required' }),
     isRecurring: z.boolean().default(true),
-    streetSweepingDate: z.date({ required_error: 'Street Sweeping Date is required' }),
     street: z
       .number({
         required_error: 'Street is required',
@@ -36,21 +28,10 @@ const schema = toTypedSchema(
 const toast = useToast()
 const router = useRouter()
 const reminderStore = useRemindersStore()
-const streetsStore = useStreetsStore()
-
-const { streets, isLoading } = storeToRefs(streetsStore)
-
-const streetOptions = computed(() => {
-  return streets.value.map((street) => ({
-    value: street.id,
-    label: street.streetName + `, ${street.zipCode}`,
-  }))
-})
 
 async function onSubmit(values) {
   try {
     console.log(`SS time: ${values.streetSweepingDate}`)
-    await streetsStore.createSchedule(values.street, values.streetSweepingDate)
     await reminderStore.createReminder(values)
     toast.success('Reminder created successfully!')
     setTimeout(() => {
@@ -59,18 +40,8 @@ async function onSubmit(values) {
   } catch (error) {
     console.error('Reminder creation failed:', error)
     toast.error('Failed to create reminder. Please try again.')
-  } finally {
-    streetsStore.clearStreets()
   }
 }
-
-const handleStreetSearch = _.debounce(async (query) => {
-  if (query) {
-    streetsStore.searchStreets(query)
-  } else {
-    streetsStore.clearStreets()
-  }
-}, 300)
 </script>
 
 <template>
@@ -127,40 +98,6 @@ const handleStreetSearch = _.debounce(async (query) => {
             <ErrorMessage name="message" class="text-red-500 text-xs mt-1" />
           </div>
 
-          <!-- Street (Searchable Dropdown using Element Plus) -->
-          <div class="mb-4">
-            <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
-              Street Name <span class="text-red-500">*</span>
-            </label>
-            <!-- Use VeeValidate Field component for validation -->
-            <Field name="street" v-slot="{ field, value, errors }">
-              <el-select
-                v-bind="field"
-                :model-value="value"
-                @update:modelValue="field.onChange($event)"
-                placeholder="Select or search for a street"
-                filterable
-                remote
-                :remote-method="handleStreetSearch"
-                :loading="isLoading"
-                clearable
-                class="w-full"
-                id="street"
-                :class="{ 'el-select-invalid': errors?.street }"
-              >
-                <el-option
-                  v-for="item in streetOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </Field>
-            <!-- Display validation error -->
-            <ErrorMessage name="street" class="text-red-500 text-xs mt-1" />
-          </div>
-          <!-- End Street -->
-
           <!-- ZIP Code -->
           <div class="mb-4">
             <label for="zip" class="block text-gray-700 text-sm font-bold mb-2">
@@ -168,23 +105,6 @@ const handleStreetSearch = _.debounce(async (query) => {
             </label>
             <Field id="zip" name="zip" type="text" placeholder="e.g. 90210" class="input-field" />
             <ErrorMessage name="zip" class="text-red-500 text-xs mt-1" />
-          </div>
-
-          <!-- Street Sweeping Date Picker -->
-          <div class="mb-6">
-            <label for="streetSweepingDate" class="block text-gray-700 text-sm font-bold mb-2">
-              First Street Sweeping Date <span class="text-red-500">*</span>
-            </label>
-            <Field name="streetSweepingDate" v-slot="{ field, errors }">
-              <Datepicker
-                v-bind="field"
-                :model-value="field.value"
-                @update:model-value="field.onChange"
-                input-class-name="input-field"
-                placeholder="Pick a date for the first street sweeping day"
-              />
-              <span class="text-red-500 text-xs mt-1 block">{{ errors[0] }}</span>
-            </Field>
           </div>
 
           <!-- Reminder Date Picker -->
