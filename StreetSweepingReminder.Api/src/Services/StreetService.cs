@@ -14,9 +14,9 @@ public class StreetService : IStreetService
     private readonly IValidator<StreetResponseDto> _streetResponseValidator;
     private readonly IStreetSweepingSchedulerService _schedulerService;
     private readonly IStreetSweepingDatesRepository _streetSweepingDatesRepository;
-    private readonly IValidator<StreetSweepingScheduleResponseDto> _streetSweepingScheduleResponseValidator;
+    private readonly IValidator<StreetSweepingScheduleDto> _streetSweepingScheduleResponseValidator;
 
-    public StreetService(IStreetRepository streetRepository, ILogger<StreetService> logger, IValidator<StreetResponseDto> streetResponseValidator, IStreetSweepingSchedulerService schedulerService, IStreetSweepingDatesRepository streetSweepingDatesRepository, IValidator<StreetSweepingScheduleResponseDto> streetSweepingScheduleResponseValidator)
+    public StreetService(IStreetRepository streetRepository, ILogger<StreetService> logger, IValidator<StreetResponseDto> streetResponseValidator, IStreetSweepingSchedulerService schedulerService, IStreetSweepingDatesRepository streetSweepingDatesRepository, IValidator<StreetSweepingScheduleDto> streetSweepingScheduleResponseValidator)
     {
         _streetRepository = streetRepository;
         _logger = logger;
@@ -127,7 +127,7 @@ public class StreetService : IStreetService
         }
     }
 
-    public async Task<Result<List<StreetSweepingScheduleResponseDto>>> GetScheduleByStreetId(int streetId)
+    public async Task<Result<StreetSweepingScheduleResponseDto>> GetScheduleByStreetId(int streetId)
     {
         if (streetId <= 0)
         {
@@ -137,9 +137,9 @@ public class StreetService : IStreetService
         try
         {
             var result = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
-            var resultList = result.ToSweepingScheduleResponseDtos();
+            var responseDto = result.ToStreetSweepingScheduleResponseDto();
 
-            foreach (var dto in resultList)
+            foreach (var dto in responseDto.Schedule)
             {
                 var validationResult = await _streetSweepingScheduleResponseValidator.ValidateAsync(dto);
                 if (!validationResult.IsValid)
@@ -148,7 +148,7 @@ public class StreetService : IStreetService
                 }
             }
             
-            return Result.Ok(resultList);
+            return Result.Ok(responseDto);
         }
         catch (Exception e)
         {
