@@ -25,6 +25,9 @@ const streetsStore = useStreetsStore()
 
 const { streets, isLoading } = storeToRefs(streetsStore)
 
+const formRef = ref(null)
+const isScheduleLoading = ref(false)
+
 const streetOptions = computed(() => {
   return streets.value.map((street) => ({
     value: street.id,
@@ -89,8 +92,48 @@ const schema = toTypedSchema(
   }),
 )
 
+async function handleStreetChange(streetId) {
+  formRef.value?.resetField('weekOfMonth')
+  formRef.value?.resetField('dayOfWeek')
+  formRef.value?.resetField('year')
+
+  if (!streetId) {
+    return
+  }
+
+  isScheduleLoading.value = true
+  try {
+    console.log(`Fetching schedule for street ID: ${streetId}`)
+    const scheduleData = await streetsStore.getSchedule(streetId)
+
+    console.log('scheduleData received:', scheduleData)
+    if (scheduleData && scheduleData.weekOfMonth && scheduleData.dayOfWeek && scheduleData.year) {
+      formRef.value?.setFieldValue('weekOfMonth', scheduleData.weekOfMonth)
+      formRef.value?.setFieldValue('dayOfWeek', scheduleData.dayOfWeek)
+      formRef.value?.setFieldValue('year', scheduleData.year)
+      toast.info('Existing schedule data loaded.')
+      // emit('scheduleLoaded', true);
+      emit('update:isReminderFormVisible', true)
+    } else {
+      console.log('No existing schedule found for this street.')
+
+      toast.info('No schedule found for this street. Please enter details.')
+    }
+  } catch (error) {
+    console.error('Failed to fetch street schedule:', error)
+    toast.error('Could not fetch schedule details.')
+
+    formRef.value?.resetField('weekOfMonth')
+    formRef.value?.resetField('dayOfWeek')
+    formRef.value?.resetField('year')
+  } finally {
+    isScheduleLoading.value = false
+  }
+}
+
 async function onSubmit(values) {
-  console.log('Form submitted with:', values)
+  console.log('Form submitted for creation:', values)
+
   const { street: streetId, weekOfMonth, dayOfWeek, year } = values
 
   if (
@@ -99,35 +142,32 @@ async function onSubmit(values) {
     dayOfWeek === undefined ||
     year === undefined
   ) {
-    console.error('Form values are incomplete:', values)
-    toast.error('Please fill out all required fields.')
+    toast.error('Form data is incomplete. Please check all fields.')
     return
   }
 
+  isScheduleLoading.value = true
   try {
-    const streetId = values.street
-    const getSchedule = await streetsStore.getSchedule(streetId)
-    if (getSchedule) {
-      toast.success('Street Sweeping Schedule retrieved successfully!')
+    const createScheduleResult = await streetsStore.createSchedule(
+      streetId,
+      weekOfMonth,
+      dayOfWeek,
+      year,
+    )
+
+    if (createScheduleResult) {
+      toast.success('Street Sweeping Schedule created successfully!')
       emit('update:isReminderFormVisible', true)
     } else {
-      const createSchedule = await streetsStore.createSchedule(
-        streetId,
-        weekOfMonth,
-        dayOfWeek,
-        year,
-      )
-      if (createSchedule > 0) {
-        await streetsStore.getSchedule(createSchedule)
-        toast.success('Street Sweeping Schedule created successfully!')
-        emit('update:isReminderFormVisible', true)
-      } else {
-        toast.error('Failed to create Street Sweeping Schedule')
-      }
+      toast.error('Failed to create Street Sweeping Schedule (API reported failure).')
     }
   } catch (error) {
     console.error('Street Sweeping Schedule creation failed:', error)
-    toast.error('Failed to create Street Sweeping Schedule')
+    const errorMessage =
+      error?.response?.data?.message || 'Failed to create Street Sweeping Schedule'
+    toast.error(errorMessage)
+  } finally {
+    isScheduleLoading.value = false
   }
 }
 
@@ -147,18 +187,21 @@ const handleStreetSearch = _.debounce(async (query) => {
     >
       <div class="bg-white shadow-md rounded-lg px-4 sm:px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Search for your street</h2>
-        <Form @submit="onSubmit" :validation-schema="schema">
-          <!-- Street (Searchable Dropdown using Element Plus) -->
+        <Form ref="formRef" @submit="onSubmit" :validation-schema="schema">
           <div class="mb-4">
             <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
               Street Name <span class="text-red-500">*</span>
             </label>
-            <!-- Use VeeValidate Field component for validation -->
             <Field name="street" v-slot="{ field, value, errors }">
               <el-select
                 v-bind="field"
                 :model-value="value"
-                @update:modelValue="field.onChange($event)"
+                @update:modelValue="
+                  (newValue) => {
+                    field.onChange(newValue)
+                    handleStreetChange(newValue)
+                  }
+                "
                 placeholder="Select or search for a street"
                 filterable
                 remote
@@ -177,10 +220,8 @@ const handleStreetSearch = _.debounce(async (query) => {
                 />
               </el-select>
             </Field>
-            <!-- Display validation error -->
             <ErrorMessage name="street" class="text-red-500 text-xs mt-1" />
           </div>
-          <!-- End Street -->
 
           <div class="mb-4">
             <label for="weekOfMonth" class="block text-gray-700 text-sm font-bold mb-2">
@@ -192,6 +233,7 @@ const handleStreetSearch = _.debounce(async (query) => {
                 @update:modelValue="field.onChange($event)"
                 placeholder="Select Week"
                 clearable
+                :disabled="isScheduleLoading"
                 class="w-full"
                 id="weekOfMonth"
                 :class="{ 'el-select-invalid': errors?.length }"
@@ -217,6 +259,7 @@ const handleStreetSearch = _.debounce(async (query) => {
                 @update:modelValue="field.onChange($event)"
                 placeholder="Select Day"
                 clearable
+                :disabled="isScheduleLoading"
                 class="w-full"
                 id="dayOfWeek"
                 :class="{ 'el-select-invalid': errors?.length }"
@@ -242,6 +285,7 @@ const handleStreetSearch = _.debounce(async (query) => {
                 @update:modelValue="field.onChange($event)"
                 placeholder="Select Year"
                 clearable
+                :disabled="isScheduleLoading"
                 class="w-full"
                 id="year"
                 :class="{ 'el-select-invalid': errors?.length }"
@@ -261,8 +305,9 @@ const handleStreetSearch = _.debounce(async (query) => {
             <button
               type="submit"
               class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+              :disabled="isScheduleLoading"
             >
-              Find or Create Schedule
+              {{ isScheduleLoading ? 'Processing...' : 'Create Schedule' }}
             </button>
           </div>
         </Form>

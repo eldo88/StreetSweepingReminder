@@ -55,13 +55,13 @@ export const useStreetsStore = defineStore('streets', {
       try {
         const response = await api.get(`Street/${id}/getSchedule`)
         if (response.data) {
-          this.schedule = response.data
+          return response.data
         } else {
-          this.schedule = []
+          return null
         }
       } catch (error) {
         console.error('Failed to get schedule' + error)
-        this.schedule = []
+        return null
       }
     },
 
