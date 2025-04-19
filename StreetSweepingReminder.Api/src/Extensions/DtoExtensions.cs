@@ -1,5 +1,6 @@
 using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Entities;
+using StreetSweepingReminder.Api.Services.Utils;
 
 namespace StreetSweepingReminder.Api.Extensions;
 
@@ -104,17 +105,36 @@ public static class DtoExtensions
     
     /* StreetSweepingDates entity to StreetSweepingScheduleResponseDto Mappings */
 
-    public static List<StreetSweepingScheduleResponseDto> ToSweepingScheduleResponseDtos(
+    public static StreetSweepingScheduleResponseDto ToStreetSweepingScheduleResponseDto(
         this IEnumerable<StreetSweepingDates> source)
     {
-        List<StreetSweepingScheduleResponseDto> dtos = [];
+        var day = 0;
+        var month = 0;
+        var year = 0;
+        var streetId = 0;
+        
+        var schedule = source.ToStreetSweepingDto();
+        if (schedule.Count > 0)
+        {
+            var firstDate = schedule[0];
+            day = (int)firstDate.StreetSweepingDate.DayOfWeek;
+            month = DateUtils.GetWeekOfMonth(firstDate.StreetSweepingDate);
+            year = firstDate.StreetSweepingDate.Year;
+            streetId = firstDate.StreetId;
+        }
+
+        return new StreetSweepingScheduleResponseDto(day, month, year, streetId, schedule);
+    }
+
+    public static List<StreetSweepingScheduleDto> ToStreetSweepingDto(this IEnumerable<StreetSweepingDates> source)
+    {
+        List<StreetSweepingScheduleDto> dtos = [];
         foreach (var entity in source)
         {
-            var dto = new StreetSweepingScheduleResponseDto(
+            var dto = new StreetSweepingScheduleDto(
                 entity.Id, 
                 entity.StreetId, 
-                entity.StreetSweepingDate, 
-                entity.StreetSweepingDate.DayOfWeek);
+                entity.StreetSweepingDate);
             
             dtos.Add(dto);
         }
