@@ -7,7 +7,7 @@ const isReminderFormVisible = ref(false)
 </script>
 
 <template>
-  <StreetSweepingForm />
+  <StreetSweepingForm v-model:isReminderFormVisible="isReminderFormVisible" />
   <div v-if="isReminderFormVisible">
     <ReminderForm />
   </div>
