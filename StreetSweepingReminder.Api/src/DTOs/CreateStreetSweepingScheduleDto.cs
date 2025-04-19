@@ -1,3 +1,3 @@
 namespace StreetSweepingReminder.Api.DTOs;
 
-public record CreateStreetSweepingScheduleDto(DateTime StreetSweepingDate, int WeekOfMonth);
+public record CreateStreetSweepingScheduleDto(int WeekOfMonth, int DayOfWeek, int Year);
