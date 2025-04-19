@@ -39,10 +39,11 @@ public class StreetSweepingSchedulerService :
 
     protected override DateTime GetBaseScheduleDate(CreateStreetSweepingScheduleDto command)
     {
-        var year = command.StreetSweepingDate.Year;
-        var dayOfWeek = command.StreetSweepingDate.DayOfWeek;
+        var year = command.Year;
+        var dayOfWeek = (DayOfWeek)command.DayOfWeek;
+        var weekOfMonth = command.WeekOfMonth;
         const int month = 4; // street sweeping starts in April
-        var baseStreetSweepingDate = DateUtils.GetNthWeekdayOfMonth(year, month, dayOfWeek, command.WeekOfMonth);
+        var baseStreetSweepingDate = DateUtils.GetNthWeekdayOfMonth(year, month, dayOfWeek, weekOfMonth);
         return DateTime.SpecifyKind(baseStreetSweepingDate, DateTimeKind.Local);
     }
 
