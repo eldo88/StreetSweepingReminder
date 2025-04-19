@@ -11,6 +11,15 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { ElSelect, ElOption } from 'element-plus'
 import 'element-plus/dist/index.css'
 
+defineProps({
+  isReminderFormVisible: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const emit = defineEmits(['update:isReminderFormVisible'])
+
 const schema = toTypedSchema(
   z.object({
     street: z
@@ -40,10 +49,14 @@ async function onSubmit(values) {
     const getSchedule = await streetsStore.getSchedule(streetId)
     if (getSchedule) {
       toast.success('Street Sweeping Schedule retrieved successfully!')
+      emit('update:isReminderFormVisible', true)
     } else {
-      const createSchedule = await streetsStore.createSchedule(streetId, values.streetSweepingDate)
-      if (createSchedule) {
+      const date = new Date(2025, 3, 14)
+      const createSchedule = await streetsStore.createSchedule(streetId, date)
+      if (createSchedule > 0) {
+        await streetsStore.getSchedule(createSchedule)
         toast.success('Street Sweeping Schedule created successfully!')
+        emit('update:isReminderFormVisible', true)
       } else {
         toast.error('Failed to create Street Sweeping Schedule')
       }
@@ -104,6 +117,15 @@ const handleStreetSearch = _.debounce(async (query) => {
             <ErrorMessage name="street" class="text-red-500 text-xs mt-1" />
           </div>
           <!-- End Street -->
+
+          <div class="flex flex-col gap-3">
+            <button
+              type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+            >
+              Save Reminder
+            </button>
+          </div>
         </Form>
       </div>
     </div>

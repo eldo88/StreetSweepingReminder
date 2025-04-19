@@ -6,6 +6,7 @@ export const useStreetsStore = defineStore('streets', {
     streets: [],
     isLoading: false,
     schedule: [],
+    streetId: null,
   }),
 
   actions: {
@@ -40,10 +41,10 @@ export const useStreetsStore = defineStore('streets', {
           weekOfMonth: 3,
         }
         const reponse = await api.post(`Street/${id}/schedule`, payload)
-        if (reponse.data) {
-          this.schedule = reponse.data
+        if (reponse.data > 0) {
+          return reponse.data
         } else {
-          this.schedule = []
+          return null
         }
       } catch (error) {
         console.log('Failed to create schedule' + error)
