@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import RegisterPageView from '@/views/RegisterPageView.vue'
 import MainView from '@/views/MainView.vue'
 import { useAuthStore } from '@/stores/auth.js'
@@ -8,7 +8,7 @@ import ReminderPageView from '@/views/ReminderPageView.vue'
 import CreateReminderView from '@/views/CreateReminderView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/',
