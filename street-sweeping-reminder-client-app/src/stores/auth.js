@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { setGlobalTimeout } from '@/utils/globalTmeout'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -43,6 +44,7 @@ export const useAuthStore = defineStore('auth', {
         console.log('User id in auth store: ' + this.userId)
 
         localStorage.setItem('jwtToken', data.token)
+        setGlobalTimeout(this.tokenExpirationInMinutes)
       } catch (error) {
         console.error('Login error:', error)
         throw error // Optionally re-throw to let the component handle it
