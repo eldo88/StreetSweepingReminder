@@ -73,7 +73,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("http://localhost:8080", "http://localhost:5500", "http://localhost:5173", "http://localhost:5174")
+        policy.WithOrigins("https://eldo88.github.io/StreetSweepingReminder/", "http://localhost:8080", "http://localhost:5500", "http://localhost:5173", "http://localhost:5174")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
