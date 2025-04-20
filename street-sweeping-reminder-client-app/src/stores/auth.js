@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { setGlobalTimeout } from '@/utils/globalTmeout'
+import { setGlobalTimeout } from '@/utils/globalTimeout'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
