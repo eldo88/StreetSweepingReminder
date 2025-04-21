@@ -18,15 +18,18 @@ onMounted(() => {
 
   <div class="md:ml-auto">
     <div class="flex h-20 items-center justify-center gap-4 flex-wrap">
-      <a href="/reminders" class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2">
+      <router-link
+        to="/reminders"
+        class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2"
+      >
         Reminders
-      </a>
-      <a
-        href="/createReminder"
+      </router-link>
+      <router-link
+        to="/createReminder"
         class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2"
       >
         Create New Reminder
-      </a>
+      </router-link>
     </div>
   </div>
 </template>

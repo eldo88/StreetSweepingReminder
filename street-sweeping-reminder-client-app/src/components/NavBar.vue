@@ -26,24 +26,24 @@ function handleLogout() {
           </a>
           <div class="md:ml-auto">
             <div class="flex space-x-2">
-              <a
-                href="/main"
+              <router-link
+                to="/main"
                 class="text-white bg-green-900 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                >Home</a
+                >Home</router-link
               >
-              <a
-                href="/reminders"
+              <router-link
+                to="/reminders"
                 class="text-white bg-green-900 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                >Reminders</a
+                >Reminders</router-link
               >
 
-              <a
-                href="#"
+              <router-link
+                to="#"
                 @click.prevent="handleLogout"
                 class="text-white bg-green-900 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
               >
                 Logout
-              </a>
+              </router-link>
             </div>
           </div>
         </div>
