@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  build-and-migrate: # Renamed job for clarity
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,38 +40,22 @@ jobs:
       - name: Build project
         run: dotnet build ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore
 
-      # --------------------- Run EF Migration IN BUILD JOB ---------------------
-      - name: Install dotnet-ef tool
-        run: dotnet tool install --global dotnet-ef
-          
-      - name: Run EF Core Migrations from Project Directory
-        working-directory: StreetSweepingReminder.Api
-        env:
-          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }}
-        run: |
-            # Now commands run from within StreetSweepingReminder.Api/
-            dotnet ef database update \
-              --context ApplicationDbContext \
-              --configuration Release \
-              # Tool should find output in ./bin/Release/net9.0/
-      # ----------------------------------------------------------------------
-
       - name: Publish project
-        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --no-build -o ${{env.DOTNET_ROOT}}/myapp # Use DOTNET_ROOT or runner.temp
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --no-build -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp # Use the same path as publish output
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     permissions:
       contents: none
     runs-on: ubuntu-latest
-    needs: build-and-migrate # Depend on the renamed job
+    needs: build
     environment:
-      name: 'Production' # Or 'Development' - match your setup
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -79,8 +63,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-          # Download to workspace root or specify path
-          # path: ./deploy_package # Example specific path
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -88,5 +70,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          # Ensure this path matches where artifact was downloaded/extracted if needed
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} # Usually '.' for artifact root
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
