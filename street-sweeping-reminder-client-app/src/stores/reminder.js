@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
+import { useStreetsStore } from './streets'
 import api from '@/services/api'
 
 export const useRemindersStore = defineStore('reminders', {
@@ -43,16 +44,14 @@ export const useRemindersStore = defineStore('reminders', {
           console.warn('No user ID found.')
           return
         }
-
+        const streetsStore = useStreetsStore()
         const payload = {
           title: formData.title,
           scheduledDateTimeUtc: formData.reminderDate.toISOString(),
           status: 'Pending',
           phoneNumber: formData.phoneNumber,
-          streetId: 1, // hard coded for now, need to implement api call
+          streetId: streetsStore.streetId,
           isRecurring: formData.isRecurring,
-          weekOfMonth: 3, // hard coded for now
-          streetSweepingDate: formData.streetSweepingDate.toISOString(),
         }
 
         const response = await api.post('Reminder', payload)
