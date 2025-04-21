@@ -24,7 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="SqlScripts\*.sql" />
+    <None Update="Data\denver_streets.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
