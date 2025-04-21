@@ -45,7 +45,7 @@ jobs:
         run: dotnet tool install --global dotnet-ef
           
       - name: Run EF Core Migrations from Project Directory
-        working-directory: $(dirname ${{ env.API_PROJECT_PATH }})
+        working-directory: StreetSweepingReminder.Api
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }}
         run: |
