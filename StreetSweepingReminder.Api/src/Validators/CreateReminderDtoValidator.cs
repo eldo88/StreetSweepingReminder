@@ -14,9 +14,6 @@ public class CreateReminderDtoValidator : AbstractValidator<CreateReminderDto>
         
         RuleFor(x => x.ScheduledDateTimeUtc)
             .GreaterThan(DateTime.UtcNow).WithMessage(ValidationMessages.ScheduledDateTimeInvalid);
-
-        RuleFor(x => x.StreetSweepingDate)
-            .GreaterThan(DateTime.UtcNow).WithMessage(ValidationMessages.StreetSweepingDateInvalid);
         
         RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage(ValidationMessages.PhoneNumberRequired)
@@ -25,9 +22,5 @@ public class CreateReminderDtoValidator : AbstractValidator<CreateReminderDto>
         
         RuleFor(x => x.StreetId)
             .GreaterThan(0).WithMessage(ValidationMessages.StreetNumberInvalid);
-
-        RuleFor(x => x.WeekOfMonth)
-            .GreaterThan(0).WithMessage(ValidationMessages.WeekOfMonthInvalid)
-            .LessThanOrEqualTo(4).WithMessage(ValidationMessages.WeekOfMonthInvalid);
     }
 }
