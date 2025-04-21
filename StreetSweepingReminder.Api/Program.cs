@@ -44,38 +44,46 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 
+var environmentName = builder.Environment.EnvironmentName;
+
 // DbUp
-try
+if (builder.Environment.IsProduction())
 {
-    Console.WriteLine("Starting DbUp migrations...");
-    var upgradeEngine = DeployChanges.To
-        .SqliteDatabase(connectionString)
-        .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
-        .LogToConsole()
-        .Build();
+    try
+    {
+        Console.WriteLine("Starting DbUp migrations...");
+        var upgradeEngine = DeployChanges.To
+            .SqliteDatabase(connectionString)
+            .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+            .LogToConsole()
+            .Build();
    
-    var result = upgradeEngine.PerformUpgrade();
+        var result = upgradeEngine.PerformUpgrade();
    
-    if (!result.Successful)
+        if (!result.Successful)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("DbUp migration failed:");
+            Console.WriteLine(result.Error);
+            Console.ResetColor();
+            throw new Exception("DbUp database migration failed.", result.Error);
+        }
+   
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("DbUp migration successful!");
+        Console.ResetColor();
+    }
+    catch (Exception ex)
     {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("DbUp migration failed:");
-        Console.WriteLine(result.Error);
+        Console.WriteLine("An error occurred during DbUp execution:");
+        Console.WriteLine(ex);
         Console.ResetColor();
-        throw new Exception("DbUp database migration failed.", result.Error);
+        throw;
     }
-   
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("DbUp migration successful!");
-    Console.ResetColor();
-}
-catch (Exception ex)
+} else
 {
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("An error occurred during DbUp execution:");
-    Console.WriteLine(ex);
-    Console.ResetColor();
-    throw;
+    Console.WriteLine("Skipping DbUp migrations (Not Production Environment or Design Time).");
 }
 
 
