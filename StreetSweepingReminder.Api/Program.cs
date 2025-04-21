@@ -45,7 +45,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 
 // DbUp
-var upgradeEngine = DeployChanges.To
+/*var upgradeEngine = DeployChanges.To
     .SqliteDatabase(connectionString)
     .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
     .LogToConsole()
@@ -65,7 +65,7 @@ if (!result.Successful)
 
 Console.ForegroundColor = ConsoleColor.Green;
 Console.WriteLine("Database migration successful!");
-Console.ResetColor();
+Console.ResetColor();*/
 
 
 // CORS
@@ -122,6 +122,66 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+// 1. DbUp for Application Tables
+try
+{
+    Console.WriteLine("Starting DbUp migrations...");
+    var upgradeEngine = DeployChanges.To
+        .SqliteDatabase(connectionString)
+        .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+        .LogToConsole()
+        .Build();
+
+    var result = upgradeEngine.PerformUpgrade();
+
+    if (!result.Successful)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("DbUp migration failed:");
+        Console.WriteLine(result.Error);
+        Console.ResetColor();
+        throw new Exception("DbUp database migration failed.", result.Error); // Stop startup
+    }
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("DbUp migration successful!");
+    Console.ResetColor();
+}
+catch (Exception ex)
+{
+    // Catch potential exceptions during DbUp setup or execution
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("An error occurred during DbUp execution:");
+    Console.WriteLine(ex);
+    Console.ResetColor();
+    throw; // Rethrow to stop application startup
+}
+
+
+// 2. EF Core Migrations for Identity Tables
+try
+{
+    // Create a scope to resolve services from the *app's* service provider
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Console.WriteLine("Applying EF Core migrations (for Identity)...");
+        dbContext.Database.Migrate(); // Applies pending EF Core migrations
+        Console.WriteLine("EF Core migrations applied successfully.");
+    }
+}
+catch (Exception ex)
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("EF Core migration failed:");
+    // Consider using ILogger here if you have logging configured
+    Console.WriteLine(ex);
+    Console.ResetColor();
+    // Rethrow to stop application startup, as Identity might not work
+    throw new Exception("EF Core migration failed during startup.", ex);
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
