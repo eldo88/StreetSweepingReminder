@@ -91,7 +91,7 @@ public static class DtoExtensions
         return new ReminderSchedule()
         {
             Message = string.Empty,
-            WeekOfMonth = source.WeekOfMonth,
+            WeekOfMonth = DateUtils.GetWeekOfMonth(source.ScheduledDateTimeUtc),
             StartMonth = source.ScheduledDateTimeUtc.Month,
             NextNotificationDate = source.ScheduledDateTimeUtc,
             DayOfWeek = source.ScheduledDateTimeUtc.DayOfWeek,
