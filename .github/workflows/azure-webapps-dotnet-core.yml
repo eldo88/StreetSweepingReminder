@@ -44,17 +44,15 @@ jobs:
       - name: Install dotnet-ef tool
         run: dotnet tool install --global dotnet-ef
           
-      - name: Run EF Core Migrations using explicit assemblies
-          # Define paths to the built assemblies in the Release output
+      - name: Run EF Core Migrations from Project Directory
+          # Set the working directory to the API project's directory
+        working-directory: $(dirname ${{ env.API_PROJECT_PATH }})
         run: |
-          ASSEMBLY_PATH=$(dirname ${{ env.API_PROJECT_PATH }})/bin/Release/net9.0/StreetSweepingReminder.Api.dll
-          dotnet ef database update \
-              --assembly "$ASSEMBLY_PATH" \
-              --startup-assembly "$ASSEMBLY_PATH" \
-              --project ${{ env.API_PROJECT_PATH }} \
+            # Now commands run from within StreetSweepingReminder.Api/
+            dotnet ef database update \
               --context ApplicationDbContext \
-              --configuration Release # Keep configuration for potential MSBuild tasks
-          # Pass connection string securely as environment variable
+              --configuration Release \
+              # Tool should find output in ./bin/Release/net9.0/
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }} # Ensure this secret exists
       # ----------------------------------------------------------------------
 
