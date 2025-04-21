@@ -82,6 +82,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          
+      - name: Restore dependencies for API project
+        run: dotnet restore ${{ env.API_PROJECT_PATH }}
 
       - name: Install dotnet-ef tool
         run: dotnet tool install --global dotnet-ef
