@@ -16,7 +16,7 @@ public class StreetSweepingDates
     public DateTime? ModifiedAt { get; set; }
     
     [ForeignKey("StreetId")]
-    public virtual Street Street { get; set; } = null!;
+    public virtual Street? Street { get; set; }
 
     public StreetSweepingDates()
     {
