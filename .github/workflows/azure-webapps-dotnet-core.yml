@@ -90,7 +90,7 @@ jobs:
         run: dotnet tool install --global dotnet-ef
 
       - name: Run EF Core Migrations
-        run: dotnet ef database update --project ${{ env.API_PROJECT_PATH }}
+        run: dotnet ef database update --project ${{ env.API_PROJECT_PATH }} --context ApplicationDbContext --no-build
         env:
             ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }}
             
