@@ -16,12 +16,6 @@ const schema = toTypedSchema(
     zip: z.string().regex(/^\d{5}$/, 'Must be a valid 5-digit ZIP code'),
     reminderDate: z.date({ required_error: 'Reminder Date is required' }),
     isRecurring: z.boolean().default(true),
-    street: z
-      .number({
-        required_error: 'Street is required',
-        invalid_type_error: 'Street must be selected',
-      })
-      .positive('Street must be selected'),
   }),
 )
 
