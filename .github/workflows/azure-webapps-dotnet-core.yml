@@ -45,15 +45,15 @@ jobs:
         run: dotnet tool install --global dotnet-ef
           
       - name: Run EF Core Migrations from Project Directory
-          # Set the working directory to the API project's directory
         working-directory: $(dirname ${{ env.API_PROJECT_PATH }})
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }}
         run: |
             # Now commands run from within StreetSweepingReminder.Api/
             dotnet ef database update \
               --context ApplicationDbContext \
               --configuration Release \
               # Tool should find output in ./bin/Release/net9.0/
-          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }} # Ensure this secret exists
       # ----------------------------------------------------------------------
 
       - name: Publish project
