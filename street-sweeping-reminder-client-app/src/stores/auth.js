@@ -29,7 +29,7 @@ export const useAuthStore = defineStore('auth', {
           },
           body: JSON.stringify(credentials),
         })
-
+        console.log(`api: ${API_BASE_URL}/Auth/login`)
         const data = await response.json()
 
         if (!response.ok) {
@@ -62,7 +62,7 @@ export const useAuthStore = defineStore('auth', {
           },
           body: JSON.stringify({ email, password }),
         })
-
+        console.log(`api when registering: ${API_BASE_URL}/Auth/login`)
         const data = await response.json()
 
         if (!response.ok) {
