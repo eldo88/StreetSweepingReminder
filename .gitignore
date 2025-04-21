@@ -32,8 +32,6 @@ obj/
 .idea/webServers.xml
 .idea/codeStyles/
 
-# Entity Framework Core migrations
-Migrations/
 
 # SQLite database files
 *.db
