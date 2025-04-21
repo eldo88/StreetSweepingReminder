@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { setGlobalTimeout } from '@/utils/globalTimeout'
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isLoggedIn: false,
@@ -20,7 +22,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(credentials) {
       try {
-        const response = await fetch('http://localhost:5010/api/Auth/login', {
+        const response = await fetch(`${API_BASE_URL}/Auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -53,7 +55,7 @@ export const useAuthStore = defineStore('auth', {
 
     async register({ email, password }) {
       try {
-        const response = await fetch('http://localhost:5010/api/Auth/register', {
+        const response = await fetch(`${API_BASE_URL}/Auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
