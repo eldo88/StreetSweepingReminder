@@ -4,6 +4,7 @@ using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Extensions;
 using StreetSweepingReminder.Api.Repositories;
+using StreetSweepingReminder.Api.Services.Utils;
 
 namespace StreetSweepingReminder.Api.Services;
 
@@ -39,7 +40,7 @@ public class ReminderSchedulerService :
 
     protected override object[] GetRecurringParameters(CreateReminderDto command)
     {
-        return [command.WeekOfMonth];
+        return [DateUtils.GetWeekOfMonth(command.ScheduledDateTimeUtc)];
     }
 
     protected override ReminderSchedule MapToEntity(CreateReminderDto command, int parentId)
