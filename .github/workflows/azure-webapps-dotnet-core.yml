@@ -88,6 +88,18 @@ jobs:
 
       - name: Install dotnet-ef tool
         run: dotnet tool install --global dotnet-ef
+        
+      - name: List files before EF Migration # *** ADD DEBUG STEP ***
+        run: |
+          pwd
+          echo "Listing files in repository root:"
+          ls -lA
+          echo "Listing files in API project directory:"
+          ls -lA $(dirname ${{ env.API_PROJECT_PATH }})
+          echo "Listing files in API project obj directory:"
+          ls -lA $(dirname ${{ env.API_PROJECT_PATH }})/obj
+          # Define working directory relative to GITHUB_WORKSPACE
+          working-directory: ./ # Run from repo root
 
       - name: Run EF Core Migrations
         run: dotnet ef database update --project ${{ env.API_PROJECT_PATH }} --context ApplicationDbContext --no-build
