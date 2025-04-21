@@ -7,7 +7,6 @@ public static class DataSeeder
 {
     public static async Task SeedStreetsAsync(ApplicationDbContext context, string csvFilePath)
     {
-        // Check if streets already exist
         if (await context.Streets.AnyAsync())
         {
             Console.WriteLine("Streets table already seeded. Skipping.");
@@ -18,42 +17,49 @@ public static class DataSeeder
         if (!File.Exists(csvFilePath))
         {
             await Console.Error.WriteLineAsync($"Seed file not found: {csvFilePath}");
-            return; // Or throw exception
+            return;
         }
 
         var streetsToInsert = new List<Street>();
         var lines = await File.ReadAllLinesAsync(csvFilePath);
 
-        foreach (var line in lines)
+        foreach (var line in lines.Skip(1))
         {
-            if (string.IsNullOrWhiteSpace(line)) continue; // Skip empty lines
+            if (string.IsNullOrWhiteSpace(line)) continue;
 
-            // Split by comma. Adjust StringSplitOptions if needed.
-            // Handles simple case: "Street Name,ZipCode" or Street Name,ZipCode
             var parts = line.Split(',', StringSplitOptions.TrimEntries);
 
             if (parts.Length == 2)
             {
                 var streetName = parts[0].Trim('"');
-                var zipCode = parts[1].Trim('"');
-
-                if (!string.IsNullOrEmpty(streetName) && !string.IsNullOrEmpty(zipCode))
+                var zipCodeString = parts[1].Trim('"');
+                
+                if (int.TryParse(zipCodeString, out int zipCodeInt))
                 {
-                    streetsToInsert.Add(new Street
+                    
+                    if (!string.IsNullOrEmpty(streetName))
                     {
-                        StreetName = streetName,
-                        ZipCode = int.Parse(zipCode)
-                    });
+                        streetsToInsert.Add(new Street
+                        {
+                            StreetName = streetName,
+                            ZipCode = zipCodeInt
+                        });
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Skipping line with empty street name: {line}");
+                    }
                 }
-                else {
-                     Console.WriteLine($"Skipping invalid line: {line}");
+                else
+                {
+                    Console.WriteLine($"Skipping line due to invalid zip code format: {line}");
                 }
             }
-            else {
-                Console.WriteLine($"Skipping line with incorrect format: {line}");
+            else
+            {
+                Console.WriteLine($"Skipping line with incorrect format (expected 2 parts): {line}");
             }
         }
-
 
         if (streetsToInsert.Any())
         {
