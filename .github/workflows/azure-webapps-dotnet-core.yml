@@ -1,29 +1,10 @@
-# This workflow will build and push a .NET Core app to an Azure Web App when a commit is pushed to your default branch.
-#
-# This workflow assumes you have already created the target Azure App Service web app.
-# For instructions see https://docs.microsoft.com/en-us/azure/app-service/quickstart-dotnetcore?tabs=net60&pivots=development-environment-vscode
-#
-# To configure this workflow:
-#
-# 1. Download the Publish Profile for your Azure Web App. You can download this file from the Overview page of your Web App in the Azure Portal.
-#    For more information: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
-#
-# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
-#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
-#
-# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and DOTNET_VERSION environment variables below.
-#
-# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
-# For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
-
-name: Build and deploy ASP.Net Core app to an Azure Web App
+name: Build, Migrate Database, and Deploy ASP.Net Core app
 
 env:
-  AZURE_WEBAPP_NAME: street-sweeping-reminder    # set this to the name of your Azure Web App
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
-  API_PROJECT_PATH: 'StreetSweepingReminder.Api/StreetSweepingReminder.Api.csproj'
-  DOTNET_VERSION: '9'                 # set this to the .NET Core version to use
+  AZURE_WEBAPP_NAME: street-sweeping-reminder      # set this to the name of your Azure Web App
+  AZURE_WEBAPP_PACKAGE_PATH: '.'                   # path inside the artifact to deploy (usually '.')
+  API_PROJECT_PATH: 'StreetSweepingReminder.Api/StreetSweepingReminder.Api.csproj' # Correct relative path to API project
+  DOTNET_VERSION: '9.0.100-preview.3'              # Specific preview version
 
 on:
   push:
@@ -34,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-and-migrate: # Renamed job for clarity
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +26,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Set up dependency caching for faster builds
+      - name: Set up dependency caching
         uses: actions/cache@v3
         with:
           path: ~/.nuget/packages
@@ -53,63 +34,49 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Build with dotnet
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.API_PROJECT_PATH }}
+
+      - name: Build project
         run: dotnet build ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore
 
-      - name: dotnet publish
-        run: dotnet publish ${{ env.API_PROJECT_PATH }} -c Release -o ${{env.DOTNET_ROOT}}/myapp --no-build
+      # --------------------- Run EF Migration IN BUILD JOB ---------------------
+      - name: Install dotnet-ef tool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Run EF Core Migrations
+        # Run migrations AFTER build is successful
+        run: dotnet ef database update --project ${{ env.API_PROJECT_PATH }} --context ApplicationDbContext --no-build # Use --no-build as project was just built
+        env:
+          # Pass connection string securely as environment variable
+          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }} # Ensure this secret exists
+      # ----------------------------------------------------------------------
+
+      - name: Publish project
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --no-build -o ${{env.DOTNET_ROOT}}/myapp # Use DOTNET_ROOT or runner.temp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{env.DOTNET_ROOT}}/myapp # Use the same path as publish output
 
   deploy:
     permissions:
       contents: none
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-and-migrate # Depend on the renamed job
     environment:
-      name: 'Development'
+      name: 'Production' # Or 'Development' - match your setup
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Checkout code (needed for dotnet ef)
-        uses: actions/checkout@v4 # Checks out the code again in this job
-
-      - name: Set up .NET Core (needed for dotnet ef)
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-          
-      - name: Restore dependencies for API project
-        run: dotnet restore ${{ env.API_PROJECT_PATH }}
-
-      - name: Install dotnet-ef tool
-        run: dotnet tool install --global dotnet-ef
-        
-      - name: List files before EF Migration # *** ADD DEBUG STEP ***
-        run: |
-          pwd
-          echo "Listing files in repository root:"
-          ls -lA
-          echo "Listing files in API project directory:"
-          ls -lA $(dirname ${{ env.API_PROJECT_PATH }})
-          echo "Listing files in API project obj directory:"
-          ls -lA $(dirname ${{ env.API_PROJECT_PATH }})/obj
-          # Define working directory relative to GITHUB_WORKSPACE
-          working-directory: ./ # Run from repo root
-
-      - name: Run EF Core Migrations
-        run: dotnet ef database update --project ${{ env.API_PROJECT_PATH }} --context ApplicationDbContext --no-build
-        env:
-            ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }}
-            
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+          # Download to workspace root or specify path
+          # path: ./deploy_package # Example specific path
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -117,4 +84,5 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          # Ensure this path matches where artifact was downloaded/extracted if needed
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} # Usually '.' for artifact root
