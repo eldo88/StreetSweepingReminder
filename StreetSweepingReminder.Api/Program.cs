@@ -98,6 +98,57 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+// Get a logger (optional but highly recommended)
+var logger = services.GetRequiredService<ILogger<Program>>(); // Use Program or a specific class for logging category
+
+try
+{
+    logger.LogInformation("Applying database migrations...");
+
+    // Resolve the DbContext
+    var context = services.GetRequiredService<ApplicationDbContext>();
+
+    // --- Ensure Database Directory Exists (for SQLite) ---
+    var configuration = services.GetRequiredService<IConfiguration>();
+    var dbConnectionString = configuration.GetConnectionString("DefaultConnection");
+    var dataSourcePrefix = "Data Source=";
+    if (!string.IsNullOrEmpty(dbConnectionString) && dbConnectionString.StartsWith(dataSourcePrefix, StringComparison.OrdinalIgnoreCase))
+    {
+        var filePath = dbConnectionString.Substring(dataSourcePrefix.Length);
+        var fullPath = Path.GetFullPath(filePath); // Resolve potential relative paths
+        var directory = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            logger.LogInformation("Database directory not found. Creating: {DirectoryPath}", directory);
+            Directory.CreateDirectory(directory);
+        }
+    }
+    // ------------------------------------------------------
+
+    // Apply pending EF Core migrations
+    await context.Database.MigrateAsync();
+
+    logger.LogInformation("Database migrations applied successfully.");
+
+    // --- Call Your Data Seeding Logic Here ---
+    // Example: Assuming you have a DataSeeder class and CSV file
+    // Ensure the seed file is configured with "Copy to Output Directory"
+    string seedFilePath = Path.Combine(AppContext.BaseDirectory, "Data/denver_streets.csv");
+    logger.LogInformation("Attempting data seeding...");
+    await DataSeeder.SeedStreetsAsync(context, seedFilePath);
+    logger.LogInformation("Data seeding completed.");
+    // -----------------------------------------
+
+}
+catch (Exception ex)
+{
+    logger.LogError(ex, "An error occurred during database migration or seeding.");
+    // IMPORTANT: Decide if the application should stop if migrations fail.
+    // Re-throwing the exception here will stop the application startup.
+    throw;
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
