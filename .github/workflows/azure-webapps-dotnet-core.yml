@@ -22,6 +22,7 @@ name: Build and deploy ASP.Net Core app to an Azure Web App
 env:
   AZURE_WEBAPP_NAME: street-sweeping-reminder    # set this to the name of your Azure Web App
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  API_PROJECT_PATH: './StreetSweepingReminder.Api/StreetSweepingReminder.Api.csproj'
   DOTNET_VERSION: '9'                 # set this to the .NET Core version to use
 
 on:
@@ -53,10 +54,10 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} -c Release -o ${{env.DOTNET_ROOT}}/myapp --no-build
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -74,6 +75,22 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+      - name: Checkout code (needed for dotnet ef)
+        uses: actions/checkout@v4 # Checks out the code again in this job
+
+      - name: Set up .NET Core (needed for dotnet ef)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install dotnet-ef tool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Run EF Core Migrations
+        run: dotnet ef database update --project ${{ env.API_PROJECT_PATH }}
+        env:
+            ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }}
+            
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
