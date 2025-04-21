@@ -55,14 +55,14 @@ export const useAuthStore = defineStore('auth', {
 
     async register({ email, password }) {
       try {
-        const response = await fetch(`${API_BASE_URL}/Auth/register`, {
+        const response = await fetch(`${API_BASE_URL}Auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ email, password }),
         })
-        console.log(`api when registering: ${API_BASE_URL}/Auth/login`)
+        console.log(`api when registering: ${API_BASE_URL}Auth/login`)
         const data = await response.json()
 
         if (!response.ok) {
