@@ -22,14 +22,14 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(credentials) {
       try {
-        const response = await fetch(`${API_BASE_URL}/Auth/login`, {
+        const response = await fetch(`${API_BASE_URL}Auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(credentials),
         })
-        console.log(`api: ${API_BASE_URL}/Auth/login`)
+        console.log(`api: ${API_BASE_URL}Auth/login`)
         const data = await response.json()
 
         if (!response.ok) {
