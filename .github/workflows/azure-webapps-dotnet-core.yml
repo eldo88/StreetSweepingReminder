@@ -44,19 +44,16 @@ jobs:
       - name: Install dotnet-ef tool
         run: dotnet tool install --global dotnet-ef
           
-          # Add ls command for debugging AFTER build
-      - name: List build output directory # *** DEBUG STEP ***
+      - name: Run EF Core Migrations using explicit assemblies
+          # Define paths to the built assemblies in the Release output
         run: |
-          echo "Checking for Release output:"
-          ls -lA $(dirname ${{ env.API_PROJECT_PATH }})/bin/Release/net9.0/ || echo "Release directory not found or empty."
-          echo "Checking for Debug output:"
-          ls -lA $(dirname ${{ env.API_PROJECT_PATH }})/bin/Debug/net9.0/ || echo "Debug directory not found or empty."
-          working-directory: ./ # Ensure running from repo root
-
-      - name: Run EF Core Migrations
-        # Run migrations AFTER build is successful
-        run: dotnet ef database update --project ${{ env.API_PROJECT_PATH }} --context ApplicationDbContext --configuration Release
-        env:
+          ASSEMBLY_PATH=$(dirname ${{ env.API_PROJECT_PATH }})/bin/Release/net9.0/StreetSweepingReminder.Api.dll
+          dotnet ef database update \
+              --assembly "$ASSEMBLY_PATH" \
+              --startup-assembly "$ASSEMBLY_PATH" \
+              --project ${{ env.API_PROJECT_PATH }} \
+              --context ApplicationDbContext \
+              --configuration Release # Keep configuration for potential MSBuild tasks
           # Pass connection string securely as environment variable
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_DB_CONNECTION_STRING }} # Ensure this secret exists
       # ----------------------------------------------------------------------
