@@ -5,9 +5,11 @@ import router from '@/router/index.js'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useToast } from 'vue-toastification'
 
 const email = ref('')
 const password = ref('')
+const toast = useToast()
 
 const store = useAuthStore()
 
@@ -25,7 +27,7 @@ const handleRegister = async (values) => {
     await router.push('/main')
   } catch (error) {
     console.error('Registration failed', error)
-    // Show error to user
+    toast.error('Registration failed. Please check your credentials.' + error.message)
   }
 }
 </script>

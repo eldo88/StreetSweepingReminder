@@ -5,6 +5,7 @@ import router from '@/router/index.js'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useToast } from 'vue-toastification'
 
 const props = defineProps({
   redirectAfterLogin: {
@@ -20,6 +21,7 @@ const props = defineProps({
 const email = ref('')
 const password = ref('')
 const emit = defineEmits(['success'])
+const toast = useToast()
 
 const store = useAuthStore()
 
@@ -43,6 +45,7 @@ const handleSignIn = () => {
     })
     .catch((error) => {
       console.error('Login failed', error)
+      toast.error('Login failed. Please check your credentials.')
     })
 }
 </script>
