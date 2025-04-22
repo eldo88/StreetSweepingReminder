@@ -143,6 +143,12 @@ public static class DtoExtensions
         return dtos;
     }
 
+    public static ReminderScheduleResponseDto ToReminderScheduleResponseDto(this IEnumerable<ReminderSchedule> source)
+    {
+        var schedule = source.ToReminderScheduleDto();
+        return new ReminderScheduleResponseDto(schedule);
+    }
+
     public static List<ReminderScheduleDto> ToReminderScheduleDto(this IEnumerable<ReminderSchedule> source)
     {
         List<ReminderScheduleDto> dtos = [];
