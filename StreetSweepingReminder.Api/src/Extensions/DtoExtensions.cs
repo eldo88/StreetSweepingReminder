@@ -114,7 +114,7 @@ public static class DtoExtensions
         var year = 0;
         var streetId = 0;
         
-        var schedule = source.ToStreetSweepingDto();
+        var schedule = source.ToStreetSweepingScheduleDto();
         if (schedule.Count > 0)
         {
             var firstDate = schedule[0];
@@ -127,7 +127,7 @@ public static class DtoExtensions
         return new StreetSweepingScheduleResponseDto(day, month, year, streetId, schedule);
     }
 
-    public static List<StreetSweepingScheduleDto> ToStreetSweepingDto(this IEnumerable<StreetSweepingDates> source)
+    public static List<StreetSweepingScheduleDto> ToStreetSweepingScheduleDto(this IEnumerable<StreetSweepingDates> source)
     {
         List<StreetSweepingScheduleDto> dtos = [];
         foreach (var entity in source)
