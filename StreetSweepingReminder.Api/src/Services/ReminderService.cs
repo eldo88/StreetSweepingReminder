@@ -1,6 +1,7 @@
 using FluentResults;
 using FluentValidation;
 using StreetSweepingReminder.Api.DTOs;
+using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Extensions;
 using StreetSweepingReminder.Api.Messages;
@@ -76,16 +77,10 @@ public class ReminderService : IReminderService
             {
                 return Result.Fail<ReminderResponseDto>(new NotFoundError("No reminder found."));
             }
-
-            var streetId = reminder.StreetId;
-            var scheduleResult = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
-            var scheduleResponseDto = scheduleResult.ToStreetSweepingScheduleResponseDto();
-            var reminderId = reminder.Id;
-            var reminderScheduleResult = await _reminderScheduleRepository.GetByReminderId(reminderId);
-            var reminderScheduleResponseDto = reminderScheduleResult.ToReminderScheduleResponseDto();
-            var dto = reminder.ToReminderResponseDto(scheduleResponseDto, reminderScheduleResponseDto);
+            
+            var dto = await BuildReminderResponse(reminder);
+            
             var validationResult = await _reminderResponseValidator.ValidateAsync(dto);
-
             if (!validationResult.IsValid)
             {
                 return validationResult.ToFluentResult();
@@ -112,13 +107,12 @@ public class ReminderService : IReminderService
                 return Result.Fail<List<ReminderResponseDto>>(new NotFoundError("No reminders found for user."));
             }
 
-            var streetId = reminderList.ElementAt(0).StreetId;
-            var scheduleResult = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
-            var scheduleList = scheduleResult.ToStreetSweepingScheduleResponseDto();
-            var reminderId = reminderList.ElementAt(0).Id;
-            var reminderScheduleResult = await _reminderScheduleRepository.GetByReminderId(reminderId);
-            var reminderScheduleResponseDto = reminderScheduleResult.ToReminderScheduleResponseDto();
-            var dtos = reminderList.ToListOfReminderResponseDtos(scheduleList, reminderScheduleResponseDto);
+            List<ReminderResponseDto> dtos = [];
+            foreach (var reminder in reminderList)
+            {
+                var dto = await BuildReminderResponse(reminder);
+                dtos.Add(dto);
+            }
 
             foreach (var dto in dtos)
             {
@@ -160,5 +154,16 @@ public class ReminderService : IReminderService
             _logger.LogError(e, "Error updating reminder.");
             return Result.Fail(new ApplicationError($"An unexpected error occurred while updating reminder: {e.Message}"));
         }
+    }
+
+    private async Task<ReminderResponseDto> BuildReminderResponse(Reminder reminder)
+    {
+        var streetId = reminder.StreetId;
+        var scheduleResult = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
+        var scheduleList = scheduleResult.ToStreetSweepingScheduleResponseDto();
+        var reminderId = reminder.Id;
+        var reminderScheduleResult = await _reminderScheduleRepository.GetByReminderId(reminderId);
+        var reminderScheduleResponseDto = reminderScheduleResult.ToReminderScheduleResponseDto();
+        return reminder.ToReminderResponseDto(scheduleList, reminderScheduleResponseDto);
     }
 }
