@@ -75,7 +75,10 @@ public class ReminderService : IReminderService
                 return Result.Fail<ReminderResponseDto>(new NotFoundError("No reminder found."));
             }
 
-            var dto = reminder.ToReminderResponseDto();
+            var streetId = reminder.StreetId;
+            var scheduleResult = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
+            var scheduleResponseDto = scheduleResult.ToStreetSweepingScheduleResponseDto();
+            var dto = reminder.ToReminderResponseDto(scheduleResponseDto);
             var validationResult = await _reminderResponseValidator.ValidateAsync(dto);
 
             if (!validationResult.IsValid)
@@ -106,8 +109,8 @@ public class ReminderService : IReminderService
 
             var streetId = reminderList.ElementAt(0).StreetId;
             var scheduleResult = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
-            var scheduleList = scheduleResult.ToList();
-            var dtos = reminderList.ToListOfReminderResponseDtos();
+            var scheduleList = scheduleResult.ToStreetSweepingScheduleResponseDto();
+            var dtos = reminderList.ToListOfReminderResponseDtos(scheduleList);
 
             foreach (var dto in dtos)
             {
