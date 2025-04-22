@@ -109,7 +109,7 @@ const scheduleList = computed(() => {
       <!-- Right Column: Schedule -->
       <!-- Give it a specific width or let it flex. md:w-1/3 or md:w-1/2 are common -->
       <div class="md:w-1/3">
-        <h3 class="text-lg font-medium text-indigo-600 mb-3">Full Schedule</h3>
+        <h3 class="text-lg font-medium text-indigo-600 mb-3">Full Street Sweeping Schedule</h3>
 
         <!-- Conditional Rendering: Show only if schedule exists and has items -->
         <div v-if="scheduleList.length > 0">
