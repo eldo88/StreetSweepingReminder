@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStreetsStore } from '@/stores/streets'
+import { formatDate } from '@/utils/dateUtils.js'
 
 const props = defineProps({
   reminder: {
@@ -21,6 +22,9 @@ const props = defineProps({
       schedule: [],
     },
     streetId: null,
+    reminderSchedule: {
+      schedule: [],
+    },
   }),
 })
 
@@ -29,26 +33,6 @@ const streetsStore = useStreetsStore()
 const getStreetName = (streetId) => {
   const street = streetsStore.streets.find((s) => s.id === streetId)
   return street ? street.name : 'Unknown Street'
-}
-
-const formatDate = (dateString) => {
-  if (!dateString) return 'Invalid Date'
-  try {
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date'
-    }
-
-    return date.toLocaleDateString(undefined, {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  } catch (error) {
-    console.error('Error formatting date:', dateString, error)
-    return 'Invalid Date'
-  }
 }
 
 const nextStreetSweepingDateComputed = computed(() => {
@@ -70,8 +54,12 @@ const nextStreetSweepingDateComputed = computed(() => {
   return 'No schedule available'
 })
 
-const scheduleList = computed(() => {
+const streetSweepingScheduleList = computed(() => {
   return props.reminder.streetSweepingSchedule?.schedule ?? []
+})
+
+const reminderScheduleList = computed(() => {
+  return props.reminder.reminderSchedule?.schedule ?? []
 })
 </script>
 
@@ -106,21 +94,27 @@ const scheduleList = computed(() => {
         </div>
       </div>
 
-      <!-- Right Column: Schedule -->
-      <!-- Give it a specific width or let it flex. md:w-1/3 or md:w-1/2 are common -->
+      <div class="md:w-1/3">
+        <h3 class="text-lg font-medium text-indigo-600 mb-3">Your Reminder Schedule</h3>
+        <div v-if="reminderScheduleList.length > 0">
+          <ul class="space-y-1 text-sm list-disc list-inside text-gray-600">
+            <li v-for="item in reminderScheduleList" :key="item.id">
+              {{ formatDate(item.nextNotificationDate) }}
+            </li>
+          </ul>
+        </div>
+        <div v-else class="text-sm text-gray-500 italic">No schedule data available.</div>
+      </div>
+
       <div class="md:w-1/3">
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Full Street Sweeping Schedule</h3>
-
-        <!-- Conditional Rendering: Show only if schedule exists and has items -->
-        <div v-if="scheduleList.length > 0">
-          <!-- Option 1: Simple List -->
+        <div v-if="streetSweepingScheduleList.length > 0">
           <ul class="space-y-1 text-sm list-disc list-inside text-gray-600">
-            <li v-for="item in scheduleList" :key="item.id">
+            <li v-for="item in streetSweepingScheduleList" :key="item.id">
               {{ formatDate(item.streetSweepingDate) }}
             </li>
           </ul>
         </div>
-        <!-- Message if no schedule data -->
         <div v-else class="text-sm text-gray-500 italic">No schedule data available.</div>
       </div>
     </div>
