@@ -15,13 +15,15 @@ public class ReminderService : IReminderService
     private readonly IReminderRepository _reminderRepository;
     private readonly IValidator<ReminderResponseDto> _reminderResponseValidator;
     private readonly IReminderScheduler _reminderScheduler;
+    private readonly IStreetSweepingDatesRepository _streetSweepingDatesRepository;
 
-    public ReminderService(ILogger<ReminderService> logger, IReminderRepository reminderRepository, IValidator<ReminderResponseDto> reminderResponseValidator, IReminderScheduler reminderScheduler)
+    public ReminderService(ILogger<ReminderService> logger, IReminderRepository reminderRepository, IValidator<ReminderResponseDto> reminderResponseValidator, IReminderScheduler reminderScheduler, IStreetSweepingDatesRepository streetSweepingDatesRepository)
     {
         _logger = logger;
         _reminderRepository = reminderRepository;
         _reminderResponseValidator = reminderResponseValidator;
         _reminderScheduler = reminderScheduler;
+        _streetSweepingDatesRepository = streetSweepingDatesRepository;
     }
     
     public async Task<Result<int>> CreateReminderAsync(CreateReminderDto command, string userId)
@@ -102,7 +104,10 @@ public class ReminderService : IReminderService
                 return Result.Fail<List<ReminderResponseDto>>(new NotFoundError("No reminders found for user."));
             }
 
-            var dtos = reminderList.ToListOfReminderResponseDtos().ToList();
+            var streetId = reminderList.ElementAt(0).StreetId;
+            var scheduleResult = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
+            var scheduleList = scheduleResult.ToList();
+            var dtos = reminderList.ToListOfReminderResponseDtos();
 
             foreach (var dto in dtos)
             {
