@@ -13,10 +13,10 @@ onMounted(() => {
 <template>
   <div class="md:ml-auto">
     <div class="flex h-20 items-center justify-center">
-      <a
-        href="/createReminder"
+      <router-link
+        to="/createReminder"
         class="text-white bg-blue-600 hover:bg-gray-900 hover:text-white rounded-md px-6 py-2"
-        >Create New Reminder</a
+        >Create New Reminder</router-link
       >
     </div>
   </div>
