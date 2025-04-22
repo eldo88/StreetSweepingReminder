@@ -45,14 +45,14 @@ public class StreetController : ControllerBase
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
     }
 
-    [HttpGet]
-    [ProducesResponseType(typeof(ReminderResponseDto), StatusCodes.Status200OK)]
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(StreetResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetStreet(int id)
     {
         var result = await _streetService.GetStreetByIdAsync(id);
-        
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -60,7 +60,7 @@ public class StreetController : ControllerBase
 
         if (result.HasError<NotFoundError>())
         {
-            return Ok();
+            return NotFound();
         }
         
         if (result.HasError<ValidationError>(out var validationErrors))
