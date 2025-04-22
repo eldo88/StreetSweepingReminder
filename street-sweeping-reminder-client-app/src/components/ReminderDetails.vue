@@ -64,6 +64,25 @@ const nextStreetSweepingDateComputed = computed(() => {
   return 'No schedule available'
 })
 
+const nextReminderDate = computed(() => {
+  const schedule = props.reminder.reminderSchedule?.schedule
+  if (schedule && Array.isArray(schedule) && schedule.length > 0) {
+    const today = new Date()
+    const nextDate = schedule
+      .map((s) => new Date(s.nextNotificationDate))
+      .sort((a, b) => a - b)
+      .find((date) => date > today)
+    return nextDate ? formatDate(nextDate.toDateString()) : 'No upcoming reminders'
+  }
+  if (!schedule || !Array.isArray(schedule)) {
+    return 'Schedule data unavailable'
+  }
+  if (schedule.length === 0) {
+    return 'No schedule entries'
+  }
+  return 'No schedule available'
+})
+
 const streetSweepingScheduleList = computed(() => {
   return props.reminder.streetSweepingSchedule?.schedule ?? []
 })
@@ -92,6 +111,7 @@ onMounted(() => {
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Details</h3>
         <div class="space-y-2 text-sm text-gray-600">
           <div><strong>Phone Number:</strong> {{ reminder.phoneNumber }}</div>
+          <div><strong>Next Reminder:</strong> {{ nextReminderDate }}</div>
           <div><strong>Next Sweeping:</strong> {{ nextStreetSweepingDateComputed }}</div>
           <div><strong>Status:</strong> {{ reminder.status }}</div>
           <div><strong>Street:</strong> {{ streetName }}</div>
