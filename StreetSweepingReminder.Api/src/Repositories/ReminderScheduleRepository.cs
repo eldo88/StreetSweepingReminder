@@ -50,4 +50,18 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
     {
         throw new NotImplementedException();
     }
+
+    public async Task<IEnumerable<ReminderSchedule>> GetByReminderId(int reminderId)
+    {
+        const string sql =
+            """
+            SELECT *
+            FROM ReminderSchedule
+            WHERE ReminderId = @reminderId
+            """;
+
+        using var connection = CreateConnection();
+        var reminderDates = await connection.QueryAsync<ReminderSchedule>(sql, new { reminderId });
+        return reminderDates;
+    }
 }
