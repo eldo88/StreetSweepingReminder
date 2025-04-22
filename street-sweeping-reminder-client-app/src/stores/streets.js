@@ -5,8 +5,8 @@ export const useStreetsStore = defineStore('streets', {
   state: () => ({
     streets: [],
     isLoading: false,
-    schedule: [],
-    streetId: null,
+    cachedSchedule: {},
+    cachedStreets: {},
   }),
 
   actions: {
@@ -42,7 +42,7 @@ export const useStreetsStore = defineStore('streets', {
         }
         const reponse = await api.post(`Street/${id}/schedule`, payload)
         if (reponse.data > 0) {
-          this.streetId = id
+          this.cachedSchedule[id] = reponse.data
           return reponse.data
         } else {
           return null
@@ -53,10 +53,15 @@ export const useStreetsStore = defineStore('streets', {
     },
 
     async getSchedule(id) {
+      if (this.cachedSchedule[id]) {
+        return this.cachedSchedule[id]
+      }
+      if (!id) {
+        return null
+      }
       try {
         const response = await api.get(`Street/${id}/getSchedule`)
         if (response.data) {
-          this.streetId = id
           return response.data
         } else {
           return null
@@ -68,10 +73,17 @@ export const useStreetsStore = defineStore('streets', {
     },
 
     async getStreet(id) {
+      if (this.cachedStreets[id]) {
+        return this.cachedStreets[id]
+      }
+      if (!id) {
+        return null
+      }
       try {
         const response = await api.get(`Street/${id}`)
         if (response.data) {
           this.streetId = id
+          this.cachedStreets[id] = response.data
           return response.data
         } else {
           return null
