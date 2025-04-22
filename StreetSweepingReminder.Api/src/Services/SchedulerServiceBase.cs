@@ -1,7 +1,7 @@
 using FluentResults;
 using StreetSweepingReminder.Api.Errors;
 using StreetSweepingReminder.Api.Repositories;
-using StreetSweepingReminder.Api.Services.Utils;
+using StreetSweepingReminder.Api.Utils;
 
 namespace StreetSweepingReminder.Api.Services;
 

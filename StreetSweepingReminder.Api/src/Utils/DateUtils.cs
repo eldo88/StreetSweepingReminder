@@ -1,4 +1,4 @@
-namespace StreetSweepingReminder.Api.Services.Utils;
+namespace StreetSweepingReminder.Api.Utils;
 
 public static class DateUtils
 {
