@@ -28,20 +28,23 @@ public class ReminderController : ControllerBase
     public async Task<IActionResult> CreateReminder([FromBody] CreateReminderDto createReminderDto)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var result = await _reminderService.CreateReminderAsync(createReminderDto, userId);
-        if (result.IsSuccess)
+        if (userId is not null)
         {
-            var newId = result.Value;
-            return CreatedAtAction(nameof(GetReminder), new { id = newId }, newId);
-        }
+            var result = await _reminderService.CreateReminderAsync(createReminderDto, userId);
+            if (result.IsSuccess)
+            {
+                var newId = result.Value;
+                return CreatedAtAction(nameof(GetReminder), new { id = newId }, newId);
+            }
         
-        _logger.LogError("Failed to create reminder. Command: {@Command}, Errors: {Errors}", createReminderDto, result.Errors);
+            _logger.LogError("Failed to create reminder. Command: {@Command}, Errors: {Errors}", createReminderDto, result.Errors);
 
-        if (result.HasError<ApplicationError>())
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred while saving the reminder.");
+            if (result.HasError<ApplicationError>())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred while saving the reminder.");
+            }
         }
-        
+
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
     }
     
