@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useStreetsStore } from '@/stores/streets'
 import { formatDate } from '@/utils/dateUtils.js'
 
@@ -28,10 +28,21 @@ const props = defineProps({
 })
 
 const streetsStore = useStreetsStore()
+const streetName = ref('Loading...')
 
-const getStreetName = (streetId) => {
-  const street = streetsStore.streets.find((s) => s.id === streetId)
-  return street ? street.name : 'Unknown Street'
+async function fetchStreetDetails(streetId) {
+  if (!streetId) {
+    streetName.value = 'N/A'
+    return
+  }
+  streetName.value = 'Loading...'
+  try {
+    const street = await streetsStore.getStreet(streetId)
+    streetName.value = street ? street.streetName : 'Unknown Street'
+  } catch (error) {
+    console.error('Failed to fetch street details:', error)
+    streetName.value = 'Error loading street'
+  }
 }
 
 const nextStreetSweepingDateComputed = computed(() => {
@@ -60,23 +71,21 @@ const streetSweepingScheduleList = computed(() => {
 const reminderScheduleList = computed(() => {
   return props.reminder.reminderSchedule?.schedule ?? []
 })
+
+onMounted(() => {
+  fetchStreetDetails(props.reminder.streetId)
+})
 </script>
 
 <template>
   <div class="bg-white rounded-xl shadow-md relative p-4">
-    <!-- Top Header Section -->
     <div class="mb-6">
-      <!-- Example: Use title from reminder data -->
       <h1 class="text-xl font-semibold text-gray-800 my-2">
         {{ reminder.title || 'Street Reminder' }}
       </h1>
       <div class="border-t border-gray-300 mb-5"></div>
     </div>
-
-    <!-- Main Content Area (using Flexbox) -->
-    <!-- On medium screens and up (md:), display side-by-side -->
     <div class="flex flex-col md:flex-row gap-6 md:gap-8">
-      <!-- Left Column: Details -->
       <div class="flex-1">
         {{}}
 
@@ -85,8 +94,7 @@ const reminderScheduleList = computed(() => {
           <div><strong>Phone Number:</strong> {{ reminder.phoneNumber }}</div>
           <div><strong>Next Sweeping:</strong> {{ nextStreetSweepingDateComputed }}</div>
           <div><strong>Status:</strong> {{ reminder.status }}</div>
-          <!-- Add other details if needed -->
-          <div><strong>Street:</strong> {{ getStreetName() }}</div>
+          <div><strong>Street:</strong> {{ streetName }}</div>
         </div>
       </div>
 

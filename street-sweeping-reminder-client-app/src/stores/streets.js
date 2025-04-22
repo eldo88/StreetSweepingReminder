@@ -67,6 +67,21 @@ export const useStreetsStore = defineStore('streets', {
       }
     },
 
+    async getStreet(id) {
+      try {
+        const response = await api.get(`Street/${id}`)
+        if (response.data) {
+          this.streetId = id
+          return response.data
+        } else {
+          return null
+        }
+      } catch (error) {
+        console.error('Failed to get street' + error)
+        return null
+      }
+    },
+
     clearStreets() {
       this.streets = []
       this.isLoading = false
