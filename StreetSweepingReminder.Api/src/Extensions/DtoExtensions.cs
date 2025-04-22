@@ -31,7 +31,7 @@ public static class DtoExtensions
             source.StreetId);
     }
 
-    public static IEnumerable<ReminderResponseDto> ToListOfReminderResponseDtos(this IEnumerable<Reminder> source)
+    public static List<ReminderResponseDto> ToListOfReminderResponseDtos(this IEnumerable<Reminder> source)
     {
         return source.Select(r => r.ToReminderResponseDto()).ToList();
     }
