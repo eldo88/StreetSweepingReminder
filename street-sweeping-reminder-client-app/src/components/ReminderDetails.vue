@@ -11,7 +11,6 @@ const props = defineProps({
   default: () => ({
     id: 0,
     title: 'Default Title',
-    message: 'No message available',
     phoneNumber: 'N/A',
     status: 'N/A',
     streetSweepingSchedule: {
@@ -80,9 +79,6 @@ const reminderScheduleList = computed(() => {
       <!-- Left Column: Details -->
       <div class="flex-1">
         {{}}
-        <div class="mb-5 text-gray-700">
-          {{ reminder.message }}
-        </div>
 
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Details</h3>
         <div class="space-y-2 text-sm text-gray-600">
