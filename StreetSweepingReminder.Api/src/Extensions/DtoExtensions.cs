@@ -36,14 +36,6 @@ public static class DtoExtensions
             reminderSchedule);
     }
 
-    public static List<ReminderResponseDto> ToListOfReminderResponseDtos(
-        this IEnumerable<Reminder> source, 
-        StreetSweepingScheduleResponseDto streetSweepingSchedule,
-        ReminderScheduleResponseDto reminderSchedule)
-    {
-        return source.Select(r => r.ToReminderResponseDto(streetSweepingSchedule, reminderSchedule)).ToList();
-    }
-
     public static Reminder ToReminderEntity(this UpdateReminderDto source)
     {
         return new Reminder()
