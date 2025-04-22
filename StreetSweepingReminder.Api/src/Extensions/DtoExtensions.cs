@@ -142,4 +142,28 @@ public static class DtoExtensions
 
         return dtos;
     }
+
+    public static List<ReminderScheduleDto> ToReminderScheduleDto(this IEnumerable<ReminderSchedule> source)
+    {
+        List<ReminderScheduleDto> dtos = [];
+        foreach (var entity in source)
+        {
+            var dto = new ReminderScheduleDto(
+                entity.Id,
+                entity.ReminderId,
+                entity.NextNotificationDate,
+                entity.DayOfWeek,
+                entity.WeekOfMonth,
+                entity.StartMonth,
+                entity.EndMonth,
+                entity.TimeOfDay,
+                entity.TimeZone,
+                entity.IsRecurring,
+                entity.IsActive);
+            
+            dtos.Add(dto);
+        }
+
+        return dtos;
+    }
 }
