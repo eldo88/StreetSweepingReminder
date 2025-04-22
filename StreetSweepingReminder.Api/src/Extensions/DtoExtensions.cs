@@ -21,7 +21,10 @@ public static class DtoExtensions
         };
     }
 
-    public static ReminderResponseDto ToReminderResponseDto(this Reminder source, StreetSweepingScheduleResponseDto streetSweepingSchedule)
+    public static ReminderResponseDto ToReminderResponseDto(
+        this Reminder source, 
+        StreetSweepingScheduleResponseDto streetSweepingSchedule,
+        ReminderScheduleResponseDto reminderSchedule)
     {
         return new ReminderResponseDto(
             source.Id,
@@ -29,12 +32,16 @@ public static class DtoExtensions
             source.Status,
             source.PhoneNumber,
             source.StreetId,
-            streetSweepingSchedule);
+            streetSweepingSchedule,
+            reminderSchedule);
     }
 
-    public static List<ReminderResponseDto> ToListOfReminderResponseDtos(this IEnumerable<Reminder> source, StreetSweepingScheduleResponseDto streetSweepingSchedule)
+    public static List<ReminderResponseDto> ToListOfReminderResponseDtos(
+        this IEnumerable<Reminder> source, 
+        StreetSweepingScheduleResponseDto streetSweepingSchedule,
+        ReminderScheduleResponseDto reminderSchedule)
     {
-        return source.Select(r => r.ToReminderResponseDto(streetSweepingSchedule)).ToList();
+        return source.Select(r => r.ToReminderResponseDto(streetSweepingSchedule, reminderSchedule)).ToList();
     }
 
     public static Reminder ToReminderEntity(this UpdateReminderDto source)
