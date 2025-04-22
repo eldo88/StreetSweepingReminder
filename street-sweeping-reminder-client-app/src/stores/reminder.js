@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
-import { useStreetsStore } from './streets'
 import api from '@/services/api'
 
 export const useRemindersStore = defineStore('reminders', {
@@ -35,7 +34,11 @@ export const useRemindersStore = defineStore('reminders', {
       }
     },
 
-    async createReminder(formData) {
+    async createReminder(formData, streetId) {
+      if (!streetId) {
+        console.error('createReminder action called without a streetId!')
+        throw new Error('Street ID is required to create a reminder.')
+      }
       try {
         const authStore = useAuthStore()
         const userId = authStore.getUserId
@@ -44,16 +47,16 @@ export const useRemindersStore = defineStore('reminders', {
           console.warn('No user ID found.')
           return
         }
-        const streetsStore = useStreetsStore()
+
         const payload = {
           title: formData.title,
           scheduledDateTimeUtc: formData.reminderDate.toISOString(),
           status: 'Pending',
           phoneNumber: formData.phoneNumber,
-          streetId: streetsStore.streetId,
+          streetId: streetId,
           isRecurring: formData.isRecurring,
         }
-
+        console.log('Reminder Payload being sent:', JSON.stringify(payload, null, 2))
         const response = await api.post('Reminder', payload)
 
         return response.data

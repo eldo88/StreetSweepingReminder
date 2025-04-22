@@ -18,7 +18,7 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['update:isReminderFormVisible'])
+const emit = defineEmits(['update:isReminderFormVisible', 'streetSelected'])
 
 const toast = useToast()
 const streetsStore = useStreetsStore()
@@ -96,6 +96,8 @@ async function handleStreetChange(streetId) {
   formRef.value?.resetField('weekOfMonth')
   formRef.value?.resetField('dayOfWeek')
   formRef.value?.resetField('year')
+
+  emit('streetSelected', streetId)
 
   if (!streetId) {
     return

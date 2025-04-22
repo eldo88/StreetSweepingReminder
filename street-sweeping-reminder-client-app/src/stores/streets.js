@@ -42,6 +42,7 @@ export const useStreetsStore = defineStore('streets', {
         }
         const reponse = await api.post(`Street/${id}/schedule`, payload)
         if (reponse.data > 0) {
+          this.streetId = id
           this.cachedSchedule[id] = reponse.data
           return reponse.data
         } else {
@@ -99,4 +100,6 @@ export const useStreetsStore = defineStore('streets', {
       this.isLoading = false
     },
   },
+
+  persist: true,
 })

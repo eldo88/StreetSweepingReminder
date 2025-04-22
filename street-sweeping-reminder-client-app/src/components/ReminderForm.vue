@@ -8,12 +8,17 @@ import { useRemindersStore } from '@/stores/reminder'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 
+const props = defineProps({
+  streetId: {
+    type: Number,
+    default: null,
+  },
+})
+
 const schema = toTypedSchema(
   z.object({
     title: z.string().min(1, 'Title is required'),
-    message: z.string().min(1, 'Message is required'),
     phoneNumber: z.string().min(10, 'Phone number is required'),
-    zip: z.string().regex(/^\d{5}$/, 'Must be a valid 5-digit ZIP code'),
     reminderDate: z.date({ required_error: 'Reminder Date is required' }),
     isRecurring: z.boolean().default(true),
   }),
@@ -24,9 +29,16 @@ const router = useRouter()
 const reminderStore = useRemindersStore()
 
 async function onSubmit(values) {
+  console.log('Street ID from prop:', props.streetId)
+
+  if (!props.streetId) {
+    toast.error('Cannot create reminder: No street selected.')
+    console.error('Attempted to submit reminder without a streetId prop.')
+    return
+  }
+
   try {
-    console.log(`SS time: ${values.streetSweepingDate}`)
-    await reminderStore.createReminder(values)
+    await reminderStore.createReminder(values, props.streetId)
     toast.success('Reminder created successfully!')
     setTimeout(() => {
       router.push('/reminders')
@@ -75,30 +87,6 @@ async function onSubmit(values) {
               class="input-field"
             />
             <ErrorMessage name="phoneNumber" class="text-red-500 text-xs mt-1" />
-          </div>
-
-          <!-- Message -->
-          <div class="mb-4">
-            <label for="message" class="block text-gray-700 text-sm font-bold mb-2">
-              Message <span class="text-red-500">*</span>
-            </label>
-            <Field
-              id="message"
-              name="message"
-              type="text"
-              placeholder="Reminder message"
-              class="input-field"
-            />
-            <ErrorMessage name="message" class="text-red-500 text-xs mt-1" />
-          </div>
-
-          <!-- ZIP Code -->
-          <div class="mb-4">
-            <label for="zip" class="block text-gray-700 text-sm font-bold mb-2">
-              ZIP Code <span class="text-red-500">*</span>
-            </label>
-            <Field id="zip" name="zip" type="text" placeholder="e.g. 90210" class="input-field" />
-            <ErrorMessage name="zip" class="text-red-500 text-xs mt-1" />
           </div>
 
           <!-- Reminder Date Picker -->
