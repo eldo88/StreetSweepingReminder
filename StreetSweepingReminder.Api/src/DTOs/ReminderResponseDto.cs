@@ -7,5 +7,6 @@ public record ReminderResponseDto(
     string Status, 
     string PhoneNumber, 
     int StreetId,
-    StreetSweepingScheduleResponseDto StreetSweepingSchedule);
+    StreetSweepingScheduleResponseDto StreetSweepingSchedule,
+    ReminderScheduleResponseDto ReminderSchedule);
     
