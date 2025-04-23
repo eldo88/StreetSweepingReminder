@@ -8,7 +8,7 @@ import { Form, Field, ErrorMessage } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 
-import { ElSelect, ElOption } from 'element-plus'
+import { ElSelect, ElOption, ElDialog, ElButton } from 'element-plus'
 import 'element-plus/dist/index.css'
 
 defineProps({
@@ -66,14 +66,8 @@ const yearOptions = ref(
   })),
 )
 
-const schema = toTypedSchema(
+const scheduleSchema = toTypedSchema(
   z.object({
-    street: z
-      .number({
-        required_error: 'Street is required',
-        invalid_type_error: 'Street must be selected',
-      })
-      .positive('Street must be selected'),
     weekOfMonth: z
       .number({
         required_error: 'Week of month is required',
@@ -100,14 +94,17 @@ const schema = toTypedSchema(
   }),
 )
 
-async function handleStreetChange(streetId) {
-  formRef.value?.resetField('weekOfMonth')
-  formRef.value?.resetField('dayOfWeek')
-  formRef.value?.resetField('year')
+async function handleStreetChange(streetId, label) {
+  loadedScheduleData.value = null
+  selectedStreetId.value = streetId
+  selectedStreetLabel.value = label || ''
+  console.log('handleStreetChange - Street ID set to:', selectedStreetId.value)
 
   emit('streetSelected', streetId)
+  emit('update:isReminderFormVisible', false) // Start hidden
 
   if (!streetId) {
+    isScheduleEntryModalVisible.value = false
     return
   }
 
@@ -145,46 +142,6 @@ async function handleStreetChange(streetId) {
   }
 }
 
-async function onSubmit(values) {
-  console.log('Form submitted for creation:', values)
-
-  const { street: streetId, weekOfMonth, dayOfWeek, year } = values
-
-  if (
-    streetId === undefined ||
-    weekOfMonth === undefined ||
-    dayOfWeek === undefined ||
-    year === undefined
-  ) {
-    toast.error('Form data is incomplete. Please check all fields.')
-    return
-  }
-
-  isScheduleLoading.value = true
-  try {
-    const createScheduleResult = await streetsStore.createSchedule(
-      streetId,
-      weekOfMonth,
-      dayOfWeek,
-      year,
-    )
-
-    if (createScheduleResult) {
-      toast.success('Street Sweeping Schedule created successfully!')
-      emit('update:isReminderFormVisible', true)
-    } else {
-      toast.error('Failed to create Street Sweeping Schedule (API reported failure).')
-    }
-  } catch (error) {
-    console.error('Street Sweeping Schedule creation failed:', error)
-    const errorMessage =
-      error?.response?.data?.message || 'Failed to create Street Sweeping Schedule'
-    toast.error(errorMessage)
-  } finally {
-    isScheduleLoading.value = false
-  }
-}
-
 // Handler for submitting the schedule form FROM THE MODAL
 async function onScheduleEntrySubmit(values) {
   console.log('Modal Form submitted for creation:', values)
@@ -192,6 +149,7 @@ async function onScheduleEntrySubmit(values) {
 
   if (!selectedStreetId.value) {
     toast.error('Internal Error: Street ID is missing.')
+    isScheduleEntryModalVisible.value = false
     return
   }
 
@@ -213,6 +171,7 @@ async function onScheduleEntrySubmit(values) {
 
       // Fetch the newly created schedule to display it
       const newScheduleData = await streetsStore.getSchedule(selectedStreetId.value)
+      console.log('Newly created schedule data:', newScheduleData)
       loadedScheduleData.value = newScheduleData
 
       // Emit events: one for general creation, one to update parent visibility
@@ -240,10 +199,14 @@ function handleModalClose() {
 }
 
 const handleStreetSearch = _.debounce(async (query) => {
+  loadedScheduleData.value = null
   if (query) {
     streetsStore.searchStreets(query)
   } else {
     streetsStore.clearStreets()
+    selectedStreetId.value = null
+    selectedStreetLabel.value = ''
+    emit('streetSelected', null)
   }
 }, 300)
 
@@ -258,131 +221,199 @@ const getOptionLabel = (value, options) =>
     >
       <div class="bg-white shadow-md rounded-lg px-4 sm:px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Search for your street</h2>
-        <Form ref="formRef" @submit="onSubmit" :validation-schema="schema">
-          <div class="mb-4">
-            <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
-              Street Name <span class="text-red-500">*</span>
-            </label>
-            <Field name="street" v-slot="{ field, value, errors }">
-              <el-select
-                v-bind="field"
-                :model-value="value"
-                @update:modelValue="
-                  (newValue) => {
-                    field.onChange(newValue)
-                    handleStreetChange(newValue)
-                  }
-                "
-                placeholder="Select or search for a street"
-                filterable
-                remote
-                :remote-method="handleStreetSearch"
-                :loading="isLoading"
-                clearable
-                class="w-full"
-                id="street"
-                :class="{ 'el-select-invalid': errors?.street }"
-              >
-                <el-option
-                  v-for="item in streetOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </Field>
-            <ErrorMessage name="street" class="text-red-500 text-xs mt-1" />
-          </div>
 
-          <div class="mb-4">
-            <label for="weekOfMonth" class="block text-gray-700 text-sm font-bold mb-2">
-              Week of Month <span class="text-red-500">*</span>
-            </label>
-            <Field name="weekOfMonth" v-slot="{ field, value, errors }">
-              <el-select
-                :model-value="value"
-                @update:modelValue="field.onChange($event)"
-                placeholder="Select Week"
-                clearable
-                :disabled="isScheduleLoading"
-                class="w-full"
-                id="weekOfMonth"
-                :class="{ 'el-select-invalid': errors?.length }"
-              >
-                <el-option
-                  v-for="item in weekOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </Field>
-            <ErrorMessage name="weekOfMonth" class="text-red-500 text-xs mt-1" />
-          </div>
+        <!-- Main Form for Street Search -->
+        <!-- No need for vee-validate Form wrapper if just the select -->
+        <div class="mb-4">
+          <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
+            Street Name <span class="text-red-500">*</span>
+          </label>
+          <el-select
+            :model-value="selectedStreetId"
+            @update:modelValue="
+              (val) => {
+                const selectedOption = streetOptions.find((opt) => opt.value === val)
+                handleStreetChange(val, selectedOption?.label)
+              }
+            "
+            placeholder="Type to search for a street"
+            filterable
+            remote
+            :remote-method="handleStreetSearch"
+            :loading="isSearchLoading"
+            clearable
+            @clear="handleStreetChange(null, null)"
+            class="w-full"
+            id="street"
+            value-key="value"
+          >
+            <el-option
+              v-for="item in streetOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+            <template #empty>
+              <p class="el-select-dropdown__empty">
+                {{ isSearchLoading ? 'Loading...' : 'No streets found.' }}
+              </p>
+            </template>
+          </el-select>
+          <!-- No error message needed here if selection is the only field -->
+        </div>
 
-          <div class="mb-4">
-            <label for="dayOfWeek" class="block text-gray-700 text-sm font-bold mb-2">
-              Day of Week <span class="text-red-500">*</span>
-            </label>
-            <Field name="dayOfWeek" v-slot="{ field, value, errors }">
-              <el-select
-                :model-value="value"
-                @update:modelValue="field.onChange($event)"
-                placeholder="Select Day"
-                clearable
-                :disabled="isScheduleLoading"
-                class="w-full"
-                id="dayOfWeek"
-                :class="{ 'el-select-invalid': errors?.length }"
-              >
-                <el-option
-                  v-for="item in dayOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </Field>
-            <ErrorMessage name="dayOfWeek" class="text-red-500 text-xs mt-1" />
-          </div>
+        <!-- Display Loading State for Schedule -->
+        <div v-if="isScheduleLoading && selectedStreetId" class="text-center text-gray-500 my-4">
+          Loading schedule details...
+        </div>
 
-          <div class="mb-4">
-            <label for="year" class="block text-gray-700 text-sm font-bold mb-2">
-              Year <span class="text-red-500">*</span>
-            </label>
-            <Field name="year" v-slot="{ field, value, errors }">
-              <el-select
-                :model-value="value"
-                @update:modelValue="field.onChange($event)"
-                placeholder="Select Year"
-                clearable
-                :disabled="isScheduleLoading"
-                class="w-full"
-                id="year"
-                :class="{ 'el-select-invalid': errors?.length }"
-              >
-                <el-option
-                  v-for="item in yearOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </Field>
-            <ErrorMessage name="year" class="text-red-500 text-xs mt-1" />
-          </div>
+        <!-- Display Loaded Schedule Information (if found AND not loading) -->
+        <div
+          v-if="!isScheduleLoading && loadedScheduleData"
+          class="mt-6 p-4 border rounded bg-green-50 border-green-200"
+        >
+          <h3 class="font-semibold text-lg text-gray-800 mb-2">Sweeping Schedule:</h3>
+          <p>
+            <span class="font-medium">Week:</span>
+            {{ getOptionLabel(loadedScheduleData.weekOfMonth, weekOptions) }}
+          </p>
+          <p>
+            <span class="font-medium">Day:</span>
+            {{ getOptionLabel(loadedScheduleData.dayOfWeek, dayOptions) }}
+          </p>
+          <p><span class="font-medium">Year:</span> {{ loadedScheduleData.year }}</p>
+        </div>
 
-          <div class="flex flex-col gap-3">
-            <button
-              type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
-              :disabled="isScheduleLoading"
-            >
-              {{ isScheduleLoading ? 'Processing...' : 'Create Schedule' }}
-            </button>
-          </div>
-        </Form>
+        <!-- Message when street selected but no schedule found (before/during modal) -->
+        <div
+          v-if="
+            selectedStreetId &&
+            !isScheduleLoading &&
+            !loadedScheduleData &&
+            !isScheduleEntryModalVisible
+          "
+          class="mt-6 p-4 border rounded bg-yellow-50 border-yellow-200"
+        >
+          <p class="text-center text-gray-700">
+            No schedule found for this street. Opening form to add details...
+          </p>
+          <!-- Button is optional since modal opens automatically -->
+          <!-- <el-button @click="isScheduleEntryModalVisible = true">Add Schedule Manually</el-button> -->
+        </div>
       </div>
     </div>
+
+    <!-- "Enter Schedule Details" Modal -->
+    <el-dialog
+      v-model="isScheduleEntryModalVisible"
+      :title="`Enter Schedule for ${selectedStreetLabel || 'Selected Street'}`"
+      width="90%"
+      :max-width="'500px'"
+      @closed="handleModalClose"
+      :close-on-click-modal="false"
+      append-to-body
+      top="5vh"
+    >
+      <p class="text-sm text-gray-600 mb-4">
+        No existing schedule was found for this street. Please provide the details below.
+      </p>
+      <Form ref="modalFormRef" @submit="onScheduleEntrySubmit" :validation-schema="scheduleSchema">
+        <!-- Schedule Fields: Week, Day, Year -->
+        <div class="mb-4">
+          <label for="modalWeekOfMonth" class="block text-gray-700 text-sm font-bold mb-2">
+            Week of Month <span class="text-red-500">*</span>
+          </label>
+          <Field name="weekOfMonth" v-slot="{ field, errors }">
+            <el-select
+              :model-value="field.value"
+              @update:modelValue="field.onChange($event)"
+              placeholder="Select Week"
+              clearable
+              class="w-full"
+              id="modalWeekOfMonth"
+              :class="{ 'el-select-invalid': errors?.length }"
+            >
+              <el-option
+                v-for="item in weekOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </Field>
+          <ErrorMessage name="weekOfMonth" class="text-red-500 text-xs mt-1" />
+        </div>
+
+        <div class="mb-4">
+          <label for="modalDayOfWeek" class="block text-gray-700 text-sm font-bold mb-2">
+            Day of Week <span class="text-red-500">*</span>
+          </label>
+          <Field name="dayOfWeek" v-slot="{ field, errors }">
+            <el-select
+              :model-value="field.value"
+              @update:modelValue="field.onChange($event)"
+              placeholder="Select Day"
+              clearable
+              class="w-full"
+              id="modalDayOfWeek"
+              :class="{ 'el-select-invalid': errors?.length }"
+            >
+              <el-option
+                v-for="item in dayOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </Field>
+          <ErrorMessage name="dayOfWeek" class="text-red-500 text-xs mt-1" />
+        </div>
+
+        <div class="mb-4">
+          <label for="modalYear" class="block text-gray-700 text-sm font-bold mb-2">
+            Year <span class="text-red-500">*</span>
+          </label>
+          <Field name="year" v-slot="{ field, errors }">
+            <el-select
+              :model-value="field.value"
+              @update:modelValue="field.onChange($event)"
+              placeholder="Select Year"
+              clearable
+              class="w-full"
+              id="modalYear"
+              :class="{ 'el-select-invalid': errors?.length }"
+            >
+              <el-option
+                v-for="item in yearOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </Field>
+          <ErrorMessage name="year" class="text-red-500 text-xs mt-1" />
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex justify-end gap-2 mt-6">
+          <el-button @click="handleModalClose" :disabled="isScheduleLoading">Cancel</el-button>
+          <el-button type="primary" native-type="submit" :loading="isScheduleLoading">
+            {{ isScheduleLoading ? 'Saving...' : 'Save Schedule' }}
+          </el-button>
+        </div>
+      </Form>
+    </el-dialog>
   </section>
 </template>
+
+<style scoped>
+/* Add specific styles if needed, e.g., for validation */
+.el-select-invalid .el-input__wrapper {
+  box-shadow: 0 0 0 1px theme('colors.red.500') !important;
+}
+/* Ensure dialog content is scrollable if it gets too long on small screens */
+:deep(.el-dialog__body) {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+</style>
