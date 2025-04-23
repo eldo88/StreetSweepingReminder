@@ -19,7 +19,10 @@ const schema = toTypedSchema(
   z.object({
     title: z.string().min(1, 'Title is required'),
     phoneNumber: z.string().min(10, 'Phone number is required'),
-    reminderDate: z.date({ required_error: 'Reminder Date is required' }),
+    reminderDate: z.coerce.date({
+      required_error: 'Reminder Date is required',
+      invalid_type_error: 'Invalid date format',
+    }),
     isRecurring: z.boolean().default(true),
   }),
 )
@@ -101,6 +104,15 @@ async function onSubmit(values) {
                 @update:model-value="field.onChange"
                 input-class-name="input-field"
                 placeholder="Pick a date for the first reminder"
+                :enable-time-picker="true"
+                :is-24="false"
+                format="MM/dd/yyyy hh:mm a"
+                :teleport="true"
+                :clearable="false"
+                :auto-apply="false"
+                :close-on-auto-apply="false"
+                :week-start="0"
+                :timezone="'America/Denver'"
               />
               <span class="text-red-500 text-xs mt-1 block">{{ errors[0] }}</span>
             </Field>
