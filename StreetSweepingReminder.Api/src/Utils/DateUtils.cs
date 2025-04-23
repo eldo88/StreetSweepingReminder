@@ -35,7 +35,7 @@ public static class DateUtils
         }
     }
 
-    public static List<DateTime> CalculateMonthlyRecurringSchedule(DateTime initialReminderDateTime, int weekOfMonth)
+    public static List<DateTime> CalcMonthlyRecurringScheduleByWeek(DateTime initialReminderDateTime, int weekOfMonth)
     {
         var scheduledDays = new List<DateTime>();
         var dayOfWeek = initialReminderDateTime.DayOfWeek;
@@ -53,6 +53,20 @@ public static class DateUtils
                 dateToAdd = GetNthWeekdayOfMonth(year, month, dayOfWeek, weekOfMonth);
                 scheduledDays.Add(dateToAdd);
             }
+        }
+
+        return scheduledDays;
+    }
+
+    public static List<DateTime> CalcMonthlyRecurringScheduleByOffset(IEnumerable<DateTime> schedule, int offSet)
+    {
+        var scheduledDays = new List<DateTime>();
+
+        foreach (var date in schedule)
+        {
+            var timeSpan = new TimeSpan(offSet);
+            var newDate = date.Subtract(timeSpan);
+            scheduledDays.Add(newDate);
         }
 
         return scheduledDays;
