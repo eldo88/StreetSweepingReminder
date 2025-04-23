@@ -193,6 +193,7 @@ function handleModalClose() {
 
 const handleStreetSearch = _.debounce(async (query) => {
   loadedScheduleData.value = null
+  emit('update:isReminderFormVisible', false)
   if (query) {
     streetsStore.searchStreets(query)
   } else {
