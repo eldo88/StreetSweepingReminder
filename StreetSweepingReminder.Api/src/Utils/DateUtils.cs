@@ -58,14 +58,15 @@ public static class DateUtils
         return scheduledDays;
     }
 
-    public static List<DateTime> CalcMonthlyRecurringScheduleByOffset(IEnumerable<DateTime> schedule, int offSet)
+    public static List<DateTime> CalcMonthlyRecurringScheduleByOffset(IEnumerable<DateTime> schedule, int offSetInDays)
     {
         var scheduledDays = new List<DateTime>();
 
+        var timeSpanOffset = TimeSpan.FromDays(offSetInDays);
+
         foreach (var date in schedule)
         {
-            var timeSpan = new TimeSpan(offSet);
-            var newDate = date.Subtract(timeSpan);
+            var newDate = date.Subtract(timeSpanOffset);
             scheduledDays.Add(newDate);
         }
 
@@ -100,7 +101,13 @@ public static class DateUtils
         var offset = 0;
         foreach (var scheduledDay in sortedScheduleList)
         {
-            if (scheduledDay >= baseDateTime)
+            if (scheduledDay >= baseDateTime && scheduledDay.Month == baseDateTime.Month)
+            {
+                offset = scheduledDay.Day - baseDateTime.Day;
+                break;
+            }
+            
+            if (scheduledDay.Month > baseDateTime.Month)
             {
                 offset = scheduledDay.DayOfWeek - baseDateTime.DayOfWeek;
                 break;
