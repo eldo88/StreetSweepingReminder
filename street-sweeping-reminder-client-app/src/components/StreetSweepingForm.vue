@@ -101,7 +101,7 @@ async function handleStreetChange(streetId, label) {
   console.log('handleStreetChange - Street ID set to:', selectedStreetId.value)
 
   emit('streetSelected', streetId)
-  emit('update:isReminderFormVisible', false) // Start hidden
+  emit('update:isReminderFormVisible', false)
 
   if (!streetId) {
     isScheduleEntryModalVisible.value = false
@@ -142,7 +142,6 @@ async function handleStreetChange(streetId, label) {
   }
 }
 
-// Handler for submitting the schedule form FROM THE MODAL
 async function onScheduleEntrySubmit(values) {
   console.log('Modal Form submitted for creation:', values)
   console.log('Target Street ID:', selectedStreetId.value)
@@ -157,7 +156,6 @@ async function onScheduleEntrySubmit(values) {
 
   isScheduleLoading.value = true
   try {
-    // Use the existing createSchedule store action
     const createScheduleResult = await streetsStore.createSchedule(
       selectedStreetId.value,
       weekOfMonth,
@@ -167,18 +165,15 @@ async function onScheduleEntrySubmit(values) {
 
     if (createScheduleResult) {
       toast.success('Street Sweeping Schedule created successfully!')
-      isScheduleEntryModalVisible.value = false // Close modal
+      isScheduleEntryModalVisible.value = false
 
-      // Fetch the newly created schedule to display it
       const newScheduleData = await streetsStore.getSchedule(selectedStreetId.value)
       console.log('Newly created schedule data:', newScheduleData)
       loadedScheduleData.value = newScheduleData
 
-      // Emit events: one for general creation, one to update parent visibility
-      emit('scheduleCreated', selectedStreetId.value) // Let parent know schedule exists now
-      emit('update:isReminderFormVisible', true) // Tell parent to show the ReminderForm
+      emit('scheduleCreated', selectedStreetId.value)
+      emit('update:isReminderFormVisible', true)
     } else {
-      // This else might not be reachable if createSchedule throws on failure
       toast.error('Failed to create Street Sweeping Schedule (API reported failure).')
     }
   } catch (error) {
@@ -186,8 +181,6 @@ async function onScheduleEntrySubmit(values) {
     const errorMessage =
       error?.response?.data?.message || 'Failed to create Street Sweeping Schedule'
     toast.error(errorMessage)
-    // Keep modal open on error? Or close? User decision.
-    // isScheduleEntryModalVisible.value = false;
   } finally {
     isScheduleLoading.value = false
   }
@@ -222,8 +215,6 @@ const getOptionLabel = (value, options) =>
       <div class="bg-white shadow-md rounded-lg px-4 sm:px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Search for your street</h2>
 
-        <!-- Main Form for Street Search -->
-        <!-- No need for vee-validate Form wrapper if just the select -->
         <div class="mb-4">
           <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
             Street Name <span class="text-red-500">*</span>
@@ -259,15 +250,12 @@ const getOptionLabel = (value, options) =>
               </p>
             </template>
           </el-select>
-          <!-- No error message needed here if selection is the only field -->
         </div>
 
-        <!-- Display Loading State for Schedule -->
         <div v-if="isScheduleLoading && selectedStreetId" class="text-center text-gray-500 my-4">
           Loading schedule details...
         </div>
 
-        <!-- Display Loaded Schedule Information (if found AND not loading) -->
         <div
           v-if="!isScheduleLoading && loadedScheduleData"
           class="mt-6 p-4 border rounded bg-green-50 border-green-200"
@@ -283,8 +271,6 @@ const getOptionLabel = (value, options) =>
           </p>
           <p><span class="font-medium">Year:</span> {{ loadedScheduleData.year }}</p>
         </div>
-
-        <!-- Message when street selected but no schedule found (before/during modal) -->
         <div
           v-if="
             selectedStreetId &&
@@ -297,13 +283,10 @@ const getOptionLabel = (value, options) =>
           <p class="text-center text-gray-700">
             No schedule found for this street. Opening form to add details...
           </p>
-          <!-- Button is optional since modal opens automatically -->
-          <!-- <el-button @click="isScheduleEntryModalVisible = true">Add Schedule Manually</el-button> -->
         </div>
       </div>
     </div>
 
-    <!-- "Enter Schedule Details" Modal -->
     <el-dialog
       v-model="isScheduleEntryModalVisible"
       :title="`Enter Schedule for ${selectedStreetLabel || 'Selected Street'}`"
@@ -318,7 +301,6 @@ const getOptionLabel = (value, options) =>
         No existing schedule was found for this street. Please provide the details below.
       </p>
       <Form ref="modalFormRef" @submit="onScheduleEntrySubmit" :validation-schema="scheduleSchema">
-        <!-- Schedule Fields: Week, Day, Year -->
         <div class="mb-4">
           <label for="modalWeekOfMonth" class="block text-gray-700 text-sm font-bold mb-2">
             Week of Month <span class="text-red-500">*</span>
@@ -394,7 +376,6 @@ const getOptionLabel = (value, options) =>
           <ErrorMessage name="year" class="text-red-500 text-xs mt-1" />
         </div>
 
-        <!-- Modal Actions -->
         <div class="flex justify-end gap-2 mt-6">
           <el-button @click="handleModalClose" :disabled="isScheduleLoading">Cancel</el-button>
           <el-button type="primary" native-type="submit" :loading="isScheduleLoading">
@@ -407,7 +388,6 @@ const getOptionLabel = (value, options) =>
 </template>
 
 <style scoped>
-/* Add specific styles if needed, e.g., for validation */
 .el-select-invalid .el-input__wrapper {
   box-shadow: 0 0 0 1px theme('colors.red.500') !important;
 }
