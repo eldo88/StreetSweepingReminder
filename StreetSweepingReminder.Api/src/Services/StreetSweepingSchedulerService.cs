@@ -47,9 +47,10 @@ public class StreetSweepingSchedulerService :
         return DateTime.SpecifyKind(baseStreetSweepingDate, DateTimeKind.Local);
     }
 
-    protected override object[] GetRecurringParameters(CreateStreetSweepingScheduleDto command)
+    protected override Task<object[]> GetRecurringParameters(CreateStreetSweepingScheduleDto command)
     {
-        return [command.WeekOfMonth];
+        object[] parameters = [command.WeekOfMonth];
+        return Task.FromResult(parameters);
     }
 
     protected override StreetSweepingDates MapToEntity(CreateStreetSweepingScheduleDto command, int parentId)
