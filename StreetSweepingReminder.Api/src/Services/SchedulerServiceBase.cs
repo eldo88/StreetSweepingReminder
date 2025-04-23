@@ -20,7 +20,7 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
 
     protected abstract bool GetIsRecurring(TCommand command);
     protected abstract DateTime GetBaseScheduleDate(TCommand command);
-    protected abstract object[] GetRecurringParameters(TCommand command);
+    protected abstract Task<object[]> GetRecurringParameters(TCommand command);
     
     
     /// <summary>
@@ -45,7 +45,7 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
     /// Calculates the list of dates for which schedule items should be created.
     /// Can be overridden if the calculation logic differs significantly.
     /// </summary>
-    protected virtual List<DateTime> CalculateScheduleDates(TCommand command)
+    protected virtual async Task<List<DateTime>> CalculateScheduleDates(TCommand command)
     {
         var baseDate = GetBaseScheduleDate(command);
         if (!GetIsRecurring(command))
@@ -53,11 +53,11 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
             return new List<DateTime> { baseDate };
         }
 
-        var parameters = GetRecurringParameters(command);
+        var parameters = await GetRecurringParameters(command);
         
         var weekOfMonth = parameters.Length > 0 && parameters[0] is int w ? w : 0;
         
-        return DateUtils.CalculateMonthlyRecurringSchedule(baseDate, weekOfMonth);
+        return DateUtils.CalcMonthlyRecurringScheduleByWeek(baseDate, weekOfMonth);
     }
 
     protected async Task<Result> CreateScheduleAsync(TCommand command, TParentId parentId)
@@ -65,7 +65,7 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
         List<DateTime> scheduleDates;
         try
         {
-            scheduleDates = CalculateScheduleDates(command);
+            scheduleDates = await CalculateScheduleDates(command);
         }
         catch (Exception e)
         {
