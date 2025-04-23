@@ -68,9 +68,6 @@ export const useStreetsStore = defineStore('streets', {
     },
 
     async getStreet(id) {
-      if (this.cachedStreets[id]) {
-        return this.cachedStreets[id]
-      }
       if (!id) {
         return null
       }
