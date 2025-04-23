@@ -88,24 +88,10 @@ public class ReminderSchedulerService :
             {
                 dates.Add(date.StreetSweepingDate);
             }
-            offset = CalcDateOffset(baseDate, dates);
+            offset = DateUtils.CalcDateOffset(dates, baseDate);
         }
 
         return DateUtils.CalcMonthlyRecurringScheduleByOffset(dates, offset);
     }
-
-    private int CalcDateOffset(DateTime baseDateTime, IEnumerable<DateTime> schedule)
-    {
-        var sortedScheduleList = schedule.OrderBy(dt => dt).ToList();
-        var offset = 0;
-        foreach (var scheduledDay in sortedScheduleList)
-        {
-            if (scheduledDay >= baseDateTime)
-            {
-                offset = scheduledDay.DayOfWeek - baseDateTime.DayOfWeek;
-            }
-        }
-
-        return offset;
-    }
+    
 }

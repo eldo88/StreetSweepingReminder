@@ -83,7 +83,7 @@ public static class DateUtils
 
         for (var i = 0; i < day; i++)
         {
-            if (firstDayOfTheMonth.DayOfWeek == DayOfWeek.Sunday)
+            if (firstDayOfTheMonth.DayOfWeek == DayOfWeek.Sunday && i > 0)
             {
                 weekCount++;
             }
@@ -92,5 +92,21 @@ public static class DateUtils
         }
 
         return weekCount;
+    }
+    
+    public static int CalcDateOffset(IEnumerable<DateTime> schedule, DateTime baseDateTime)
+    {
+        var sortedScheduleList = schedule.OrderBy(dt => dt).ToList();
+        var offset = 0;
+        foreach (var scheduledDay in sortedScheduleList)
+        {
+            if (scheduledDay >= baseDateTime)
+            {
+                offset = scheduledDay.DayOfWeek - baseDateTime.DayOfWeek;
+                break;
+            }
+        }
+
+        return offset;
     }
 }
