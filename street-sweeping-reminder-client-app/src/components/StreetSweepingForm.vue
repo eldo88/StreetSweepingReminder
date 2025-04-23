@@ -18,15 +18,23 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['update:isReminderFormVisible', 'streetSelected'])
+const emit = defineEmits(['update:isReminderFormVisible', 'streetSelected', 'scheduleCreated'])
 
 const toast = useToast()
 const streetsStore = useStreetsStore()
 
-const { streets, isLoading } = storeToRefs(streetsStore)
+const { streets, isLoading: isSearchLoading } = storeToRefs(streetsStore)
 
 const formRef = ref(null)
+const modalFormRef = ref(null)
+
 const isScheduleLoading = ref(false)
+
+const isScheduleEntryModalVisible = ref(false)
+
+const selectedStreetId = ref(null)
+const selectedStreetLabel = ref('')
+const loadedScheduleData = ref(null)
 
 const streetOptions = computed(() => {
   return streets.value.map((street) => ({
@@ -116,10 +124,14 @@ async function handleStreetChange(streetId) {
       toast.info('Existing schedule data loaded.')
       // emit('scheduleLoaded', true);
       emit('update:isReminderFormVisible', true)
+      isScheduleEntryModalVisible.value = false
     } else {
       console.log('No existing schedule found for this street.')
 
       toast.info('No schedule found for this street. Please enter details.')
+
+      isScheduleEntryModalVisible.value = true
+      modalFormRef.value?.resetForm()
     }
   } catch (error) {
     console.error('Failed to fetch street schedule:', error)
@@ -173,6 +185,60 @@ async function onSubmit(values) {
   }
 }
 
+// Handler for submitting the schedule form FROM THE MODAL
+async function onScheduleEntrySubmit(values) {
+  console.log('Modal Form submitted for creation:', values)
+  console.log('Target Street ID:', selectedStreetId.value)
+
+  if (!selectedStreetId.value) {
+    toast.error('Internal Error: Street ID is missing.')
+    return
+  }
+
+  const { weekOfMonth, dayOfWeek, year } = values
+
+  isScheduleLoading.value = true
+  try {
+    // Use the existing createSchedule store action
+    const createScheduleResult = await streetsStore.createSchedule(
+      selectedStreetId.value,
+      weekOfMonth,
+      dayOfWeek,
+      year,
+    )
+
+    if (createScheduleResult) {
+      toast.success('Street Sweeping Schedule created successfully!')
+      isScheduleEntryModalVisible.value = false // Close modal
+
+      // Fetch the newly created schedule to display it
+      const newScheduleData = await streetsStore.getSchedule(selectedStreetId.value)
+      loadedScheduleData.value = newScheduleData
+
+      // Emit events: one for general creation, one to update parent visibility
+      emit('scheduleCreated', selectedStreetId.value) // Let parent know schedule exists now
+      emit('update:isReminderFormVisible', true) // Tell parent to show the ReminderForm
+    } else {
+      // This else might not be reachable if createSchedule throws on failure
+      toast.error('Failed to create Street Sweeping Schedule (API reported failure).')
+    }
+  } catch (error) {
+    console.error('Street Sweeping Schedule creation failed:', error)
+    const errorMessage =
+      error?.response?.data?.message || 'Failed to create Street Sweeping Schedule'
+    toast.error(errorMessage)
+    // Keep modal open on error? Or close? User decision.
+    // isScheduleEntryModalVisible.value = false;
+  } finally {
+    isScheduleLoading.value = false
+  }
+}
+
+function handleModalClose() {
+  isScheduleEntryModalVisible.value = false
+  modalFormRef.value?.resetForm()
+}
+
 const handleStreetSearch = _.debounce(async (query) => {
   if (query) {
     streetsStore.searchStreets(query)
@@ -180,6 +246,9 @@ const handleStreetSearch = _.debounce(async (query) => {
     streetsStore.clearStreets()
   }
 }, 300)
+
+const getOptionLabel = (value, options) =>
+  options.find((opt) => opt.value === value)?.label || 'N/A'
 </script>
 
 <template>
