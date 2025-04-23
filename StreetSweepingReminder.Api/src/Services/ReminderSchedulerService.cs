@@ -12,8 +12,10 @@ public class ReminderSchedulerService :
     SchedulerServiceBase<CreateReminderDto, ReminderSchedule, IReminderScheduleRepository, int, ReminderSchedulerService>,
     IReminderScheduler
 {
-    public ReminderSchedulerService(ILogger<ReminderSchedulerService> logger, IReminderScheduleRepository repository) : base(logger, repository)
+    private readonly IStreetSweepingDatesRepository _streetSweepingDatesRepository;
+    public ReminderSchedulerService(ILogger<ReminderSchedulerService> logger, IReminderScheduleRepository repository, IStreetSweepingDatesRepository streetSweepingDatesRepository) : base(logger, repository)
     {
+        _streetSweepingDatesRepository = streetSweepingDatesRepository;
     }
 
     public Task<Result> CreateReminderNotificationSchedule(CreateReminderDto command, int reminderId)
@@ -35,12 +37,15 @@ public class ReminderSchedulerService :
 
     protected override DateTime GetBaseScheduleDate(CreateReminderDto command)
     {
-        return DateTime.SpecifyKind(command.ScheduledDateTimeUtc, DateTimeKind.Local);
+        return DateTime.SpecifyKind(command.ScheduledDateTimeUtc, DateTimeKind.Utc);
     }
 
-    protected override object[] GetRecurringParameters(CreateReminderDto command)
+    protected override async Task<object[]> GetRecurringParameters(CreateReminderDto command)
     {
-        return [DateUtils.GetWeekOfMonth(command.ScheduledDateTimeUtc)];
+        var streetSweepingSchedule = await
+            _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(command.StreetId);
+
+        return [streetSweepingSchedule];
     }
 
     protected override ReminderSchedule MapToEntity(CreateReminderDto command, int parentId)
@@ -57,5 +62,50 @@ public class ReminderSchedulerService :
     {
         // Set properties specific to ReminderSchedule just before saving
         entity.IsActive = true;
+    }
+
+    protected override async Task<List<DateTime>> CalculateScheduleDates(CreateReminderDto command)
+    {
+        var baseDate = GetBaseScheduleDate(command);
+        if (!GetIsRecurring(command))
+        {
+            return [baseDate];
+        }
+
+        var parameters = await GetRecurringParameters(command);
+
+        var streetSweepingSchedule = parameters.Length > 0 && parameters[0] is IEnumerable<StreetSweepingDates> schedule
+            ? schedule
+            : default;
+
+        var offset = 0;
+        var dates = new List<DateTime>();
+        if (streetSweepingSchedule is not null)
+        {
+            var sweepingSchedule = streetSweepingSchedule as StreetSweepingDates[] ?? streetSweepingSchedule.ToArray();
+            
+            foreach (var date in sweepingSchedule)
+            {
+                dates.Add(date.StreetSweepingDate);
+            }
+            offset = CalcDateOffset(baseDate, dates);
+        }
+
+        return DateUtils.CalcMonthlyRecurringScheduleByOffset(dates, offset);
+    }
+
+    private int CalcDateOffset(DateTime baseDateTime, IEnumerable<DateTime> schedule)
+    {
+        var sortedScheduleList = schedule.OrderBy(dt => dt).ToList();
+        var offset = 0;
+        foreach (var scheduledDay in sortedScheduleList)
+        {
+            if (scheduledDay >= baseDateTime)
+            {
+                offset = scheduledDay.DayOfWeek - baseDateTime.DayOfWeek;
+            }
+        }
+
+        return offset;
     }
 }
