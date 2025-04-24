@@ -43,9 +43,9 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
             SELECT rs.Id, rs.ReminderId, rs.NextNotificationDate, rs.NextNotificationDate, rs.DayOfWeek, rs.WeekOfMonth,
                    rs.StartMonth, rs.EndMonth, rs.TimeOfDay, rs.TimeZone, rs.IsRecurring, rs.IsActive
             FROM ReminderSchedule as rs
-            JOIN Reminders as r
-            WHERE rs.ReminderId = r.Id
-            AND r.UserId = @userId
+                JOIN Reminders as r
+                    WHERE rs.ReminderId = r.Id
+                AND r.UserId = @userId
             """;
 
         using var connection = CreateConnection();
