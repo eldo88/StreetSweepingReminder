@@ -37,9 +37,22 @@ internal class StreetSweepingDatesRepository : RepositoryBase, IStreetSweepingDa
         return streetSweepingDate;
     }
 
-    public Task<IEnumerable<StreetSweepingDates>> GetAllAsync(string userId)
+    public async Task<IEnumerable<StreetSweepingDates>> GetAllAsync(string userId)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            SELECT ssd.Id, ssd.StreetId, ssd.StreetSweepingDate, ssd.CreatedAt, ssd.ModifiedAt
+            FROM StreetSweepingDates as ssd
+                JOIN Streets as s
+                    ON ssd.StreetId = s.Id
+                JOIN Reminders as r
+                    ON s.Id = r.StreetId
+                AND r.UserId = @userId
+            """;
+
+        using var connection = CreateConnection();
+        var dates = await connection.QueryAsync<StreetSweepingDates>(sql, new { userId });
+        return dates;
     }
 
     public Task<bool> UpdateAsync(StreetSweepingDates obj)
