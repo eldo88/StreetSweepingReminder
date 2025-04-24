@@ -69,9 +69,18 @@ internal class StreetSweepingDatesRepository : RepositoryBase, IStreetSweepingDa
         return recordsUpdated == 1;
     }
 
-    public Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            DELETE
+            FROM StreetSweepingDates
+            WHERE Id = @id
+            """;
+
+        using var connection = CreateConnection();
+        var recordsDeleted = await connection.ExecuteAsync(sql, new { id });
+        return recordsDeleted == 1;
     }
 
     public async Task<IEnumerable<StreetSweepingDates>> GetStreetSweepingScheduleByStreetId(int streetId)
