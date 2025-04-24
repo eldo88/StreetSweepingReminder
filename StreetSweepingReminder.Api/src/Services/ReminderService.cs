@@ -35,10 +35,9 @@ public class ReminderService : IReminderService
         reminder.UserId = userId;
         reminder.Status = ReminderStatus.Scheduled;
 
-        var newId = -1;
         try
         {
-            newId = await _reminderRepository.CreateAsync(reminder);
+            var newId = await _reminderRepository.CreateAsync(reminder);
             if (newId <= 0)
             {
                 Result.Fail<int>(new ApplicationError("Failed to save reminder to the database."));
