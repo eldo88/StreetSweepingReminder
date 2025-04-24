@@ -44,7 +44,7 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
                    rs.StartMonth, rs.EndMonth, rs.TimeOfDay, rs.TimeZone, rs.IsRecurring, rs.IsActive
             FROM ReminderSchedule as rs
                 JOIN Reminders as r
-                    WHERE rs.ReminderId = r.Id
+                    ON rs.ReminderId = r.Id
                     AND r.UserId = @userId
             """;
 
