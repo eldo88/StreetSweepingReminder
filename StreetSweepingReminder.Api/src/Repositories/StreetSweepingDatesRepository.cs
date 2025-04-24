@@ -55,9 +55,18 @@ internal class StreetSweepingDatesRepository : RepositoryBase, IStreetSweepingDa
         return dates;
     }
 
-    public Task<bool> UpdateAsync(StreetSweepingDates obj)
+    public async Task<bool> UpdateAsync(StreetSweepingDates obj)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            UPDATE StreetSweepingDates
+            SET StreetSweepingDate = @StreetSweepingDate, ModifiedAt = @ModifiedAt
+            WHERE Id = @Id
+            """;
+
+        using var connection = CreateConnection();
+        var recordsUpdated = await connection.ExecuteAsync(sql, obj);
+        return recordsUpdated == 1;
     }
 
     public Task<bool> DeleteAsync(int id)
