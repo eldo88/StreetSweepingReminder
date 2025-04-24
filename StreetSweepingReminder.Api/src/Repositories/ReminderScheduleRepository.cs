@@ -45,7 +45,7 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
             FROM ReminderSchedule as rs
                 JOIN Reminders as r
                     WHERE rs.ReminderId = r.Id
-                AND r.UserId = @userId
+                    AND r.UserId = @userId
             """;
 
         using var connection = CreateConnection();
