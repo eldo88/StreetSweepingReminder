@@ -53,9 +53,20 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
         return schedule;
     }
 
-    public Task<bool> UpdateAsync(ReminderSchedule obj)
+    public async Task<bool> UpdateAsync(ReminderSchedule obj)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            UPDATE ReminderSchedule
+            SET Message = @Message, NextNotificationDate = @NextNotificationDate, DayOfWeek = @DayOfWeek, 
+                WeekOfMonth = @WeekOfMonth, StartMonth = @StartMonth, EndMonth = @EndMonth, TimeOfDay = @TimeOfDay, 
+                TimeZone = @TimeZone, IsRecurring = @IsRecurring, IsActive = @IsActive, ModifiedAt = @ModifiedAt
+            WHERE Id = @Id
+            """;
+
+        using var connection = CreateConnection();
+        var recordsUpdated = await connection.ExecuteAsync(sql, obj);
+        return recordsUpdated == 1;
     }
 
     public Task<bool> DeleteAsync(int id)
