@@ -69,9 +69,18 @@ internal class ReminderScheduleRepository : RepositoryBase, IReminderScheduleRep
         return recordsUpdated == 1;
     }
 
-    public Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        const string sql =
+            """
+            DELETE 
+            FROM ReminderSchedule
+            WHERE Id = @id
+            """;
+
+        using var connection = CreateConnection();
+        var recordsDeleted = await connection.ExecuteAsync(sql, new { id });
+        return recordsDeleted == 1;
     }
 
     public async Task<IEnumerable<ReminderSchedule>> GetByReminderId(int reminderId)
