@@ -159,10 +159,10 @@ public class ReminderService : IReminderService
     {
         var streetId = reminder.StreetId;
         var scheduleResult = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
-        var scheduleList = scheduleResult.ToStreetSweepingScheduleResponseDto();
+        var streetSweepingScheduleResponseDto = scheduleResult.ToStreetSweepingScheduleResponseDto();
         var reminderId = reminder.Id;
         var reminderScheduleResult = await _reminderScheduleRepository.GetByReminderId(reminderId);
         var reminderScheduleResponseDto = reminderScheduleResult.ToReminderScheduleResponseDto();
-        return reminder.ToReminderResponseDto(scheduleList, reminderScheduleResponseDto);
+        return reminder.ToReminderResponseDto(streetSweepingScheduleResponseDto, reminderScheduleResponseDto);
     }
 }
