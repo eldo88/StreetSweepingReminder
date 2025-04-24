@@ -13,8 +13,8 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
     {
         const string sql =
             """
-            INSERT INTO Streets (StreetName, ZipCode) 
-            VALUES (@StreetName, @ZipCode);
+            INSERT INTO Streets (StreetName, ZipCode, CreatedAt) 
+            VALUES (@StreetName, @ZipCode, @CreatedAt);
             SELECT last_insert_rowid();
             """;
 
