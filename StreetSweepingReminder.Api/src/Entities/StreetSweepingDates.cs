@@ -5,7 +5,7 @@ namespace StreetSweepingReminder.Api.Entities;
 
 [Table("StreetSweepingDates")]
 public class StreetSweepingDates
-{
+{   //TODO added side of street or cardinal direction for sorting/filtering
     [Key]
     public int Id { get; set; }
     
