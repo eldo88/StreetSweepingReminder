@@ -108,12 +108,13 @@ public static class DtoExtensions
     public static StreetSweepingScheduleResponseDto ToStreetSweepingScheduleResponseDto(
         this IEnumerable<StreetSweepingDates> source)
     {
+        var schedule = source.ToStreetSweepingScheduleDto();
+        
         var day = 0;
         var month = 0;
         var year = 0;
         var streetId = 0;
         
-        var schedule = source.ToStreetSweepingScheduleDto();
         if (schedule.Count > 0)
         {
             var firstDate = schedule[0];
@@ -124,6 +125,32 @@ public static class DtoExtensions
         }
 
         return new StreetSweepingScheduleResponseDto(day, month, year, streetId, schedule);
+    }
+    
+    
+    public static List<StreetSweepingScheduleResponseDto> ToStreetSweepingScheduleResponseDtoList(
+        this IEnumerable<StreetSweepingDates> source)
+    {   //TODO add login for separating by side of street or day
+        var responseDtos = new List<StreetSweepingScheduleResponseDto>();
+        var schedule = source.ToStreetSweepingScheduleDto();
+        
+        var day = 0;
+        var month = 0;
+        var year = 0;
+        var streetId = 0;
+        
+        if (schedule.Count > 0)
+        {
+            var firstDate = schedule[0];
+            day = (int)firstDate.StreetSweepingDate.DayOfWeek;
+            month = DateUtils.GetWeekOfMonth(firstDate.StreetSweepingDate);
+            year = firstDate.StreetSweepingDate.Year;
+            streetId = firstDate.StreetId;
+            var sssrDto = new StreetSweepingScheduleResponseDto(day, month, year, streetId, schedule);
+            responseDtos.Add(sssrDto);
+        }
+
+        return responseDtos;
     }
 
     public static List<StreetSweepingScheduleDto> ToStreetSweepingScheduleDto(this IEnumerable<StreetSweepingDates> source)
