@@ -127,7 +127,7 @@ public class StreetService : IStreetService
         }
     }
 
-    public async Task<Result<StreetSweepingScheduleResponseDto>> GetScheduleByStreetId(int streetId)
+    public async Task<Result<List<StreetSweepingScheduleResponseDto>>> GetScheduleByStreetId(int streetId)
     {
         if (streetId <= 0)
         {
@@ -137,14 +137,17 @@ public class StreetService : IStreetService
         try
         {
             var result = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
-            var responseDto = result.ToStreetSweepingScheduleResponseDto();
+            var responseDto = result.ToStreetSweepingScheduleResponseDtoList();
 
-            foreach (var dto in responseDto.Schedule)
+            foreach (var dto in responseDto)
             {
-                var validationResult = await _streetSweepingScheduleResponseValidator.ValidateAsync(dto);
-                if (!validationResult.IsValid)
+                foreach (var schedule in dto.Schedule)
                 {
-                    return validationResult.ToFluentResult();
+                    var validationResult = await _streetSweepingScheduleResponseValidator.ValidateAsync(schedule);
+                    if (!validationResult.IsValid)
+                    {
+                        return validationResult.ToFluentResult();
+                    }   
                 }
             }
             
