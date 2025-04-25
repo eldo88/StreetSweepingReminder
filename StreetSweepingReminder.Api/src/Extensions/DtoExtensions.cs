@@ -1,3 +1,4 @@
+using StreetSweepingReminder.Api.Constants_Enums;
 using StreetSweepingReminder.Api.DTOs;
 using StreetSweepingReminder.Api.Entities;
 using StreetSweepingReminder.Api.Utils;
@@ -114,6 +115,7 @@ public static class DtoExtensions
         var month = 0;
         var year = 0;
         var streetId = 0;
+        CardinalDirection sideOfStreet = default;
         
         if (schedule.Count > 0)
         {
@@ -121,10 +123,11 @@ public static class DtoExtensions
             day = (int)firstDate.StreetSweepingDate.DayOfWeek;
             month = DateUtils.GetWeekOfMonth(firstDate.StreetSweepingDate);
             year = firstDate.StreetSweepingDate.Year;
+            sideOfStreet = firstDate.SideOfStreet;
             streetId = firstDate.StreetId;
         }
 
-        return new StreetSweepingScheduleResponseDto(day, month, year, streetId, schedule);
+        return new StreetSweepingScheduleResponseDto(day, month, year, streetId, sideOfStreet ,schedule);
     }
     
     
@@ -146,7 +149,8 @@ public static class DtoExtensions
             month = DateUtils.GetWeekOfMonth(firstDate.StreetSweepingDate);
             year = firstDate.StreetSweepingDate.Year;
             streetId = firstDate.StreetId;
-            var sssrDto = new StreetSweepingScheduleResponseDto(day, month, year, streetId, schedule);
+            var sideOfStreet = firstDate.SideOfStreet;
+            var sssrDto = new StreetSweepingScheduleResponseDto(day, month, year, streetId, sideOfStreet, schedule);
             responseDtos.Add(sssrDto);
         }
 
@@ -161,7 +165,8 @@ public static class DtoExtensions
             var dto = new StreetSweepingScheduleDto(
                 entity.Id, 
                 entity.StreetId, 
-                entity.StreetSweepingDate);
+                entity.StreetSweepingDate,
+                entity.SideOfStreet);
             
             dtos.Add(dto);
         }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using StreetSweepingReminder.Api.Constants_Enums;
 
 namespace StreetSweepingReminder.Api.Entities;
 
@@ -12,6 +13,7 @@ public class StreetSweepingDates
     [Required]
     public int StreetId { get; set; } // FK to Streets
     public DateTime StreetSweepingDate { get; set; }
+    public CardinalDirection SideOfStreet { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
     

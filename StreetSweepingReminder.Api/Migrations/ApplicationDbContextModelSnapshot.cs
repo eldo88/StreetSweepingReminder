@@ -273,6 +273,9 @@ namespace StreetSweepingReminder.Api.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SideOfStreet")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("StreetId")
                         .HasColumnType("INTEGER");
 

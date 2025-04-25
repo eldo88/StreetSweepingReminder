@@ -57,7 +57,8 @@ public class StreetSweepingSchedulerService :
     {   //TODO add mapping for cardinal direction
         return new StreetSweepingDates
         {
-            StreetId = parentId
+            StreetId = parentId,
+            SideOfStreet = command.SideOfStreet
         };
     }
 
