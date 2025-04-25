@@ -28,18 +28,21 @@ public class StreetController : ControllerBase
     public async Task<IActionResult> CreateStreet([FromBody] CreateStreetDto createStreetDto)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var result = await _streetService.CreateStreetAsync(createStreetDto, userId);
-        if (result.IsSuccess)
+        if (userId is not null)
         {
-            var newId = result.Value;
-            return CreatedAtAction(nameof(GetStreet), newId);
-        }
+            var result = await _streetService.CreateStreetAsync(createStreetDto, userId);
+            if (result.IsSuccess)
+            {
+                var newId = result.Value;
+                return CreatedAtAction(nameof(GetStreet), newId);
+            }
         
-        _logger.LogError("Failed to create street. Command: {@Command}, Errors: {Errors}", createStreetDto, result.Errors);
+            _logger.LogError("Failed to create street. Command: {@Command}, Errors: {Errors}", createStreetDto, result.Errors);
 
-        if (result.HasError<ApplicationError>())
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred while saving the street.");
+            if (result.HasError<ApplicationError>())
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred while saving the street.");
+            }
         }
 
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
