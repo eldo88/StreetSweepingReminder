@@ -54,7 +54,7 @@ public class StreetSweepingSchedulerService :
     }
 
     protected override StreetSweepingDates MapToEntity(CreateStreetSweepingScheduleDto command, int parentId)
-    {
+    {   //TODO add mapping for cardinal direction
         return new StreetSweepingDates
         {
             StreetId = parentId

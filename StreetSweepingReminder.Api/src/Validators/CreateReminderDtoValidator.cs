@@ -1,6 +1,6 @@
 using FluentValidation;
+using StreetSweepingReminder.Api.Constants_Enums;
 using StreetSweepingReminder.Api.DTOs;
-using StreetSweepingReminder.Api.Messages;
 
 namespace StreetSweepingReminder.Api.Validators;
 
