@@ -1,4 +1,4 @@
-namespace StreetSweepingReminder.Api.Messages;
+namespace StreetSweepingReminder.Api.Constants_Enums;
 
 public readonly struct ValidationMessages
 {
