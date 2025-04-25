@@ -2,13 +2,22 @@
 import { useStreetsStore } from '@/stores/streets'
 import { storeToRefs } from 'pinia'
 import { useToast } from 'vue-toastification'
-import { computed, ref } from 'vue'
+import { computed, ref, nextTick } from 'vue'
 import _ from 'lodash'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 
-import { ElSelect, ElOption, ElDialog, ElButton } from 'element-plus'
+import {
+  ElSelect,
+  ElOption,
+  ElDialog,
+  ElButton,
+  ElRadioGroup,
+  ElRadio,
+  ElTable,
+  ElTableColumn,
+} from 'element-plus'
 import 'element-plus/dist/index.css'
 
 defineProps({
@@ -25,16 +34,18 @@ const streetsStore = useStreetsStore()
 
 const { streets, isLoading: isSearchLoading } = storeToRefs(streetsStore)
 
-const formRef = ref(null)
 const modalFormRef = ref(null)
 
 const isScheduleLoading = ref(false)
 
 const isScheduleEntryModalVisible = ref(false)
+const isScheduleSelectionModalVisible = ref(false)
 
 const selectedStreetId = ref(null)
 const selectedStreetLabel = ref('')
-const loadedScheduleData = ref(null)
+const loadedSchedules = ref([])
+const finalSelectedSchedule = ref(null)
+const modalSelectedScheduleIndex = ref(null)
 
 const streetOptions = computed(() => {
   return streets.value.map((street) => ({
@@ -94,14 +105,37 @@ const scheduleSchema = toTypedSchema(
   }),
 )
 
+const getOptionLabel = (value, options) => {
+  // Add a check to ensure options is actually an array before calling find
+  if (!Array.isArray(options)) {
+    console.warn('getOptionLabel received non-array options:', options)
+    return 'Invalid Options'
+  }
+  return options.find((opt) => opt.value === value)?.label || 'N/A'
+}
+
+const formatScheduleForDisplay = (schedule) => {
+  if (!schedule) return 'N/A'
+  // Use .value when accessing refs from script
+  const weekLabel = getOptionLabel(schedule.weekOfMonth, weekOptions.value)
+  const dayLabel = getOptionLabel(schedule.dayOfWeek, dayOptions.value)
+  return `Wk: ${weekLabel}, Day: ${dayLabel}, Yr: ${schedule.year}`
+}
+
 async function handleStreetChange(streetId, label) {
-  loadedScheduleData.value = null
+  loadedSchedules.value = []
+  finalSelectedSchedule.value = null
   selectedStreetId.value = streetId
   selectedStreetLabel.value = label || ''
+  modalSelectedScheduleIndex.value = null
+
   console.log('handleStreetChange - Street ID set to:', selectedStreetId.value)
 
   emit('streetSelected', streetId)
   emit('update:isReminderFormVisible', false)
+
+  isScheduleEntryModalVisible.value = false
+  isScheduleSelectionModalVisible.value = false
 
   if (!streetId) {
     isScheduleEntryModalVisible.value = false
@@ -114,29 +148,38 @@ async function handleStreetChange(streetId, label) {
     const scheduleData = await streetsStore.getSchedule(streetId)
 
     console.log('scheduleData received:', scheduleData)
-    if (scheduleData && scheduleData.weekOfMonth && scheduleData.dayOfWeek && scheduleData.year) {
-      formRef.value?.setFieldValue('weekOfMonth', scheduleData.weekOfMonth)
-      formRef.value?.setFieldValue('dayOfWeek', scheduleData.dayOfWeek)
-      formRef.value?.setFieldValue('year', scheduleData.year)
-      toast.info('Existing schedule data loaded.')
-      // emit('scheduleLoaded', true);
-      emit('update:isReminderFormVisible', true)
-      isScheduleEntryModalVisible.value = false
+    if (Array.isArray(scheduleData) && scheduleData.length > 0) {
+      // --- Case: One or More Schedule Patterns Found ---
+      console.log(`${scheduleData.length} schedule pattern(s) found.`)
+      loadedSchedules.value = scheduleData // Store the array of patterns
+      finalSelectedSchedule.value = null // Clear any previous final selection
+      toast.info('Schedule(s) found. Please select one.')
+      emit('update:isReminderFormVisible', false) // Don't show reminder form yet
+      // *** Always open the selection modal ***
+      isScheduleSelectionModalVisible.value = true
+      modalSelectedScheduleIndex.value = 0 // Default selection to the first item
+      // --- ---
     } else {
-      console.log('No existing schedule found for this street.')
-
-      toast.info('No schedule found for this street. Please enter details.')
-
+      // --- Case: No Schedules Found (null, undefined, or empty array) ---
+      console.log('No existing schedule patterns found for this street.')
+      loadedSchedules.value = [] // Ensure it's empty
+      finalSelectedSchedule.value = null
+      toast.info('No schedule found. Please enter the details.')
+      emit('update:isReminderFormVisible', false)
+      // *** Open the "Enter Schedule" modal ***
       isScheduleEntryModalVisible.value = true
+      await nextTick()
       modalFormRef.value?.resetForm()
+      // --- ---
     }
   } catch (error) {
-    console.error('Failed to fetch street schedule:', error)
+    console.error('Failed to fetch street schedule patterns:', error)
     toast.error('Could not fetch schedule details.')
-
-    formRef.value?.resetField('weekOfMonth')
-    formRef.value?.resetField('dayOfWeek')
-    formRef.value?.resetField('year')
+    // Reset state on error
+    loadedSchedules.value = []
+    finalSelectedSchedule.value = null
+    isScheduleEntryModalVisible.value = false
+    isScheduleSelectionModalVisible.value = false
   } finally {
     isScheduleLoading.value = false
   }
@@ -164,17 +207,31 @@ async function onScheduleEntrySubmit(values) {
     )
 
     if (createScheduleResult) {
-      toast.success('Street Sweeping Schedule created successfully!')
-      isScheduleEntryModalVisible.value = false
+      // Assuming it returns truthy on success
+      toast.success('Schedule pattern created successfully!')
+      isScheduleEntryModalVisible.value = false // Close entry modal
 
+      // --- Refresh and open selection modal ---
+      console.log('Refreshing schedule patterns after creation...')
       const newScheduleData = await streetsStore.getSchedule(selectedStreetId.value)
-      console.log('Newly created schedule data:', newScheduleData)
-      loadedScheduleData.value = newScheduleData
-
-      emit('scheduleCreated', selectedStreetId.value)
-      emit('update:isReminderFormVisible', true)
+      if (Array.isArray(newScheduleData) && newScheduleData.length > 0) {
+        loadedSchedules.value = newScheduleData
+        finalSelectedSchedule.value = null // No final choice yet
+        isScheduleSelectionModalVisible.value = true // Open selection modal
+        modalSelectedScheduleIndex.value = 0 // Default to first
+        emit('update:isReminderFormVisible', false) // Keep reminder hidden
+        toast.info('Schedule created. Please select from available schedules.')
+        emit('scheduleCreated', selectedStreetId.value) // Notify parent of creation
+      } else {
+        // Handle case where fetching after create fails or returns empty
+        toast.error('Could not retrieve schedules after creation. Please search again.')
+        loadedSchedules.value = []
+        finalSelectedSchedule.value = null
+        emit('update:isReminderFormVisible', false)
+      }
+      // --- ---
     } else {
-      toast.error('Failed to create Street Sweeping Schedule (API reported failure).')
+      toast.error('Failed to create Schedule Pattern (API reported failure).')
     }
   } catch (error) {
     console.error('Street Sweeping Schedule creation failed:', error)
@@ -186,14 +243,44 @@ async function onScheduleEntrySubmit(values) {
   }
 }
 
+function handleScheduleSelectionConfirm() {
+  if (modalSelectedScheduleIndex.value === null || modalSelectedScheduleIndex.value === undefined) {
+    toast.warn('Please select a schedule.')
+    return
+  }
+
+  const selectedIndex = modalSelectedScheduleIndex.value
+  if (loadedSchedules.value && loadedSchedules.value[selectedIndex]) {
+    finalSelectedSchedule.value = loadedSchedules.value[selectedIndex]
+    console.log('Schedule selected by user:', finalSelectedSchedule.value)
+    isScheduleSelectionModalVisible.value = false // Close this modal
+    emit('update:isReminderFormVisible', true) // Show reminder form
+    toast.success('Schedule selected.')
+  } else {
+    console.error('Error confirming selection: Invalid index or loadedSchedules array.')
+    toast.error('Could not select schedule. Please try again.')
+    isScheduleSelectionModalVisible.value = false // Close modal on error too
+  }
+}
+
+function handleSelectionModalClose() {
+  isScheduleSelectionModalVisible.value = false
+  if (!finalSelectedSchedule.value) {
+    modalSelectedScheduleIndex.value = null
+  }
+}
+
 function handleModalClose() {
   isScheduleEntryModalVisible.value = false
   modalFormRef.value?.resetForm()
 }
 
 const handleStreetSearch = _.debounce(async (query) => {
-  loadedScheduleData.value = null
+  loadedSchedules.value = []
+  finalSelectedSchedule.value = null
   emit('update:isReminderFormVisible', false)
+  isScheduleEntryModalVisible.value = false
+  isScheduleSelectionModalVisible.value = false
   if (query) {
     streetsStore.searchStreets(query)
   } else {
@@ -203,9 +290,6 @@ const handleStreetSearch = _.debounce(async (query) => {
     emit('streetSelected', null)
   }
 }, 300)
-
-const getOptionLabel = (value, options) =>
-  options.find((opt) => opt.value === value)?.label || 'N/A'
 </script>
 
 <template>
@@ -258,31 +342,26 @@ const getOptionLabel = (value, options) =>
         </div>
 
         <div
-          v-if="!isScheduleLoading && loadedScheduleData"
+          v-if="!isScheduleLoading && finalSelectedSchedule"
           class="mt-6 p-4 border rounded bg-green-50 border-green-200"
         >
           <h3 class="font-semibold text-lg text-gray-800 mb-2">Sweeping Schedule:</h3>
           <p>
             <span class="font-medium">Week:</span>
-            {{ getOptionLabel(loadedScheduleData.weekOfMonth, weekOptions) }}
+            {{ getOptionLabel(finalSelectedSchedule.weekOfMonth, weekOptions) }}
           </p>
           <p>
             <span class="font-medium">Day:</span>
-            {{ getOptionLabel(loadedScheduleData.dayOfWeek, dayOptions) }}
+            {{ getOptionLabel(finalSelectedSchedule.dayOfWeek, dayOptions) }}
           </p>
-          <p><span class="font-medium">Year:</span> {{ loadedScheduleData.year }}</p>
+          <p><span class="font-medium">Year:</span> {{ finalSelectedSchedule.year }}</p>
         </div>
         <div
-          v-if="
-            selectedStreetId &&
-            !isScheduleLoading &&
-            !loadedScheduleData &&
-            !isScheduleEntryModalVisible
-          "
-          class="mt-6 p-4 border rounded bg-yellow-50 border-yellow-200"
+          v-if="selectedStreetId && !isScheduleLoading && isScheduleSelectionModalVisible"
+          class="mt-6 p-4 border rounded bg-blue-50 border-blue-200"
         >
           <p class="text-center text-gray-700">
-            No schedule found for this street. Opening form to add details...
+            Multiple schedules found. Please make a selection in the dialog.
           </p>
         </div>
       </div>
@@ -385,6 +464,71 @@ const getOptionLabel = (value, options) =>
         </div>
       </Form>
     </el-dialog>
+
+    <!-- *** NEW: "Select Schedule" Modal *** -->
+    <el-dialog
+      v-model="isScheduleSelectionModalVisible"
+      :title="`Select Schedule for ${selectedStreetLabel || 'Selected Street'}`"
+      width="90%"
+      :max-width="'600px'"
+      @closed="handleSelectionModalClose"
+      :close-on-click-modal="false"
+      append-to-body
+      top="5vh"
+    >
+      <p class="text-sm text-gray-600 mb-4">
+        Multiple schedules found for this street. Please select the one you want to use:
+      </p>
+
+      <!-- Option 1: Radio Buttons with Flex Layout -->
+      <!-- <el-radio-group v-model="modalSelectedScheduleIndex" class="flex flex-col gap-3">
+            <el-radio v-for="(schedule, index) in loadedSchedules" :key="index" :label="index" border class="w-full !ml-0">
+                Side {{ index + 1 }}: {{ formatScheduleForDisplay(schedule) }}
+                 <!-/- If schedule object has a 'side' property: ->
+                 <!-/- {{ schedule.side || ('Side ' + (index + 1)) }}: {{ formatScheduleForDisplay(schedule) }} ->
+            </el-radio>
+        </el-radio-group> -->
+
+      <!-- Option 2: Table Layout -->
+      <el-radio-group v-model="modalSelectedScheduleIndex" class="w-full">
+        <el-table :data="loadedSchedules" border-style="width: 100%" highlight-current-row>
+          <el-table-column width="55" text-align="center">
+            <template #default="scope">
+              <!-- Bind radio value to the row's index -->
+              <el-radio
+                :value="scope.$index"
+                size="large"
+                @click.prevent="modalSelectedScheduleIndex = scope.$index"
+                ><i></i
+              ></el-radio>
+            </template>
+          </el-table-column>
+          <el-table-column prop="side" label="Side/Details">
+            <template #default="scope">
+              <!-- Display 'Side' if available, otherwise Side 1/2 -->
+              {{ scope.row.side || `Side ${scope.$index + 1}` }}
+            </template>
+          </el-table-column>
+          <el-table-column label="Schedule">
+            <template #default="scope">
+              {{ formatScheduleForDisplay(scope.row) }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-radio-group>
+
+      <!-- Selection Modal Actions -->
+      <div class="flex justify-end gap-2 mt-6">
+        <el-button @click="handleSelectionModalClose">Cancel</el-button>
+        <el-button
+          type="primary"
+          @click="handleScheduleSelectionConfirm"
+          :disabled="modalSelectedScheduleIndex === null"
+        >
+          Confirm Selection
+        </el-button>
+      </div>
+    </el-dialog>
   </section>
 </template>
 
@@ -396,5 +540,13 @@ const getOptionLabel = (value, options) =>
 :deep(.el-dialog__body) {
   max-height: 70vh;
   overflow-y: auto;
+}
+
+:deep(.el-table .el-radio__label) {
+  display: none; /* Hide default radio label inside table cell */
+}
+/* Add some padding if needed */
+:deep(.el-dialog__body) {
+  padding-bottom: 10px;
 }
 </style>
