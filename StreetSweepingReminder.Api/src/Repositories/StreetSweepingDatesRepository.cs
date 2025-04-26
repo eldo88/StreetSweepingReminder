@@ -13,8 +13,8 @@ internal class StreetSweepingDatesRepository : RepositoryBase, IStreetSweepingDa
     {
         const string sql =
             """
-            INSERT INTO StreetSweepingDates (StreetSweepingDate, StreetId, CreatedAt)
-            VALUES (@StreetSweepingDate, @StreetId, @CreatedAt);
+            INSERT INTO StreetSweepingDates (StreetSweepingDate, StreetId, CreatedAt, SideOfStreet)
+            VALUES (@StreetSweepingDate, @StreetId, @CreatedAt, @SideOfStreet);
             SELECT last_insert_rowid();
             """;
 
@@ -87,7 +87,7 @@ internal class StreetSweepingDatesRepository : RepositoryBase, IStreetSweepingDa
     {
         const string sql = 
             """
-            SELECT Id, StreetId, StreetSweepingDate
+            SELECT Id, StreetId, StreetSweepingDate, SideOfStreet
             FROM StreetSweepingDates
             WHERE StreetId = @streetId
             """;
