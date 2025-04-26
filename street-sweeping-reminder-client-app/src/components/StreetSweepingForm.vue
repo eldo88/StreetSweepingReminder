@@ -109,6 +109,14 @@ const scheduleSchema = toTypedSchema(
       })
       .int()
       .min(currentYear, 'Year must be current or future'),
+    sideOfStreet: z
+      .number({
+        required_error: 'Side is required',
+        invalid_type_error: 'Side must be selected',
+      })
+      .int()
+      .min(0, 'year must be selected')
+      .max(3),
   }),
 )
 
@@ -208,7 +216,7 @@ async function onScheduleEntrySubmit(values) {
     return
   }
 
-  const { weekOfMonth, dayOfWeek, year } = values
+  const { weekOfMonth, dayOfWeek, year, sideOfStreet } = values
 
   isScheduleLoading.value = true
   try {
@@ -217,6 +225,7 @@ async function onScheduleEntrySubmit(values) {
       weekOfMonth,
       dayOfWeek,
       year,
+      sideOfStreet,
     )
 
     if (createScheduleResult) {
@@ -467,6 +476,31 @@ const handleStreetSearch = _.debounce(async (query) => {
             </el-select>
           </Field>
           <ErrorMessage name="year" class="text-red-500 text-xs mt-1" />
+        </div>
+
+        <div class="mb-4">
+          <label for="modalSide" class="block text-gray-700 text-sm font-bold mb-2">
+            Side <span class="text-red-500">*</span>
+          </label>
+          <Field name="sideOfStreet" v-slot="{ field, errors }">
+            <el-select
+              :model-value="field.value"
+              @update:modelValue="field.onChange($event)"
+              placeholder="Select Side"
+              clearable
+              class="w-full"
+              id="modalSide"
+              :class="{ 'el-select-invalid': errors?.length }"
+            >
+              <el-option
+                v-for="item in sideOfStreetOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </Field>
+          <ErrorMessage name="sideOfStreet" class="text-red-500 text-xs mt-1" />
         </div>
 
         <div class="flex justify-end gap-2 mt-6">

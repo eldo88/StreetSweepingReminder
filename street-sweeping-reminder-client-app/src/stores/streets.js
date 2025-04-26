@@ -31,12 +31,13 @@ export const useStreetsStore = defineStore('streets', {
       }
     },
 
-    async createSchedule(id, weekOfMonth, dayOfWeek, year) {
+    async createSchedule(id, weekOfMonth, dayOfWeek, year, sideofStreet) {
       try {
         const payload = {
           weekOfMonth: weekOfMonth,
           dayOfWeek: dayOfWeek,
           year: year,
+          sideofStreet: sideofStreet,
         }
         const reponse = await api.post(`Street/${id}/schedule`, payload)
         if (reponse.data > 0) {
