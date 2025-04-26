@@ -69,6 +69,13 @@ const dayOptions = ref([
   { value: 5, label: 'Friday' },
 ])
 
+const sideOfStreetOptions = ref([
+  { value: 0, label: 'North' },
+  { value: 1, label: 'South' },
+  { value: 2, label: 'East' },
+  { value: 3, label: 'West' },
+])
+
 const currentYear = new Date().getFullYear()
 const yearOptions = ref(
   Array.from({ length: 6 }, (_, i) => ({
@@ -120,6 +127,12 @@ const formatScheduleForDisplay = (schedule) => {
   const weekLabel = getOptionLabel(schedule.weekOfMonth, weekOptions.value)
   const dayLabel = getOptionLabel(schedule.dayOfWeek, dayOptions.value)
   return `Wk: ${weekLabel}, Day: ${dayLabel}, Yr: ${schedule.year}`
+}
+
+const formatSideOfStreetForDisplay = (schedule) => {
+  if (!schedule) return 'N/A'
+  const sideOfStreetlabel = getOptionLabel(schedule.sideOfStreet, sideOfStreetOptions.value)
+  return `Side: ${sideOfStreetlabel}`
 }
 
 async function handleStreetChange(streetId, label) {
@@ -506,7 +519,7 @@ const handleStreetSearch = _.debounce(async (query) => {
           <el-table-column prop="side" label="Side/Details">
             <template #default="scope">
               <!-- Display 'Side' if available, otherwise Side 1/2 -->
-              {{ scope.row.side || `Side ${scope.$index + 1}` }}
+              {{ formatSideOfStreetForDisplay(scope.row) || `Side ${scope.$index + 1}` }}
             </template>
           </el-table-column>
           <el-table-column label="Schedule">
