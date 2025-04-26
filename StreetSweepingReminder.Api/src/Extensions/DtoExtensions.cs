@@ -133,25 +133,56 @@ public static class DtoExtensions
     
     public static List<StreetSweepingScheduleResponseDto> ToStreetSweepingScheduleResponseDtoList(
         this IEnumerable<StreetSweepingDates> source)
-    {   //TODO add login for separating by side of street or day
+    {   
         var responseDtos = new List<StreetSweepingScheduleResponseDto>();
-        var schedule = source.ToStreetSweepingScheduleDto();
+        var schedules = source.ToStreetSweepingScheduleDto();
+
+        var schedulesBySideOfStreet = new List<List<StreetSweepingScheduleDto>>();
+        var north = new List<StreetSweepingScheduleDto>();
+        var south = new List<StreetSweepingScheduleDto>();
+        var east = new List<StreetSweepingScheduleDto>();
+        var west = new List<StreetSweepingScheduleDto>();
         
-        var day = 0;
-        var month = 0;
-        var year = 0;
-        var streetId = 0;
-        
-        if (schedule.Count > 0)
+        foreach (var schedule in schedules)
         {
-            var firstDate = schedule[0];
-            day = (int)firstDate.StreetSweepingDate.DayOfWeek;
-            month = DateUtils.GetWeekOfMonth(firstDate.StreetSweepingDate);
-            year = firstDate.StreetSweepingDate.Year;
-            streetId = firstDate.StreetId;
-            var sideOfStreet = firstDate.SideOfStreet;
-            var sssrDto = new StreetSweepingScheduleResponseDto(day, month, year, streetId, sideOfStreet, schedule);
-            responseDtos.Add(sssrDto);
+            var sideOfStreet = schedule.SideOfStreet;
+            switch (sideOfStreet)
+            {
+                case CardinalDirection.North:
+                    north.Add(schedule);
+                    break;
+                case CardinalDirection.South:
+                    south.Add(schedule);
+                    break;
+                case CardinalDirection.East:
+                    east.Add(schedule);
+                    break;
+                case CardinalDirection.West:
+                    west.Add(schedule);
+                    break;
+                case CardinalDirection.NotFound:
+                default:
+                    throw new InvalidOperationException("Invalid side of the street");
+            }
+        }
+        
+        schedulesBySideOfStreet.Add(north);
+        schedulesBySideOfStreet.Add(south);
+        schedulesBySideOfStreet.Add(east);
+        schedulesBySideOfStreet.Add(west);
+
+        foreach (var filteredSchedules in schedulesBySideOfStreet)
+        {
+            foreach (var schedule in filteredSchedules)
+            {
+                var day = (int)schedule.StreetSweepingDate.DayOfWeek;
+                var month = DateUtils.GetWeekOfMonth(schedule.StreetSweepingDate);
+                var year = schedule.StreetSweepingDate.Year;
+                var stId = schedule.StreetId;
+                var sOfStreet = schedule.SideOfStreet;
+                var ssrDto = new StreetSweepingScheduleResponseDto(day, month, year, stId, sOfStreet, filteredSchedules);
+                responseDtos.Add(ssrDto);
+            }
         }
 
         return responseDtos;
