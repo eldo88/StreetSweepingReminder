@@ -1,6 +1,7 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, defineEmits } from 'vue'
 import { useStreetsStore } from '@/stores/streets'
+import { useRemindersStore } from '@/stores/reminder'
 import { formatDate } from '@/utils/dateUtils.js'
 
 const props = defineProps({
@@ -28,8 +29,13 @@ const props = defineProps({
   }),
 })
 
+const emit = defineEmits(['deleted'])
+
+const reminderStore = useRemindersStore()
+
 const streetsStore = useStreetsStore()
 const streetName = ref('Loading...')
+const isDeleting = ref(false)
 
 async function fetchStreetDetails(streetId) {
   if (!streetId) {
@@ -43,6 +49,30 @@ async function fetchStreetDetails(streetId) {
   } catch (error) {
     console.error('Failed to fetch street details:', error)
     streetName.value = 'Error loading street'
+  }
+}
+
+async function handleDeleteReminder() {
+  if (
+    !confirm(
+      `Are you sure you want to delete the reminder "${props.reminder.title || 'this reminder'}"?`,
+    )
+  ) {
+    return
+  }
+
+  isDeleting.value = true
+  try {
+    await reminderStore.deleteReminder(props.reminder.id)
+
+    emit('deleted', props.reminder.id)
+
+    console.log(`Reminder ${props.reminder.id} deletion process completed in component.`)
+  } catch (error) {
+    console.error(`UI Error: Failed to delete reminder ${props.reminder.id}.`, error)
+    alert(`Failed to delete reminder: ${error.message || 'Please try again.'}`)
+  } finally {
+    isDeleting.value = false
   }
 }
 
@@ -133,6 +163,16 @@ onMounted(() => {
 
 <template>
   <div class="bg-white rounded-xl shadow-md relative p-4">
+    <button
+      @click="handleDeleteReminder"
+      :disabled="isDeleting"
+      class="absolute top-2 right-2 z-10 px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed transition-colors duration-150 ease-in-out"
+      aria-label="Delete reminder"
+    >
+      {{ isDeleting ? 'Deleting...' : 'Delete' }}
+      <!-- Show text, change on loading -->
+    </button>
+
     <div class="mb-6">
       <h1 class="text-xl font-semibold text-gray-800 my-2">
         {{ reminder.title || 'Street Reminder' }}

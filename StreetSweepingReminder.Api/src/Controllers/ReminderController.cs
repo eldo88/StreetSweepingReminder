@@ -114,4 +114,37 @@ public class ReminderController : ControllerBase
         
         return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
     }
+
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteReminder(int id)
+    {
+        var result = await _reminderService.DeleteReminderAsync(id);
+        if (result.IsSuccess)
+        {
+            return Ok();
+        }
+        
+        if (result.HasError<NotFoundError>())
+        {
+            return NotFound("No reminder found for provided ID.");
+        }
+        
+        if (result.HasError<ValidationError>(out var validationErrors))
+        {
+            foreach (var error in validationErrors)
+            {
+                ModelState.AddModelError(string.Empty, error.Message);
+            }
+
+            return ValidationProblem(ModelState);
+        }
+        
+        _logger.LogError("Failed to delete reminder {id}", id);
+        
+        return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+    }
 }

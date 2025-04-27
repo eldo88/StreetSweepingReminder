@@ -9,7 +9,7 @@ public interface IReminderService
     //Task<Result<int>> CreateSingleReminderAsync(CreateReminderDto command, string userId);
     Task<Result<ReminderResponseDto>> GetReminderByIdAsync(int id);
     Task<Result<List<ReminderResponseDto>>> GetUserRemindersAsync(string userId);
-    Task<Result> UpdateReminderAsync(UpdateReminderDto command);
-    //Task<Result> DeleteReminderAsync(int id);
+    Task<Result> UpdateReminderAsync(UpdateReminderDto command); 
+    Task<Result> DeleteReminderAsync(int id);
     //Task<Result> MarkReminderAsSentAsync(int reminderId);
 }

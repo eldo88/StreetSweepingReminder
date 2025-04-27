@@ -155,6 +155,37 @@ public class ReminderService : IReminderService
         }
     }
 
+    public async Task<Result> DeleteReminderAsync(int id)
+    {
+        try
+        {
+            var reminderToDelete = await _reminderRepository.GetByIdAsync(id);
+            if (reminderToDelete is null)
+            {
+                return Result.Fail(new NotFoundError("No reminder found for provided ID."));
+            }
+            
+            var deleteScheduleResult = await _reminderScheduleRepository.DeleteByReminderId(id);
+            if (!deleteScheduleResult)
+            {
+                return Result.Fail(new ApplicationError("Error deleting schedule."));
+            }
+
+            var deleteReminderResult = await _reminderRepository.DeleteAsync(id);
+            if (!deleteReminderResult)
+            {
+                return Result.Fail(new ApplicationError("Error deleting reminder."));
+            }
+
+            return Result.Ok();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error deleting reminder.");
+            return Result.Fail(new ApplicationError($"An unexpected error occurred while deleting reminder: {e.Message}"));
+        }
+    }
+
     private async Task<ReminderResponseDto> BuildReminderResponse(Reminder reminder)
     {
         var streetId = reminder.StreetId;
