@@ -13,8 +13,8 @@ internal class ReminderRepository : RepositoryBase, IReminderRepository
     {
         const string sql =
             """
-            INSERT INTO Reminders (UserId, Title, Status, PhoneNumber, StreetId, CreatedAt) 
-            VALUES (@UserId, @Title, @Status, @PhoneNumber, @StreetId, @CreatedAt);
+            INSERT INTO Reminders (UserId, Title, Status, PhoneNumber, StreetId, SideOfStreet, CreatedAt) 
+            VALUES (@UserId, @Title, @Status, @PhoneNumber, @StreetId, @SideOfStreet, @CreatedAt);
             SELECT last_insert_rowid();
             """;
 
