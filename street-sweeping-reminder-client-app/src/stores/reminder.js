@@ -34,7 +34,7 @@ export const useRemindersStore = defineStore('reminders', {
       }
     },
 
-    async createReminder(formData, streetId) {
+    async createReminder(formData, streetId, sideofStreet) {
       if (!streetId) {
         console.error('createReminder action called without a streetId!')
         throw new Error('Street ID is required to create a reminder.')
@@ -55,6 +55,7 @@ export const useRemindersStore = defineStore('reminders', {
           phoneNumber: formData.phoneNumber,
           streetId: streetId,
           isRecurring: formData.isRecurring,
+          sideofStreet: sideofStreet,
         }
         console.log('Reminder Payload being sent:', JSON.stringify(payload, null, 2))
         const response = await api.post('Reminder', payload)

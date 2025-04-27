@@ -27,7 +27,12 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['update:isReminderFormVisible', 'streetSelected', 'scheduleCreated'])
+const emit = defineEmits([
+  'update:isReminderFormVisible',
+  'streetSelected',
+  'scheduleCreated',
+  'sideSelected',
+])
 
 const toast = useToast()
 const streetsStore = useStreetsStore()
@@ -276,7 +281,8 @@ function handleScheduleSelectionConfirm() {
     finalSelectedSchedule.value = loadedSchedules.value[selectedIndex]
     console.log('Schedule selected by user:', finalSelectedSchedule.value)
     isScheduleSelectionModalVisible.value = false // Close this modal
-    emit('update:isReminderFormVisible', true) // Show reminder form
+    emit('update:isReminderFormVisible', true)
+    emit('sideSelected', finalSelectedSchedule.value.sideOfStreet)
     toast.success('Schedule selected.')
   } else {
     console.error('Error confirming selection: Invalid index or loadedSchedules array.')

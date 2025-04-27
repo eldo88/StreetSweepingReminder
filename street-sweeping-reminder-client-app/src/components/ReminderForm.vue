@@ -13,6 +13,10 @@ const props = defineProps({
     type: Number,
     default: null,
   },
+  sideOfStreet: {
+    type: Number,
+    default: null,
+  },
 })
 
 const schema = toTypedSchema(
@@ -33,7 +37,7 @@ const reminderStore = useRemindersStore()
 
 async function onSubmit(values) {
   console.log('Street ID from prop:', props.streetId)
-
+  console.log('Side of street from prop:', props.sideOfStreet)
   if (!props.streetId) {
     toast.error('Cannot create reminder: No street selected.')
     console.error('Attempted to submit reminder without a streetId prop.')
@@ -41,7 +45,7 @@ async function onSubmit(values) {
   }
 
   try {
-    await reminderStore.createReminder(values, props.streetId)
+    await reminderStore.createReminder(values, props.streetId, props.sideOfStreet)
     toast.success('Reminder created successfully!')
     setTimeout(() => {
       router.push('/reminders')
