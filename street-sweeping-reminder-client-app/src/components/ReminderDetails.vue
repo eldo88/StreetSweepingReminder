@@ -19,6 +19,7 @@ const props = defineProps({
       year: null,
       streetId: null,
       schedule: [],
+      sideOfStreet: null,
     },
     streetId: null,
     reminderSchedule: {
@@ -91,6 +92,40 @@ const reminderScheduleList = computed(() => {
   return props.reminder.reminderSchedule?.schedule ?? []
 })
 
+const dayOfWeek = computed(() => {
+  const day = props.reminder.streetSweepingSchedule?.dayOfWeek
+  if (day === 0) {
+    return 'Sunday'
+  } else if (day === 1) {
+    return 'Monday'
+  } else if (day === 2) {
+    return 'Tuesday'
+  } else if (day === 3) {
+    return 'Wednesday'
+  } else if (day === 4) {
+    return 'Thursday'
+  } else if (day === 5) {
+    return 'Friday'
+  } else if (day === 6) {
+    return 'Saturday'
+  }
+  return 'Unknown Day'
+})
+
+const sideOfStreet = computed(() => {
+  let side = props.reminder.streetSweepingSchedule?.sideOfStreet
+  if (side === 0) {
+    return 'North'
+  } else if (side === 1) {
+    return 'South'
+  } else if (side === 2) {
+    return 'East'
+  } else if (side === 3) {
+    return 'West'
+  }
+  return 'Unknown Side'
+})
+
 onMounted(() => {
   fetchStreetDetails(props.reminder.streetId)
 })
@@ -113,6 +148,8 @@ onMounted(() => {
           <div><strong>Phone Number:</strong> {{ reminder.phoneNumber }}</div>
           <div><strong>Next Reminder:</strong> {{ nextReminderDate }}</div>
           <div><strong>Next Sweeping:</strong> {{ nextStreetSweepingDateComputed }}</div>
+          <div><strong>Street Sweeping Day:</strong> {{ dayOfWeek }}</div>
+          <div><strong>Side:</strong> {{ sideOfStreet }}</div>
           <div><strong>Status:</strong> {{ reminder.status }}</div>
           <div><strong>Street:</strong> {{ streetName }}</div>
         </div>
