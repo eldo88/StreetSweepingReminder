@@ -43,7 +43,7 @@ public class ReminderSchedulerService :
     protected override async Task<object[]> GetRecurringParameters(CreateReminderDto command)
     {
         var streetSweepingSchedule = await
-            _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(command.StreetId);
+            _streetSweepingDatesRepository.GetScheduleBuStreetIdAndSideOfStreet(command.StreetId, command.SideOfStreet);
 
         return [streetSweepingSchedule];
     }
