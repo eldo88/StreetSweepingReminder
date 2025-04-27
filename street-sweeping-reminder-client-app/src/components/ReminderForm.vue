@@ -23,6 +23,9 @@ const schema = toTypedSchema(
   z.object({
     title: z.string().min(1, 'Title is required'),
     phoneNumber: z.string().min(10, 'Phone number is required'),
+    consent: z.boolean().refine((val) => val === true, {
+      message: 'You must agree to receive text notifications to create a reminder.',
+    }),
     reminderDate: z.coerce.date({
       required_error: 'Reminder Date is required',
       invalid_type_error: 'Invalid date format',
@@ -96,12 +99,32 @@ async function onSubmit(values) {
             <ErrorMessage name="phoneNumber" class="text-red-500 text-xs mt-1" />
           </div>
 
+          <div class="mb-4">
+            <div class="flex items-start">
+              <Field
+                name="consent"
+                type="checkbox"
+                id="consentCheckbox"
+                :value="true"
+                class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-1 mr-2 flex-shrink-0"
+              />
+              <label for="consentCheckbox" class="text-sm text-gray-700">
+                I agree to receive text notifications. To cancel,
+                <router-link to="/reminders" class="text-blue-600 hover:underline"
+                  >manage your notifications</router-link
+                >
+                or reply STOP to any message. <span class="text-red-500">*</span>
+              </label>
+            </div>
+            <ErrorMessage name="consent" class="text-red-500 text-xs mt-1 block" />
+          </div>
+
           <!-- Reminder Date Picker -->
           <div class="mb-6">
             <label for="reminderDate" class="block text-gray-700 text-sm font-bold mb-2">
               Reminder Date <span class="text-red-500">*</span>
             </label>
-            <Field name="reminderDate" v-slot="{ field, errors }">
+            <Field name="reminderDate" v-slot="{ field }">
               <Datepicker
                 v-bind="field"
                 :model-value="field.value"
@@ -118,7 +141,7 @@ async function onSubmit(values) {
                 :week-start="0"
                 :timezone="'America/Denver'"
               />
-              <span class="text-red-500 text-xs mt-1 block">{{ errors[0] }}</span>
+              <ErrorMessage name="reminderDate" class="text-red-500 text-xs mt-1 block" />
             </Field>
           </div>
 
