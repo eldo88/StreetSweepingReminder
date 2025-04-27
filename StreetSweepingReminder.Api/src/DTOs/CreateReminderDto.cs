@@ -1,3 +1,5 @@
+using StreetSweepingReminder.Api.Constants_Enums;
+
 namespace StreetSweepingReminder.Api.DTOs;
 
 public record CreateReminderDto(
@@ -5,4 +7,5 @@ public record CreateReminderDto(
     DateTime ScheduledDateTimeUtc,
     string PhoneNumber, 
     int StreetId, 
-    bool IsRecurring);
+    bool IsRecurring,
+    CardinalDirection SideOfStreet);
