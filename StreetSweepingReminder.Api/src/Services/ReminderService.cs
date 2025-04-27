@@ -158,7 +158,9 @@ public class ReminderService : IReminderService
     private async Task<ReminderResponseDto> BuildReminderResponse(Reminder reminder)
     {
         var streetId = reminder.StreetId;
-        var scheduleResult = await _streetSweepingDatesRepository.GetStreetSweepingScheduleByStreetId(streetId);
+        var sideOfStreet = reminder.SideOfStreet;
+        var scheduleResult =
+            await _streetSweepingDatesRepository.GetScheduleBuStreetIdAndSideOfStreet(streetId, sideOfStreet);
         var streetSweepingScheduleResponseDto = scheduleResult.ToStreetSweepingScheduleResponseDto();
         var reminderId = reminder.Id;
         var reminderScheduleResult = await _reminderScheduleRepository.GetByReminderId(reminderId);
