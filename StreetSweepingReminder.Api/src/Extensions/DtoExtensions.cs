@@ -18,6 +18,7 @@ public static class DtoExtensions
             Status = string.Empty,
             PhoneNumber = source.PhoneNumber,
             StreetId = source.StreetId,
+            SideOfStreet = source.SideOfStreet,
             CreatedAt = DateTime.Now
         };
     }
