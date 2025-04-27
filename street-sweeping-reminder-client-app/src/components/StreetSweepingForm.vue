@@ -93,7 +93,7 @@ const scheduleSchema = toTypedSchema(
       })
       .int()
       .min(1, 'Week must be selected')
-      .max(4),
+      .max(5),
     dayOfWeek: z
       .number({
         required_error: 'Day of week is required',
@@ -294,6 +294,12 @@ function handleSelectionModalClose() {
 
 function handleModalClose() {
   isScheduleEntryModalVisible.value = false
+  modalFormRef.value?.resetForm()
+}
+
+function handleNewSchedule() {
+  isScheduleSelectionModalVisible.value = false
+  isScheduleEntryModalVisible.value = true
   modalFormRef.value?.resetForm()
 }
 
@@ -566,6 +572,7 @@ const handleStreetSearch = _.debounce(async (query) => {
 
       <!-- Selection Modal Actions -->
       <div class="flex justify-end gap-2 mt-6">
+        <el-button @click="handleNewSchedule">Add New</el-button>
         <el-button @click="handleSelectionModalClose">Cancel</el-button>
         <el-button
           type="primary"
