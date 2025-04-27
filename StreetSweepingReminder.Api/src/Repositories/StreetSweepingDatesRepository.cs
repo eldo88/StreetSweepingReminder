@@ -1,4 +1,5 @@
 using Dapper;
+using StreetSweepingReminder.Api.Constants_Enums;
 using StreetSweepingReminder.Api.Entities;
 
 namespace StreetSweepingReminder.Api.Repositories;
@@ -94,6 +95,22 @@ internal class StreetSweepingDatesRepository : RepositoryBase, IStreetSweepingDa
 
         using var connection = CreateConnection();
         var streetSweepingDates = await connection.QueryAsync<StreetSweepingDates>(sql, new { streetId });
+        return streetSweepingDates;
+    }
+
+    public async Task<IEnumerable<StreetSweepingDates>> GetScheduleBuStreetIdAndSideOfStreet(int streetId,
+        CardinalDirection sideOfStreet)
+    {
+        const string sql = 
+            """
+            SELECT Id, StreetId, StreetSweepingDate, SideOfStreet
+            FROM StreetSweepingDates
+            WHERE StreetId = @streetId
+            AND SideOfStreet = @sideOfStreet
+            """;
+
+        using var connection = CreateConnection();
+        var streetSweepingDates = await connection.QueryAsync<StreetSweepingDates>(sql, new { streetId, sideOfStreet });
         return streetSweepingDates;
     }
 }
