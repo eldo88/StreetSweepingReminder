@@ -133,61 +133,37 @@ public static class DtoExtensions
     
     public static List<StreetSweepingScheduleResponseDto> ToStreetSweepingScheduleResponseDtoList(
         this IEnumerable<StreetSweepingDates> source)
-    {   
-        var responseDtos = new List<StreetSweepingScheduleResponseDto>();
-        var schedules = source.ToStreetSweepingScheduleDto();
+    {
+        ArgumentNullException.ThrowIfNull(source);
 
-        var schedulesBySideOfStreet = new List<List<StreetSweepingScheduleDto>>();
-        var north = new List<StreetSweepingScheduleDto>();
-        var south = new List<StreetSweepingScheduleDto>();
-        var east = new List<StreetSweepingScheduleDto>();
-        var west = new List<StreetSweepingScheduleDto>();
-        
-        foreach (var schedule in schedules)
-        {
-            var sideOfStreet = schedule.SideOfStreet;
-            switch (sideOfStreet)
-            {
-                case CardinalDirection.North:
-                    north.Add(schedule);
-                    break;
-                case CardinalDirection.South:
-                    south.Add(schedule);
-                    break;
-                case CardinalDirection.East:
-                    east.Add(schedule);
-                    break;
-                case CardinalDirection.West:
-                    west.Add(schedule);
-                    break;
-                case CardinalDirection.NotFound:
-                default:
-                    throw new InvalidOperationException("Invalid side of the street");
-            }
-        }
-        
-        schedulesBySideOfStreet.Add(north);
-        schedulesBySideOfStreet.Add(south);
-        schedulesBySideOfStreet.Add(east);
-        schedulesBySideOfStreet.Add(west);
+        var scheduleDtos = source.ToStreetSweepingScheduleDto();
 
-        foreach (var filteredSchedules in schedulesBySideOfStreet)
-        {
-            foreach (var schedule in filteredSchedules)
+        var responseDtos = scheduleDtos
+            .GroupBy(dto => dto.SideOfStreet)
+            .Select(group => 
             {
-                var day = (int)schedule.StreetSweepingDate.DayOfWeek;
-                var month = DateUtils.GetWeekOfMonth(schedule.StreetSweepingDate);
-                var year = schedule.StreetSweepingDate.Year;
-                var stId = schedule.StreetId;
-                var sOfStreet = schedule.SideOfStreet;
-                var ssrDto = new StreetSweepingScheduleResponseDto(day, month, year, stId, sOfStreet, filteredSchedules);
-                responseDtos.Add(ssrDto);
-            }
-        }
+                if (group.Key == CardinalDirection.NotFound)
+                {
+                    throw new InvalidOperationException($"Invalid side of the street ({group.Key}) encountered during grouping.");
+                }
+                
+                var firstScheduleInGroup = group.First();
+                
+                var streetId = firstScheduleInGroup.StreetId;
+                var streetSweepingDate = firstScheduleInGroup.StreetSweepingDate;
+                var sideOfStreet = group.Key;
+
+                var day = (int)streetSweepingDate.DayOfWeek;
+                var weekOfMonth = DateUtils.GetWeekOfMonth(streetSweepingDate);
+                var year = streetSweepingDate.Year;
+
+                return new StreetSweepingScheduleResponseDto(day, weekOfMonth, year, streetId, sideOfStreet, group.ToList());
+            })
+            .ToList();
 
         return responseDtos;
     }
-
+    
     public static List<StreetSweepingScheduleDto> ToStreetSweepingScheduleDto(this IEnumerable<StreetSweepingDates> source)
     {
         List<StreetSweepingScheduleDto> dtos = [];
