@@ -162,7 +162,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-md relative p-4">
+  <div class="bg-white rounded-xl shadow-md relative p-4 max-w-3xl mx-auto my-4">
     <button
       @click="handleDeleteReminder"
       :disabled="isDeleting"
@@ -181,8 +181,6 @@ onMounted(() => {
     </div>
     <div class="flex flex-col md:flex-row gap-6 md:gap-8">
       <div class="flex-1">
-        {{}}
-
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Details</h3>
         <div class="space-y-2 text-sm text-gray-600">
           <div><strong>Phone Number:</strong> {{ reminder.phoneNumber }}</div>
@@ -219,6 +217,5 @@ onMounted(() => {
         <div v-else class="text-sm text-gray-500 italic">No schedule data available.</div>
       </div>
     </div>
-    {{}}
   </div>
 </template>

@@ -24,8 +24,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="md:ml-auto">
-    <div class="flex h-20 items-center justify-center">
+  <div class="p-4">
+    <div class="flex h-20 items-center justify-center mb-6">
       <router-link
         to="/createReminder"
         class="text-white bg-blue-600 hover:bg-gray-900 hover:text-white rounded-md px-6 py-2"
@@ -34,13 +34,19 @@ onMounted(() => {
     </div>
   </div>
 
-  <ul class="space-y-4">
-    <li
+  <div class="space-y-4">
+    <ReminderDetails
+      :reminder="r"
+      @deleted="handleReminderDeleted"
       v-for="r in remindersStore.reminders"
       :key="r.id"
-      class="border border-gray-200 bg-white rounded-xl shadow-md overflow-hidden"
+      class="flex-shrink-0"
+    />
+    <div
+      v-if="!remindersStore.reminders || remindersStore.reminders.length === 0"
+      class="text-center text-gray-500 w-full py-8"
     >
-      <ReminderDetails :reminder="r" @deleted="handleReminderDeleted" />
-    </li>
-  </ul>
+      You haven't created any reminders yet.
+    </div>
+  </div>
 </template>
