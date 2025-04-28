@@ -170,7 +170,6 @@ onMounted(() => {
       aria-label="Delete reminder"
     >
       {{ isDeleting ? 'Deleting...' : 'Delete' }}
-      <!-- Show text, change on loading -->
     </button>
 
     <div class="mb-6">
@@ -196,9 +195,23 @@ onMounted(() => {
       <div class="md:w-1/3">
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Your Reminder Schedule</h3>
         <div v-if="reminderScheduleList.length > 0">
-          <ul class="space-y-1 text-sm list-disc list-inside text-gray-600">
-            <li v-for="item in reminderScheduleList" :key="item.id">
-              {{ formatDate(item.nextNotificationDate) }}
+          <ul class="space-y-1 text-sm list-none text-gray-600">
+            <li v-for="item in reminderScheduleList" :key="item.id" class="flex items-start gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4 text-indigo-500 mt-1 flex-shrink-0"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12v-.008ZM12 18h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75v-.008ZM9.75 18h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5v-.008ZM7.5 18h.008v.008H7.5v-.008ZM14.25 15h.008v.008H14.25v-.008ZM14.25 18h.008v.008H14.25v-.008ZM16.5 15h.008v.008H16.5v-.008ZM16.5 18h.008v.008H16.5v-.008Z"
+                />
+              </svg>
+              <span>{{ formatDate(item.nextNotificationDate) }}</span>
             </li>
           </ul>
         </div>
@@ -208,9 +221,27 @@ onMounted(() => {
       <div class="md:w-1/3">
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Full Street Sweeping Schedule</h3>
         <div v-if="streetSweepingScheduleList.length > 0">
-          <ul class="space-y-1 text-sm list-disc list-inside text-gray-600">
-            <li v-for="item in streetSweepingScheduleList" :key="item.id">
-              {{ formatDate(item.streetSweepingDate) }}
+          <ul class="space-y-1 text-sm list-none text-gray-600">
+            <li
+              v-for="item in streetSweepingScheduleList"
+              :key="item.id"
+              class="flex items-start gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4 text-indigo-500 mt-1 flex-shrink-0"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12v-.008ZM12 18h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75v-.008ZM9.75 18h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5v-.008ZM7.5 18h.008v.008H7.5v-.008ZM14.25 15h.008v.008H14.25v-.008ZM14.25 18h.008v.008H14.25v-.008ZM16.5 15h.008v.008H16.5v-.008ZM16.5 18h.008v.008H16.5v-.008Z"
+                />
+              </svg>
+              <span>{{ formatDate(item.streetSweepingDate) }}</span>
             </li>
           </ul>
         </div>
