@@ -12,4 +12,5 @@ public interface IReminderService
     Task<Result> UpdateReminderAsync(UpdateReminderDto command); 
     Task<Result> DeleteReminderAsync(int id);
     //Task<Result> MarkReminderAsSentAsync(int reminderId);
+    Task<Result> CancelIndividualReminderAsync(int id);
 }

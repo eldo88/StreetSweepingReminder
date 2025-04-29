@@ -186,6 +186,32 @@ public class ReminderService : IReminderService
         }
     }
 
+    public async Task<Result> CancelIndividualReminderAsync(int id)
+    {
+        try
+        {
+            var individualReminder = await _reminderScheduleRepository.GetByIdAsync(id);
+            if (individualReminder is null)
+            {
+                return Result.Fail(new NotFoundError("No Reminder found for ID provided."));
+            }
+
+            individualReminder.IsActive = false;
+            var updateResult = await _reminderScheduleRepository.UpdateAsync(individualReminder);
+            if (!updateResult)
+            {
+                return Result.Fail(new ApplicationError("Error occurred updating reminder."));
+            }
+
+            return Result.Ok();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error updating reminder.");
+            return Result.Fail(new ApplicationError($"An unexpected error occurred while updating reminder: {e.Message}"));
+        }
+    }
+
     private async Task<ReminderResponseDto> BuildReminderResponse(Reminder reminder)
     {
         var streetId = reminder.StreetId;
