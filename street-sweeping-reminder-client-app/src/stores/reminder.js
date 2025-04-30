@@ -63,31 +63,20 @@ export const useRemindersStore = defineStore('reminders', {
         throw new Error('Both Reminder ID and Schedule Item ID are required to cancel.')
       }
 
-      // Optional: Set loading state
-      // this.cancellingScheduleItemId = scheduleItemId;
-      // this.cancellationError = null;
-
       try {
-        // The API endpoint seems correct based on your previous code: /Reminder/{scheduleItemId}/cancel
         const response = await api.post(`Reminder/${scheduleItemId}/cancel`)
 
         if (response.status === 200) {
-          // --- STATE UPDATE LOGIC ---
-          // Find the index of the parent reminder
           const reminderIndex = this.reminders.findIndex((r) => r.id === reminderId)
 
           if (reminderIndex !== -1) {
             const reminder = this.reminders[reminderIndex]
-            // Ensure the schedule exists and is an array
             if (reminder.reminderSchedule?.schedule) {
-              // Find the index of the specific schedule item
               const scheduleItemIndex = reminder.reminderSchedule.schedule.findIndex(
                 (item) => item.id === scheduleItemId,
               )
 
               if (scheduleItemIndex !== -1) {
-                // Update the isActive flag directly in the store's state
-                // Vue's reactivity should pick this up if reminderSchedule.schedule is reactive
                 this.reminders[reminderIndex].reminderSchedule.schedule[
                   scheduleItemIndex
                 ].isActive = false
@@ -98,37 +87,26 @@ export const useRemindersStore = defineStore('reminders', {
                 console.warn(
                   `Schedule item with ID ${scheduleItemId} not found within reminder ${reminderId} in the store.`,
                 )
-                // Optional: Fetch reminders again if state might be inconsistent
-                // await this.getReminders();
               }
             } else {
               console.warn(`Reminder ${reminderId} schedule data is missing or invalid in store.`)
             }
           } else {
             console.warn(`Reminder with ID ${reminderId} not found in the store.`)
-            // Optional: Fetch reminders again if state might be inconsistent
-            // await this.getReminders();
           }
-          // --- END STATE UPDATE LOGIC ---
         } else {
-          // Handle non-200 success statuses if necessary
           console.warn(
             `Cancellation request for ${scheduleItemId} returned status ${response.status}`,
           )
-          // Potentially throw an error or handle differently
           throw new Error(`API responded with status ${response.status}`)
         }
       } catch (error) {
         console.error(`Failed to cancel reminder schedule item ${scheduleItemId}:`, error)
-        // this.cancellationError = error; // Store error state if needed
         if (error.response?.status === 401) {
           window.dispatchEvent(new CustomEvent('unauthorized'))
         } else {
-          throw error // Re-throw for the component to catch
+          throw error
         }
-      } finally {
-        // Optional: Clear loading state
-        // this.cancellingScheduleItemId = null;
       }
     },
 

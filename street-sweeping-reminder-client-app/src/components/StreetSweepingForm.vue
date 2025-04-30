@@ -175,33 +175,25 @@ async function handleStreetChange(streetId, label) {
 
     console.log('scheduleData received:', scheduleData)
     if (Array.isArray(scheduleData) && scheduleData.length > 0) {
-      // --- Case: One or More Schedule Patterns Found ---
       console.log(`${scheduleData.length} schedule pattern(s) found.`)
-      loadedSchedules.value = scheduleData // Store the array of patterns
-      finalSelectedSchedule.value = null // Clear any previous final selection
+      loadedSchedules.value = scheduleData
+      finalSelectedSchedule.value = null
       toast.info('Schedule(s) found. Please select one.')
-      emit('update:isReminderFormVisible', false) // Don't show reminder form yet
-      // *** Always open the selection modal ***
+      emit('update:isReminderFormVisible', false)
       isScheduleSelectionModalVisible.value = true
-      modalSelectedScheduleIndex.value = 0 // Default selection to the first item
-      // --- ---
+      modalSelectedScheduleIndex.value = 0
     } else {
-      // --- Case: No Schedules Found (null, undefined, or empty array) ---
       console.log('No existing schedule patterns found for this street.')
-      loadedSchedules.value = [] // Ensure it's empty
+      loadedSchedules.value = []
       finalSelectedSchedule.value = null
       toast.info('No schedule found. Please enter the details.')
       emit('update:isReminderFormVisible', false)
-      // *** Open the "Enter Schedule" modal ***
       isScheduleEntryModalVisible.value = true
       await nextTick()
-      modalFormRef.value?.resetForm()
-      // --- ---
     }
   } catch (error) {
     console.error('Failed to fetch street schedule patterns:', error)
     toast.error('Could not fetch schedule details.')
-    // Reset state on error
     loadedSchedules.value = []
     finalSelectedSchedule.value = null
     isScheduleEntryModalVisible.value = false
@@ -234,29 +226,25 @@ async function onScheduleEntrySubmit(values) {
     )
 
     if (createScheduleResult) {
-      // Assuming it returns truthy on success
       toast.success('Schedule pattern created successfully!')
-      isScheduleEntryModalVisible.value = false // Close entry modal
+      isScheduleEntryModalVisible.value = false
 
-      // --- Refresh and open selection modal ---
       console.log('Refreshing schedule patterns after creation...')
       const newScheduleData = await streetsStore.getSchedule(selectedStreetId.value)
       if (Array.isArray(newScheduleData) && newScheduleData.length > 0) {
         loadedSchedules.value = newScheduleData
-        finalSelectedSchedule.value = null // No final choice yet
-        isScheduleSelectionModalVisible.value = true // Open selection modal
-        modalSelectedScheduleIndex.value = 0 // Default to first
-        emit('update:isReminderFormVisible', false) // Keep reminder hidden
+        finalSelectedSchedule.value = null
+        isScheduleSelectionModalVisible.value = true
+        modalSelectedScheduleIndex.value = 0
+        emit('update:isReminderFormVisible', false)
         toast.info('Schedule created. Please select from available schedules.')
-        emit('scheduleCreated', selectedStreetId.value) // Notify parent of creation
+        emit('scheduleCreated', selectedStreetId.value)
       } else {
-        // Handle case where fetching after create fails or returns empty
         toast.error('Could not retrieve schedules after creation. Please search again.')
         loadedSchedules.value = []
         finalSelectedSchedule.value = null
         emit('update:isReminderFormVisible', false)
       }
-      // --- ---
     } else {
       toast.error('Failed to create Schedule Pattern (API reported failure).')
     }
@@ -280,14 +268,14 @@ function handleScheduleSelectionConfirm() {
   if (loadedSchedules.value && loadedSchedules.value[selectedIndex]) {
     finalSelectedSchedule.value = loadedSchedules.value[selectedIndex]
     console.log('Schedule selected by user:', finalSelectedSchedule.value)
-    isScheduleSelectionModalVisible.value = false // Close this modal
+    isScheduleSelectionModalVisible.value = false
     emit('update:isReminderFormVisible', true)
     emit('sideSelected', finalSelectedSchedule.value.sideOfStreet)
     toast.success('Schedule selected.')
   } else {
     console.error('Error confirming selection: Invalid index or loadedSchedules array.')
     toast.error('Could not select schedule. Please try again.')
-    isScheduleSelectionModalVisible.value = false // Close modal on error too
+    isScheduleSelectionModalVisible.value = false
   }
 }
 
@@ -524,7 +512,6 @@ const handleStreetSearch = _.debounce(async (query) => {
       </Form>
     </el-dialog>
 
-    <!-- *** NEW: "Select Schedule" Modal *** -->
     <el-dialog
       v-model="isScheduleSelectionModalVisible"
       :title="`Select Schedule for ${selectedStreetLabel || 'Selected Street'}`"
@@ -539,21 +526,10 @@ const handleStreetSearch = _.debounce(async (query) => {
         Multiple schedules found for this street. Please select the one you want to use:
       </p>
 
-      <!-- Option 1: Radio Buttons with Flex Layout -->
-      <!-- <el-radio-group v-model="modalSelectedScheduleIndex" class="flex flex-col gap-3">
-            <el-radio v-for="(schedule, index) in loadedSchedules" :key="index" :label="index" border class="w-full !ml-0">
-                Side {{ index + 1 }}: {{ formatScheduleForDisplay(schedule) }}
-                 <!-/- If schedule object has a 'side' property: ->
-                 <!-/- {{ schedule.side || ('Side ' + (index + 1)) }}: {{ formatScheduleForDisplay(schedule) }} ->
-            </el-radio>
-        </el-radio-group> -->
-
-      <!-- Option 2: Table Layout -->
       <el-radio-group v-model="modalSelectedScheduleIndex" class="w-full">
         <el-table :data="loadedSchedules" border-style="width: 100%" highlight-current-row>
           <el-table-column width="55" text-align="center">
             <template #default="scope">
-              <!-- Bind radio value to the row's index -->
               <el-radio
                 :value="scope.$index"
                 size="large"
@@ -564,7 +540,6 @@ const handleStreetSearch = _.debounce(async (query) => {
           </el-table-column>
           <el-table-column prop="side" label="Side/Details">
             <template #default="scope">
-              <!-- Display 'Side' if available, otherwise Side 1/2 -->
               {{ formatSideOfStreetForDisplay(scope.row) || `Side ${scope.$index + 1}` }}
             </template>
           </el-table-column>
@@ -576,7 +551,6 @@ const handleStreetSearch = _.debounce(async (query) => {
         </el-table>
       </el-radio-group>
 
-      <!-- Selection Modal Actions -->
       <div class="flex justify-end gap-2 mt-6">
         <el-button @click="handleNewSchedule">Add New</el-button>
         <el-button @click="handleSelectionModalClose">Cancel</el-button>
@@ -596,16 +570,16 @@ const handleStreetSearch = _.debounce(async (query) => {
 .el-select-invalid .el-input__wrapper {
   box-shadow: 0 0 0 1px theme('colors.red.500') !important;
 }
-/* Ensure dialog content is scrollable if it gets too long on small screens */
+
 :deep(.el-dialog__body) {
   max-height: 70vh;
   overflow-y: auto;
 }
 
 :deep(.el-table .el-radio__label) {
-  display: none; /* Hide default radio label inside table cell */
+  display: none;
 }
-/* Add some padding if needed */
+
 :deep(.el-dialog__body) {
   padding-bottom: 10px;
 }

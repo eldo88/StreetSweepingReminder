@@ -7,15 +7,8 @@ const remindersStore = useRemindersStore()
 
 function handleReminderDeleted(deletedReminderId) {
   console.log(`Parent notified: Reminder ${deletedReminderId} was deleted.`)
-  // The list 'remindersStore.reminders' should update automatically via Pinia reactivity
-  // because the store action modified the state array.
 
-  // You DON'T typically need to manually filter the list here:
-  // remindersStore.reminders = remindersStore.reminders.filter(r => r.id !== deletedReminderId); // AVOID THIS
-
-  // Instead, use this handler for side effects, like showing a success message:
-  // toast.success(`Reminder (ID: ${deletedReminderId}) deleted successfully!`);
-  alert(`Reminder (ID: ${deletedReminderId}) deleted successfully!`) // Simple browser alert
+  alert(`Reminder (ID: ${deletedReminderId}) deleted successfully!`)
 }
 
 onMounted(() => {
