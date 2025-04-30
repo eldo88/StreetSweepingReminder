@@ -12,6 +12,11 @@ const handleUnauthorized = () => {
   showLogin.value = true
 }
 
+const handleSuccessfulLogin = () => {
+  showLogin.value = false
+  window.location.reload()
+}
+
 onMounted(() => {
   window.addEventListener('unauthorized', handleUnauthorized)
 
@@ -36,5 +41,5 @@ watch(
 
 <template>
   <RouterView />
-  <LoginModal :visible="showLogin" @close="showLogin = false" />
+  <LoginModal :visible="showLogin" @close="showLogin = false" @loggedIn="handleSuccessfulLogin" />
 </template>

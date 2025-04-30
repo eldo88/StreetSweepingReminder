@@ -1,9 +1,14 @@
 <script setup>
 import LoginForm from './LoginForm.vue'
 defineProps({ visible: Boolean })
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'loggedIn'])
 
 const close = () => emit('close')
+
+const handleLoginSuccess = () => {
+  emit('loggedIn')
+  close()
+}
 </script>
 
 <template>
@@ -17,8 +22,8 @@ const close = () => emit('close')
       </button>
       <LoginForm
         :redirect-after-login="false"
-        @success="close"
-        :login-form-message="'Please login agian to continue'"
+        @success="handleLoginSuccess"
+        :login-form-message="'Please login againn to continue'"
       />
     </div>
   </div>
