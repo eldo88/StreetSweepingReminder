@@ -196,7 +196,7 @@ public class ReminderService : IReminderService
                 return Result.Fail(new NotFoundError("No Reminder found for ID provided."));
             }
 
-            individualReminder.IsActive = false;
+            ConfigureIndividualReminderForCancellation(individualReminder);
             var updateResult = await _reminderScheduleRepository.UpdateAsync(individualReminder);
             if (!updateResult)
             {
@@ -210,6 +210,12 @@ public class ReminderService : IReminderService
             _logger.LogError(e, "Error updating reminder.");
             return Result.Fail(new ApplicationError($"An unexpected error occurred while updating reminder: {e.Message}"));
         }
+    }
+
+    private static void ConfigureIndividualReminderForCancellation(ReminderSchedule reminderSchedule)
+    {
+        reminderSchedule.IsActive = false;
+        reminderSchedule.ModifiedAt = DateTime.Now;
     }
 
     private async Task<ReminderResponseDto> BuildReminderResponse(Reminder reminder)
