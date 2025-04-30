@@ -10,6 +10,7 @@ public class Street
     public int Id { get; set; } //PK
     
     [Required]
+    [MaxLength(256)]
     public string StreetName { get; set; } = string.Empty;
     
     [Required]

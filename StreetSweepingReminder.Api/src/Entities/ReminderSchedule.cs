@@ -13,6 +13,7 @@ public class ReminderSchedule
     public int ReminderId { get; set; }
     
     [Required]
+    [MaxLength(256)]
     public string Message { get; set; } = string.Empty;
     public DateTime NextNotificationDate { get; set; }
     
@@ -29,9 +30,11 @@ public class ReminderSchedule
     public int EndMonth { get; set; }
     
     [Required]
+    [MaxLength(35)]
     public string TimeOfDay { get; set; } = string.Empty;
     
     [Required]
+    [MaxLength(35)]
     public string TimeZone { get; set; } = string.Empty;
     public bool IsRecurring { get; set; }
     public bool IsActive { get; set; }

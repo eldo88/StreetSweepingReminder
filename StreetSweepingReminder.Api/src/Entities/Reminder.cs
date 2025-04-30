@@ -11,15 +11,19 @@ public class Reminder
     public int Id { get; set; } //PK
     
     [Required]
+    [MaxLength(450)]
     public string UserId { get; set; } = string.Empty; // FK to User
     
     [Required]
+    [MaxLength(256)]
     public string Title { get; set; } = string.Empty;
     
     [Required]
-    public string Status { get; set; } = string.Empty; // make this into static string
+    public string Status { get; set; } = string.Empty; // make this into enum
     
     [Required]
+    [MaxLength(35)]
+    [Phone]
     public string PhoneNumber { get; set; } = string.Empty;
     
     [Required]
