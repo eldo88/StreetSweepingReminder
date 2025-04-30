@@ -23,7 +23,7 @@ const handleLoginSuccess = () => {
       <LoginForm
         :redirect-after-login="false"
         @success="handleLoginSuccess"
-        :login-form-message="'Please login againn to continue'"
+        :login-form-message="'Please login again to continue'"
       />
     </div>
   </div>
