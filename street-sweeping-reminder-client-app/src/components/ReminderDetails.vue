@@ -3,6 +3,7 @@ import { computed, ref, onMounted, defineEmits } from 'vue'
 import { useStreetsStore } from '@/stores/streets'
 import { useRemindersStore } from '@/stores/reminder'
 import { formatDate } from '@/utils/dateUtils.js'
+import { getDayOfWeek, getSideOfStreet } from '@/utils/streetUtils.js'
 
 const props = defineProps({
   reminder: {
@@ -139,36 +140,12 @@ const reminderScheduleList = computed(() => {
 
 const dayOfWeek = computed(() => {
   const day = props.reminder.streetSweepingSchedule?.dayOfWeek
-  if (day === 0) {
-    return 'Sunday'
-  } else if (day === 1) {
-    return 'Monday'
-  } else if (day === 2) {
-    return 'Tuesday'
-  } else if (day === 3) {
-    return 'Wednesday'
-  } else if (day === 4) {
-    return 'Thursday'
-  } else if (day === 5) {
-    return 'Friday'
-  } else if (day === 6) {
-    return 'Saturday'
-  }
-  return 'Unknown Day'
+  return getDayOfWeek(day)
 })
 
 const sideOfStreet = computed(() => {
   let side = props.reminder.streetSweepingSchedule?.sideOfStreet
-  if (side === 0) {
-    return 'North'
-  } else if (side === 1) {
-    return 'South'
-  } else if (side === 2) {
-    return 'East'
-  } else if (side === 3) {
-    return 'West'
-  }
-  return 'Unknown Side'
+  return getSideOfStreet(side)
 })
 
 async function handleCancelIndividualReminder(reminderId, scheduleItemId) {
