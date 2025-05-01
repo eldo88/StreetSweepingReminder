@@ -12,6 +12,9 @@ import apiPlugin from './plugins/apiPlugin'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 
+import VCalendar from 'v-calendar'
+import 'v-calendar/style.css'
+
 const app = createApp(App)
 
 app.use(Toast, {
@@ -28,5 +31,6 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(router)
 app.use(apiPlugin)
+app.use(VCalendar, {})
 
 app.mount('#app')
