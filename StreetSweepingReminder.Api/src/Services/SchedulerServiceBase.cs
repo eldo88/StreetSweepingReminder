@@ -88,11 +88,10 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
             TEntity scheduleEntity;
             try
             {
-                // 1. Map core properties first
                 scheduleEntity = MapToEntity(command, parentId);
-                // 2. Set the specific date property
+
                 SetScheduleDateOnEntity(scheduleEntity, scheduleDate);
-                // 3. Allow customization (e.g., set IsActive)
+
                 CustomizeEntityBeforeSave(scheduleEntity, command);
             }
             catch (Exception e)
@@ -101,7 +100,6 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
                 return Result.Fail(new ApplicationError($"Failed to prepare schedule information for date {scheduleDate:yyyy-MM-dd}.").CausedBy(e));
             }
 
-            // 4. Save the fully prepared entity
             var saveResult = await SaveScheduleItemAsync(scheduleEntity);
             if (saveResult.IsFailed)
             {
@@ -112,8 +110,6 @@ public abstract class SchedulerServiceBase<TCommand, TEntity, TRepository, TPare
         _logger.LogInformation("Successfully created {Count} schedule items for ParentId: {ParentId}", scheduleDates.Count, parentId);
         return Result.Ok();
     }
-
-    // --- Common Save Logic ---
 
     private async Task<Result> SaveScheduleItemAsync(TEntity entity)
     {
