@@ -2,18 +2,34 @@
 import logo from '@/assets/logo.svg'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
 
 const auth = useAuthStore()
 const router = useRouter()
+const isDark = ref(false)
 
 function handleLogout() {
   auth.logout()
   router.push('/')
 }
+
+function toggleDarkMode() {
+  isDark.value = !isDark.value
+  document.documentElement.classList.toggle('dark')
+  localStorage.setItem('darkMode', isDark.value)
+}
+
+onMounted(() => {
+  const darkMode = localStorage.getItem('darkMode')
+  isDark.value = darkMode === 'true'
+  if (isDark.value) {
+    document.documentElement.classList.add('dark')
+  }
+})
 </script>
 
 <template>
-  <nav class="bg-green-700 border-b border-green-500">
+  <nav class="bg-green-700 dark:bg-gray-800 border-b border-green-500">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
       <div class="flex h-20 items-center justify-between">
         <div class="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
@@ -25,22 +41,29 @@ function handleLogout() {
             </span>
           </RouterLink>
           <div class="md:ml-auto">
-            <div class="flex space-x-2">
+            <div class="flex space-x-2 items-center">
+              <button
+                @click="toggleDarkMode"
+                class="text-white bg-green-900 dark:bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+              >
+                <span v-if="isDark">☀️</span>
+                <span v-else>🌙</span>
+              </button>
               <router-link
                 to="/home"
-                class="text-white bg-green-900 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+                class="text-white bg-green-900 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 hover:text-white rounded-md px-3 py-2"
                 >Home</router-link
               >
               <router-link
                 to="/reminders"
-                class="text-white bg-green-900 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+                class="text-white bg-green-900 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 hover:text-white rounded-md px-3 py-2"
                 >Manage Reminders</router-link
               >
 
               <router-link
                 to="#"
                 @click.prevent="handleLogout"
-                class="text-white bg-green-900 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+                class="text-white bg-green-900 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 hover:text-white rounded-md px-3 py-2"
               >
                 Logout
               </router-link>
