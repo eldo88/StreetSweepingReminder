@@ -32,8 +32,8 @@ const router = createRouter({
       component: RegisterPageView,
     },
     {
-      path: '/main',
-      name: 'main',
+      path: '/home',
+      name: 'home',
       component: MainView,
       meta: { requiresAuth: true },
     },

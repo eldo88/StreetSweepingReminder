@@ -24,7 +24,7 @@ const handleRegister = async (values) => {
   try {
     await store.register(values)
     console.log('Registered and signed in!')
-    await router.push('/main')
+    await router.push('/home')
   } catch (error) {
     console.error('Registration failed', error)
     toast.error('Registration failed. Please check your credentials.' + error.message)

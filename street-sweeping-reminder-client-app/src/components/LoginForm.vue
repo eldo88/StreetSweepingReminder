@@ -38,7 +38,7 @@ const handleSignIn = () => {
     .then(async (response) => {
       console.log('Sign-in successful', response)
       if (props.redirectAfterLogin) {
-        await router.push('/main')
+        await router.push('/home')
       } else {
         emit('success') // Let modal parent decide what to do
       }
