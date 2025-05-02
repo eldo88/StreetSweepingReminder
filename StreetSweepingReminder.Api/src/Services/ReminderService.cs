@@ -69,6 +69,10 @@ public class ReminderService : IReminderService
 
     public async Task<Result<ReminderResponseDto>> GetReminderByIdAsync(int id)
     {
+        if (id <= 0)
+        {
+            return Result.Fail<ReminderResponseDto>(new ValidationError("Invalid ID, must be greater than 0."));
+        }
         try
         {
             var reminder = await _reminderRepository.GetByIdAsync(id);
@@ -157,6 +161,10 @@ public class ReminderService : IReminderService
 
     public async Task<Result> DeleteReminderAsync(int id)
     {
+        if (id <= 0)
+        {
+            return Result.Fail(new ValidationError("Invalid ID, must be greater than 0."));
+        }
         try
         {
             var reminderToDelete = await _reminderRepository.GetByIdAsync(id);
@@ -188,6 +196,10 @@ public class ReminderService : IReminderService
 
     public async Task<Result> CancelIndividualReminderAsync(int id)
     {
+        if (id <= 0)
+        {
+            return Result.Fail(new ValidationError("Invalid ID, must be greater than 0."));
+        }
         try
         {
             var individualReminder = await _reminderScheduleRepository.GetByIdAsync(id);
