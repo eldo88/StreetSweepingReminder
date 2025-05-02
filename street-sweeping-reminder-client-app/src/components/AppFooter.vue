@@ -21,7 +21,9 @@ const currentYear = new Date().getFullYear()
             Denver Street Sweeping Info
           </a>
           <span class="text-green-400">|</span>
-          <a href="#" class="text-white hover:text-green-200">Privacy Policy</a>
+          <router-link to="/privacy-policy" class="text-white hover:text-green-200">
+            Privacy Policy
+          </router-link>
           <span class="text-green-400">|</span>
           <a href="#" class="text-white hover:text-green-200">Terms of Service</a>
         </div>

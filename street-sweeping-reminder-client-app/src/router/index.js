@@ -6,6 +6,7 @@ import LoginPageView from '@/views/LoginPageView.vue'
 import LandingPageView from '@/views/LandingPageView.vue'
 import ReminderPageView from '@/views/ReminderPageView.vue'
 import CreateReminderView from '@/views/CreateReminderView.vue'
+import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -46,6 +47,14 @@ const router = createRouter({
       name: 'createReminder',
       component: CreateReminderView,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/privacy-policy',
+      name: 'privacy-policy',
+      component: PrivacyPolicyView,
+      meta: {
+        requiresAuth: false,
+      },
     },
   ],
 })
