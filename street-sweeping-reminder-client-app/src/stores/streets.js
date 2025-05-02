@@ -5,6 +5,7 @@ export const useStreetsStore = defineStore('streets', {
   state: () => ({
     streets: [],
     isLoading: false,
+    cachedStreets: {},
   }),
 
   actions: {
@@ -70,18 +71,24 @@ export const useStreetsStore = defineStore('streets', {
 
     async getStreet(id) {
       if (!id) {
+        console.warn('getStreet called with invalid ID:', id)
         return null
+      }
+      const key = String(id)
+      if (this.cachedStreets[key] !== undefined) {
+        return this.cachedStreets[key]
       }
       try {
         const response = await api.get(`Street/${id}`)
         if (response.data) {
-          this.streetId = id
+          this.cachedStreets[key] = response.data
           return response.data
         } else {
+          console.warn(`No data returned for street ID: ${key}`)
           return null
         }
       } catch (error) {
-        console.error('Failed to get street' + error)
+        console.error(`Failed to get street ${key}:`, error)
         return null
       }
     },
@@ -92,5 +99,7 @@ export const useStreetsStore = defineStore('streets', {
     },
   },
 
-  persist: true,
+  persist: {
+    paths: ['streets', 'isLoading'],
+  },
 })
