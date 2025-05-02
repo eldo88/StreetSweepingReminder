@@ -13,6 +13,12 @@ const isLoading = ref(true)
 const error = ref(null)
 const calendarAttributes = ref([])
 
+const today = new Date()
+const initialCalendarPage = {
+  month: today.getMonth() + 1,
+  year: today.getFullYear(),
+}
+
 onMounted(async () => {
   displayName.value = authStore.getEmail
 
@@ -56,19 +62,15 @@ onMounted(async () => {
     <div v-else-if="error" class="text-center text-red-500">
       {{ error }}
     </div>
-    <!-- V-Calendar Component -->
     <div v-else-if="calendarAttributes.length > 0">
       <v-calendar
         :attributes="calendarAttributes"
+        :initial-page="initialCalendarPage"
         is-expanded
         :rows="1"
         title-position="left"
         class="border rounded-md shadow-md"
       />
-      <!-- You can customize appearance further:
-          :rows="2" for 2 months
-          :is-dark="true" for dark mode
-          etc. Check v-calendar docs -->
     </div>
     <div v-else class="text-center text-gray-500">
       No upcoming street sweeping reminders found.
