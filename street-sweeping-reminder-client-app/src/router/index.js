@@ -7,6 +7,7 @@ import LandingPageView from '@/views/LandingPageView.vue'
 import ReminderPageView from '@/views/ReminderPageView.vue'
 import CreateReminderView from '@/views/CreateReminderView.vue'
 import PrivacyPolicyView from '@/views/PrivacyPolicyView.vue'
+import TermsOfServiceView from '@/views/TermsOfServiceView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -52,6 +53,14 @@ const router = createRouter({
       path: '/privacy-policy',
       name: 'privacy-policy',
       component: PrivacyPolicyView,
+      meta: {
+        requiresAuth: false,
+      },
+    },
+    {
+      path: '/terms-of-service',
+      name: 'terms-of-service',
+      component: TermsOfServiceView,
       meta: {
         requiresAuth: false,
       },
