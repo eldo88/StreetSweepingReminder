@@ -5,6 +5,7 @@ export default {
     './src/**/*.{vue,js,ts,jsx,tsx}',
     './node_modules/radix-vue/**/*.{vue,js,ts}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
