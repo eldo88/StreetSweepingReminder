@@ -1,5 +1,4 @@
 <script setup>
-import NavBar from './NavBar.vue'
 import HeroSection from './HeroSection.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRemindersStore } from '@/stores/reminder'
@@ -35,7 +34,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <NavBar />
   <HeroSection :subtitle="displayName" />
 
   <div class="md:ml-auto">
@@ -44,7 +42,7 @@ onMounted(async () => {
         to="/reminders"
         class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2"
       >
-        Reminders
+        Manage Reminders
       </router-link>
       <router-link
         to="/createReminder"
@@ -62,7 +60,7 @@ onMounted(async () => {
     <div v-else-if="error" class="text-center text-red-500">
       {{ error }}
     </div>
-    <div v-else-if="calendarAttributes.length > 0">
+    <div v-else-if="calendarAttributes.length > 0" class="flex justify-center items-center h-full">
       <v-calendar
         :attributes="calendarAttributes"
         :initial-page="initialCalendarPage"

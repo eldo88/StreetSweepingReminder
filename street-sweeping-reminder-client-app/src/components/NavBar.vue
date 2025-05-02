@@ -34,7 +34,7 @@ function handleLogout() {
               <router-link
                 to="/reminders"
                 class="text-white bg-green-900 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                >Reminders</router-link
+                >Manage Reminders</router-link
               >
 
               <router-link
