@@ -1,12 +1,26 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import LoginModal from '@/components/LoginModal.vue'
 import { useAuthStore } from '@/stores/auth'
 import { setGlobalTimeout } from '@/utils/globalTimeout'
+import { useRoute } from 'vue-router'
+import AppFooter from '@/components/AppFooter.vue'
+import NavBar from '@/components/NavBar.vue'
 
 const showLogin = ref(false)
 const authStore = useAuthStore()
+const route = useRoute()
+
+const showNavBar = computed(() => {
+  const publicRoutes = ['welcome', 'login', 'register']
+  return !publicRoutes.includes(route.name)
+})
+
+const showFooter = computed(() => {
+  const publicRoutes = ['welcome', 'login', 'register']
+  return !publicRoutes.includes(route.name)
+})
 
 const handleUnauthorized = () => {
   showLogin.value = true
@@ -40,6 +54,15 @@ watch(
 </script>
 
 <template>
-  <RouterView />
-  <LoginModal :visible="showLogin" @close="showLogin = false" @loggedIn="handleSuccessfulLogin" />
+  <div class="flex flex-col min-h-screen">
+    <NavBar v-if="showNavBar" />
+
+    <main class="flex-grow">
+      <RouterView />
+    </main>
+
+    <AppFooter v-if="showFooter" />
+
+    <LoginModal :visible="showLogin" @close="showLogin = false" @loggedIn="handleSuccessfulLogin" />
+  </div>
 </template>
