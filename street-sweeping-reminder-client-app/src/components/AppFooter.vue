@@ -25,7 +25,9 @@ const currentYear = new Date().getFullYear()
             Privacy Policy
           </router-link>
           <span class="text-green-400">|</span>
-          <a href="#" class="text-white hover:text-green-200">Terms of Service</a>
+          <router-link to="/terms-of-service" class="text-white hover:text-green-200">
+            Terms of Service
+          </router-link>
         </div>
       </div>
     </div>
