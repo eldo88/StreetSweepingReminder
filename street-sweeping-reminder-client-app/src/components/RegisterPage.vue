@@ -33,18 +33,23 @@ const handleRegister = async (values) => {
 </script>
 
 <template>
-  <section class="bg-blue-50 py-10">
+  <section class="bg-blue-50 py-10 dark:bg-gray-800">
     <div
       class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
     >
       <!-- Form Container -->
-      <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Create Account</h2>
+      <div class="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+        <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-300 mb-6">
+          Create Account
+        </h2>
 
         <Form @submit="handleRegister" :validation-schema="schema">
           <!-- Email Field -->
           <div class="mb-4">
-            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">
+            <label
+              for="email"
+              class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+            >
               Email Address <span class="text-red-500">*</span>
             </label>
             <Field
@@ -54,14 +59,17 @@ const handleRegister = async (values) => {
               name="email"
               placeholder="Enter your email"
               required
-              class="input-field"
+              class="input-field dark:bg-gray-800 dark:text-gray-600"
             />
             <ErrorMessage name="email" class="text-red-500 text-xs mt-1" />
           </div>
 
           <!-- Password Field -->
           <div class="mb-6">
-            <label for="password" class="block text-gray-700 text-sm font-bold mb-2">
+            <label
+              for="password"
+              class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+            >
               Password <span class="text-red-500">*</span>
             </label>
             <Field
@@ -71,7 +79,7 @@ const handleRegister = async (values) => {
               name="password"
               placeholder="Enter your password"
               required
-              class="input-field"
+              class="input-field dark:bg-gray-800 dark:text-gray-600"
             />
             <ErrorMessage name="password" class="text-red-500 text-xs mt-1" />
           </div>
@@ -80,7 +88,7 @@ const handleRegister = async (values) => {
           <div class="flex flex-col gap-3">
             <button
               type="submit"
-              class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+              class="w-full bg-green-700 hover:bg-green-600 dark:bg-gray-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
             >
               Register
             </button>
