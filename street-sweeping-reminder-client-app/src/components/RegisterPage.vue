@@ -88,7 +88,7 @@ const handleRegister = async (values) => {
           <div class="flex flex-col gap-3">
             <button
               type="submit"
-              class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+              class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
             >
               Register
             </button>
