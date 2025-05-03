@@ -159,7 +159,7 @@ async function onSubmit(values) {
 
           <!-- Is Recurring Toggle Switch -->
           <div class="mb-6">
-            <label for="isRecurring" class="flex items-center cursor-pointer">
+            <label for="isRecurring" class="flex items-center">
               <Field name="isRecurring" type="checkbox" v-slot="{ field }">
                 <input
                   type="checkbox"
@@ -170,7 +170,7 @@ async function onSubmit(values) {
                   id="isRecurring"
                 />
                 <div
-                  class="w-11 h-6 bg-gray-300 peer-checked:bg-green-500 rounded-full relative transition-colors duration-300"
+                  class="w-11 h-6 bg-gray-300 peer-checked:bg-green-500 rounded-full relative transition-colors duration-300 cursor-pointer"
                 >
                   <div
                     class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-full"
