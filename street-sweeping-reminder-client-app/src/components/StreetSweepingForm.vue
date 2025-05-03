@@ -315,15 +315,17 @@ const handleStreetSearch = _.debounce(async (query) => {
 </script>
 
 <template>
-  <section class="bg-blue-50 py-10">
+  <section class="bg-blue-50 py-10 dark:bg-gray-900">
     <div
       class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
     >
-      <div class="bg-white shadow-md rounded-lg px-4 sm:px-8 pt-6 pb-8 mb-4">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Search for your street</h2>
+      <div class="bg-white shadow-md rounded-lg px-4 sm:px-8 pt-6 pb-8 mb-4 dark:bg-gray-800">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6 dark:text-gray-200">
+          Search for your street
+        </h2>
 
         <div class="mb-4">
-          <label for="street" class="block text-gray-700 text-sm font-bold mb-2">
+          <label for="street" class="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200">
             Street Name <span class="text-red-500">*</span>
           </label>
           <el-select
@@ -341,7 +343,6 @@ const handleStreetSearch = _.debounce(async (query) => {
             :loading="isSearchLoading"
             clearable
             @clear="handleStreetChange(null, null)"
-            class="w-full"
             id="street"
             value-key="value"
           >
@@ -382,7 +383,7 @@ const handleStreetSearch = _.debounce(async (query) => {
           v-if="selectedStreetId && !isScheduleLoading && isScheduleSelectionModalVisible"
           class="mt-6 p-4 border rounded bg-blue-50 border-blue-200"
         >
-          <p class="text-center text-gray-700">
+          <p class="text-center text-gray-700 dark:text-gray-200">
             Multiple schedules found. Please make a selection in the dialog.
           </p>
         </div>
@@ -398,13 +399,17 @@ const handleStreetSearch = _.debounce(async (query) => {
       :close-on-click-modal="false"
       append-to-body
       top="5vh"
+      class="dark:bg-gray-800"
     >
-      <p class="text-sm text-gray-600 mb-4">
+      <p class="text-sm text-gray-600 mb-4 dark:text-gray-200">
         No existing schedule was found for this street. Please provide the details below.
       </p>
       <Form ref="modalFormRef" @submit="onScheduleEntrySubmit" :validation-schema="scheduleSchema">
         <div class="mb-4">
-          <label for="modalWeekOfMonth" class="block text-gray-700 text-sm font-bold mb-2">
+          <label
+            for="modalWeekOfMonth"
+            class="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200"
+          >
             Week of Month <span class="text-red-500">*</span>
           </label>
           <Field name="weekOfMonth" v-slot="{ field, errors }">
@@ -429,7 +434,10 @@ const handleStreetSearch = _.debounce(async (query) => {
         </div>
 
         <div class="mb-4">
-          <label for="modalDayOfWeek" class="block text-gray-700 text-sm font-bold mb-2">
+          <label
+            for="modalDayOfWeek"
+            class="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200"
+          >
             Day of Week <span class="text-red-500">*</span>
           </label>
           <Field name="dayOfWeek" v-slot="{ field, errors }">
@@ -454,7 +462,10 @@ const handleStreetSearch = _.debounce(async (query) => {
         </div>
 
         <div class="mb-4">
-          <label for="modalYear" class="block text-gray-700 text-sm font-bold mb-2">
+          <label
+            for="modalYear"
+            class="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200"
+          >
             Year <span class="text-red-500">*</span>
           </label>
           <Field name="year" v-slot="{ field, errors }">
@@ -479,7 +490,10 @@ const handleStreetSearch = _.debounce(async (query) => {
         </div>
 
         <div class="mb-4">
-          <label for="modalSide" class="block text-gray-700 text-sm font-bold mb-2">
+          <label
+            for="modalSide"
+            class="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200"
+          >
             Side <span class="text-red-500">*</span>
           </label>
           <Field name="sideOfStreet" v-slot="{ field, errors }">
@@ -521,6 +535,7 @@ const handleStreetSearch = _.debounce(async (query) => {
       :close-on-click-modal="false"
       append-to-body
       top="5vh"
+      class="dark:bg-gray-800"
     >
       <p class="text-sm text-gray-600 mb-4">
         Multiple schedules found for this street. Please select the one you want to use:
@@ -582,5 +597,45 @@ const handleStreetSearch = _.debounce(async (query) => {
 
 :deep(.el-dialog__body) {
   padding-bottom: 10px;
+}
+
+:deep(.el-dialog) {
+  --el-bg-color: #1f2937 !important;
+  --el-text-color-primary: #e5e7eb !important;
+}
+
+:deep(.el-table) {
+  --el-bg-color: #1f2937 !important;
+  --el-bg-color-overlay: #374151 !important;
+  --el-text-color-primary: #e5e7eb !important;
+  --el-border-color: #4b5563 !important;
+}
+
+:deep(.el-table__header) {
+  background-color: #374151 !important;
+}
+
+:deep(.el-table__cell) {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+:deep(.el-table__row:hover > td.el-table__cell) {
+  background-color: #374151 !important;
+}
+
+:deep(.el-radio__input.is-checked .el-radio__inner) {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+}
+
+:deep(.el-dialog__title) {
+  color: #e5e7eb !important;
+}
+
+:deep(.el-table--border),
+:deep(.el-table--border th),
+:deep(.el-table--border td) {
+  border-color: #4b5563 !important;
 }
 </style>

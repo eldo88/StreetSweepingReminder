@@ -53,7 +53,7 @@ onMounted(async () => {
     </div>
   </div>
 
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto px-4 py-8 dark:text-gray-200">
     <h2 class="text-2xl font-semibold mb-4 text-center">Upcoming Street Sweeping And Reminders</h2>
 
     <div v-if="isLoading" class="text-center text-gray-500">Loading calendar...</div>
@@ -67,6 +67,7 @@ onMounted(async () => {
         is-expanded
         :rows="1"
         title-position="left"
+        :is-dark="true"
         class="border rounded-md shadow-md"
       />
     </div>

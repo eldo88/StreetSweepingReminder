@@ -165,7 +165,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-md relative p-4 max-w-3xl mx-auto my-4">
+  <div
+    class="bg-white rounded-xl shadow-md relative p-4 max-w-3xl mx-auto my-4 dark:bg-gray-800 dark:border dark:border-green-500"
+  >
     <button
       @click="handleDeleteReminder"
       :disabled="isDeleting"
@@ -176,7 +178,7 @@ onMounted(() => {
     </button>
 
     <div class="mb-6">
-      <h1 class="text-xl font-semibold text-gray-800 my-2">
+      <h1 class="text-xl font-semibold text-gray-800 my-2 dark:text-gray-200">
         {{ reminder.title || 'Street Reminder' }}
       </h1>
       <div class="border-t border-gray-300 mb-5"></div>
@@ -184,7 +186,7 @@ onMounted(() => {
     <div class="flex flex-col md:flex-row gap-6 md:gap-8">
       <div class="flex-1">
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Details</h3>
-        <div class="space-y-2 text-sm text-gray-600">
+        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-200">
           <div><strong>Phone Number:</strong> {{ reminder.phoneNumber }}</div>
           <div><strong>Next Reminder:</strong> {{ nextReminderDate }}</div>
           <div><strong>Next Sweeping:</strong> {{ nextStreetSweepingDateComputed }}</div>
@@ -198,7 +200,7 @@ onMounted(() => {
       <div class="md:w-1/3">
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Your Reminder Schedule</h3>
         <div v-if="reminderScheduleList.length > 0">
-          <ul class="space-y-1 text-sm list-none text-gray-600">
+          <ul class="space-y-1 text-sm list-none text-gray-600 dark:text-gray-200">
             <li
               v-for="item in reminderScheduleList"
               :key="item.id"
@@ -229,7 +231,7 @@ onMounted(() => {
               <button
                 @click="handleCancelIndividualReminder(props.reminder.id, item.id)"
                 type="button"
-                class="ml-auto px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-1 transition-colors duration-150 ease-in-out flex-shrink-0"
+                class="ml-auto px-2 py-0.5 bg-gray-100 dark:bg-gray-400 dark:text-black dark:border dark:hover:border-red-500 dark: text-gray-700 text-xs font-medium rounded hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-1 transition-colors duration-150 ease-in-out flex-shrink-0"
                 :aria-label="`Cancel reminder for ${formatDate(item.nextNotificationDate)}`"
                 :disabled="!item.isActive"
               >
@@ -244,7 +246,7 @@ onMounted(() => {
       <div class="md:w-1/3">
         <h3 class="text-lg font-medium text-indigo-600 mb-3">Full Street Sweeping Schedule</h3>
         <div v-if="streetSweepingScheduleList.length > 0">
-          <ul class="space-y-1 text-sm list-none text-gray-600">
+          <ul class="space-y-1 text-sm list-none text-gray-600 dark:text-gray-200">
             <li
               v-for="item in streetSweepingScheduleList"
               :key="item.id"

@@ -3,11 +3,11 @@ const lastUpdated = '2024-05-02'
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-8">
-    <p class="text-sm text-gray-500 mb-4">Last Updated: {{ lastUpdated }}</p>
-    <h1 class="text-3xl font-bold mb-6">Terms of Service</h1>
+  <div class="max-w-4xl mx-auto px-4 py-8 dark:text-gray-200">
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Last Updated: {{ lastUpdated }}</p>
+    <h1 class="text-3xl font-bold mb-6 dark:text-gray-200">Terms of Service</h1>
 
-    <div class="prose prose-lg">
+    <div class="prose prose-lg dark:prose-invert">
       <section class="mb-8">
         <h2 class="text-2xl font-semibold mb-4">Agreement to Terms</h2>
         <p class="mb-4">
@@ -67,7 +67,10 @@ const lastUpdated = '2024-05-02'
         <h2 class="text-2xl font-semibold mb-4">Contact</h2>
         <p class="mb-4">
           For questions about these terms, please contact us at:
-          <a href="mailto:support@yourapp.com" class="text-blue-600 hover:underline">
+          <a
+            href="mailto:support@yourapp.com"
+            class="text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+          >
             support@yourapp.com
           </a>
         </p>

@@ -27,7 +27,7 @@ onMounted(() => {
     </div>
   </div>
 
-  <div class="space-y-4">
+  <div class="space-y-4 mb-4">
     <ReminderDetails
       :reminder="r"
       @deleted="handleReminderDeleted"
