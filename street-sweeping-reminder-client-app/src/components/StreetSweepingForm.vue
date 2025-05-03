@@ -519,7 +519,12 @@ const handleStreetSearch = _.debounce(async (query) => {
 
         <div class="flex justify-end gap-2 mt-6">
           <el-button @click="handleModalClose" :disabled="isScheduleLoading">Cancel</el-button>
-          <el-button type="primary" native-type="submit" :loading="isScheduleLoading">
+          <el-button
+            type="primary"
+            native-type="submit"
+            :loading="isScheduleLoading"
+            class="dark:bg-purple-900"
+          >
             {{ isScheduleLoading ? 'Saving...' : 'Save Schedule' }}
           </el-button>
         </div>
@@ -573,6 +578,7 @@ const handleStreetSearch = _.debounce(async (query) => {
           type="primary"
           @click="handleScheduleSelectionConfirm"
           :disabled="modalSelectedScheduleIndex === null"
+          class="dark:bg-purple-900"
         >
           Confirm Selection
         </el-button>
