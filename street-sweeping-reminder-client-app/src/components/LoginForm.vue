@@ -77,7 +77,7 @@ const handleSignIn = () => {
               name="email"
               placeholder="Enter your email"
               required
-              class="input-field dark:bg-gray-800 dark:text-gray-600"
+              class="input-field"
             />
             <ErrorMessage name="email" class="text-red-500 text-xs mt-1" />
           </div>
@@ -97,7 +97,7 @@ const handleSignIn = () => {
               name="password"
               placeholder="Enter your password"
               required
-              class="input-field dark:bg-gray-800 dark:text-gray-600"
+              class="input-field"
             />
             <ErrorMessage name="password" class="text-red-500 text-xs mt-1" />
           </div>
@@ -119,6 +119,9 @@ const handleSignIn = () => {
 
 <style scoped lang="postcss">
 .input-field {
-  @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500;
+  @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight
+  focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500
+  dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200
+    dark:focus:border-green-500 dark:placeholder-gray-400;
 }
 </style>
