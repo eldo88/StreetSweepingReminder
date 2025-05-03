@@ -33,12 +33,12 @@ const handleRegister = async (values) => {
 </script>
 
 <template>
-  <section class="bg-blue-50 py-10 dark:bg-gray-800">
+  <section class="bg-blue-50 py-10 dark:bg-gray-900">
     <div
       class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
     >
       <!-- Form Container -->
-      <div class="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+      <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-300 mb-6">
           Create Account
         </h2>
@@ -88,7 +88,7 @@ const handleRegister = async (values) => {
           <div class="flex flex-col gap-3">
             <button
               type="submit"
-              class="w-full bg-green-700 hover:bg-green-600 dark:bg-gray-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+              class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
             >
               Register
             </button>
