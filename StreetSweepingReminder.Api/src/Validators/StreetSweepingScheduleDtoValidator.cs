@@ -3,9 +3,9 @@ using StreetSweepingReminder.Api.DTOs;
 
 namespace StreetSweepingReminder.Api.Validators;
 
-public class StreetSweepingScheduleResponseDtoValidator : AbstractValidator<StreetSweepingScheduleDto>
+public class StreetSweepingScheduleDtoValidator : AbstractValidator<StreetSweepingScheduleDto>
 {
-    public StreetSweepingScheduleResponseDtoValidator()
+    public StreetSweepingScheduleDtoValidator()
     {
         RuleFor(x => x.Id)
             .GreaterThan(0).WithMessage("{PropertyName} is invalid.");
@@ -15,10 +15,14 @@ public class StreetSweepingScheduleResponseDtoValidator : AbstractValidator<Stre
 
         RuleFor(x => x.StreetSweepingDate)
             .NotEmpty().WithMessage("{PropertyName} is invalid.");
+
+        RuleFor(x => x.SideOfStreet)
+            .NotEmpty().WithMessage("{PropertyName} is invalid.");
     }
 
-    private static bool DayOfWeekIsValid(StreetSweepingScheduleDto ctx, DayOfWeek dayOfWeekToValidate)
+    //move to appropriate validator once created
+    /*private static bool DayOfWeekIsValid(StreetSweepingScheduleDto ctx, DayOfWeek dayOfWeekToValidate)
     {
         return ctx.StreetSweepingDate.DayOfWeek == dayOfWeekToValidate;
-    }
+    }*/
 }
