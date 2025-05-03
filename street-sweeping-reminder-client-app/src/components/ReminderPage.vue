@@ -21,7 +21,7 @@ onMounted(() => {
     <div class="flex h-20 items-center justify-center mb-6">
       <router-link
         to="/createReminder"
-        class="text-white bg-blue-600 hover:bg-gray-900 hover:text-white rounded-md px-6 py-2"
+        class="text-white bg-blue-600 hover:bg-gray-900 hover:text-white rounded-md px-6 py-2 dark:bg-purple-900"
         >Create New Reminder</router-link
       >
     </div>

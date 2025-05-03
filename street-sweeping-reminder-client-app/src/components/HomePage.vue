@@ -40,13 +40,13 @@ onMounted(async () => {
     <div class="flex h-20 items-center justify-center gap-4 flex-wrap">
       <router-link
         to="/reminders"
-        class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2"
+        class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2 dark:bg-purple-900"
       >
         Manage Reminders
       </router-link>
       <router-link
         to="/createReminder"
-        class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2"
+        class="text-white bg-blue-600 hover:bg-gray-900 rounded-md px-6 py-2 dark:bg-purple-900"
       >
         Create New Reminder
       </router-link>

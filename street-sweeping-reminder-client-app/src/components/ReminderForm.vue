@@ -186,7 +186,7 @@ async function onSubmit(values) {
           <div class="flex flex-col gap-3">
             <button
               type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out dark:bg-purple-900"
             >
               Save Reminder
             </button>
