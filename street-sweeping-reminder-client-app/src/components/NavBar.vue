@@ -6,7 +6,9 @@ import { ref, onMounted } from 'vue'
 
 const auth = useAuthStore()
 const router = useRouter()
-const isDark = ref(true)
+const isDark = ref(
+  localStorage.getItem('darkMode') === null ? true : localStorage.getItem('darkMode') === 'true',
+)
 
 function handleLogout() {
   auth.logout()
@@ -20,11 +22,13 @@ function toggleDarkMode() {
 }
 
 onMounted(() => {
-  const darkMode = localStorage.getItem('darkMode')
-  isDark.value = darkMode === 'true'
   if (isDark.value) {
     document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
   }
+
+  localStorage.setItem('darkMode', isDark.value)
 })
 </script>
 
