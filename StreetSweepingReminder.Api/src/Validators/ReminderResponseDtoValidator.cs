@@ -25,5 +25,11 @@ public class ReminderResponseDtoValidator : AbstractValidator<ReminderResponseDt
         
         RuleFor(x => x.StreetId)
             .GreaterThan(0).WithMessage(ValidationMessages.StreetNumberInvalid);
+        
+        RuleFor(x => x.StreetSweepingSchedule)
+            .NotNull().WithMessage("{PropertyName} cannot be null.");
+
+        RuleFor(x => x.ReminderSchedule)
+            .NotNull().WithMessage("{PropertyName} cannot be null.");
     }
 }
