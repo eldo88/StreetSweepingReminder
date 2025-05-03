@@ -6,7 +6,7 @@ import { ref, onMounted } from 'vue'
 
 const auth = useAuthStore()
 const router = useRouter()
-const isDark = ref(false)
+const isDark = ref(true)
 
 function handleLogout() {
   auth.logout()
