@@ -10,9 +10,13 @@ const login = () => {
 </script>
 
 <template>
-  <main class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-    <div class="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md space-y-6 text-center">
-      <h1 class="text-3xl font-bold text-gray-900">Welcome to Street Sweeping Reminder</h1>
+  <main class="min-h-screen flex items-center justify-center bg-gray-100 px-4 dark:bg-gray-900">
+    <div
+      class="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md space-y-6 text-center dark:bg-gray-800 dark:text-gray-200"
+    >
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-200">
+        Welcome to Street Sweeping Reminder
+      </h1>
       <p class="text-gray-500 text-sm">Never forget about a street sweeping day again</p>
 
       <div class="space-y-3">
@@ -25,7 +29,7 @@ const login = () => {
 
         <button
           @click="login"
-          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition duration-150"
+          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition duration-150 dark:bg-purple-900"
         >
           Login
         </button>
