@@ -84,7 +84,7 @@ public class StreetRepositoryIntegrationTests
     }
 
     [Test]
-    public void CreateAsync_WhenStreetNameIsNull_ShouldThrowSqliteException()
+    public async Task CreateAsync_WhenStreetNameIsNull_ShouldThrowSqliteException()
     {
         // Arrange
         var repository = new StreetRepository(_configuration);
@@ -105,5 +105,51 @@ public class StreetRepositoryIntegrationTests
                 "Exception message should indicate the specific NOT NULL constraint failure.");
             Assert.That(ex.SqliteErrorCode, Is.EqualTo(19)); // SQLITE_CONSTRAINT error code is 19
         });
+    }
+
+    [Test]
+    public async Task GetByIdAsync_WhenIdIsValid_ShouldReturnCorrectStreetEntity()
+    {
+        // Arrange
+        var repository = new StreetRepository(_configuration);
+
+        var newStreet = new Street()
+        {
+            StreetName = "Test Rd",
+            ZipCode = 80212
+        };
+
+        var newId = await repository.CreateAsync(newStreet);
+        Assert.That(newId, Is.Positive);
+        // Act
+        var streetEntity = await repository.GetByIdAsync(newId);
+        // Assert
+        Assert.That(streetEntity, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(newStreet.StreetName, Is.EqualTo(streetEntity.StreetName));
+            Assert.That(newStreet.ZipCode, Is.EqualTo(streetEntity.ZipCode));
+        });
+    }
+
+    [Test]
+    public async Task GetByIdAsync_WhenIdIsInvalid_ShouldReturnNullEntity()
+    {
+        // Arrange
+        var repository = new StreetRepository(_configuration);
+
+        var newStreet = new Street()
+        {
+            StreetName = "Test Rd",
+            ZipCode = 80212
+        };
+
+        var newId = await repository.CreateAsync(newStreet);
+        Assert.That(newId, Is.Positive);
+        var invalidId = newId + 1;
+        // Act
+        var streetEntity = await repository.GetByIdAsync(invalidId);
+        // Assert
+        Assert.That(streetEntity, Is.Null);
     }
 }
