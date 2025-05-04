@@ -66,3 +66,19 @@ watch(
     <LoginModal :visible="showLogin" @close="showLogin = false" @loggedIn="handleSuccessfulLogin" />
   </div>
 </template>
+
+<style>
+html {
+  height: 100%;
+  background-color: white;
+}
+
+html.dark {
+  background-color: #111827; /* Tailwind's gray-900 */
+}
+
+body {
+  min-height: 100%;
+  overscroll-behavior-y: none;
+}
+</style>
