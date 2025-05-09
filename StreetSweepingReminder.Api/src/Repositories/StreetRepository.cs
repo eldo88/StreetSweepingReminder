@@ -37,7 +37,7 @@ internal class StreetRepository : RepositoryBase, IStreetRepository
         return street;
     }
     
-    public async Task<IEnumerable<Street>> GetByPartialStreetName(string partialStreetName)
+    public async Task<IEnumerable<Street>> GetByPartialStreetNameAsync(string partialStreetName)
     {
         if (string.IsNullOrWhiteSpace(partialStreetName)) // extra validation to avoid returning whole table of 4600+ items
         {

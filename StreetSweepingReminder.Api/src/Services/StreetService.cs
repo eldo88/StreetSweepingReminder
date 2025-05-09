@@ -81,7 +81,7 @@ public class StreetService : IStreetService
 
         try
         {
-            var result = await _streetRepository.GetByPartialStreetName(streetName);
+            var result = await _streetRepository.GetByPartialStreetNameAsync(streetName);
             var streetList = result.ToList();
             if (streetList.Count == 0)
             {
