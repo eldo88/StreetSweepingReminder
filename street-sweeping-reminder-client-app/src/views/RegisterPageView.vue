@@ -1,5 +1,5 @@
 <script setup>
-import RegisterPage from '@/components/RegisterPage.vue'
+import RegisterForm from '@/components/RegisterForm.vue'
 import HeroSection from '@/components/HeroSection.vue'
 </script>
 
@@ -8,7 +8,7 @@ import HeroSection from '@/components/HeroSection.vue'
     title="Tired of having to remember street sweeping days?"
     subtitle="Register for reminders so you never get a ticket again."
   />
-  <RegisterPage />
+  <RegisterForm />
 </template>
 
 <style scoped></style>
