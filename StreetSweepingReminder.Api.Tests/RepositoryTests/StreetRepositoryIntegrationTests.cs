@@ -199,4 +199,41 @@ public class StreetRepositoryIntegrationTests
             Assert.That(street2.ZipCode, Is.EqualTo(80211));
         });
     }
+
+    [Test]
+    public async Task GetByPartialStreetNameAsync_WhenPartialStreetNameIsInvalid_ShouldReturnEmptyEnumerableOfStreets()
+    {
+        // Arrange
+        var repository = new StreetRepository(_configuration);
+
+        var newStreet1 = new Street()
+        {
+            StreetName = "Test Rd",
+            ZipCode = 80212
+        };
+        
+        var newStreet2 = new Street()
+        {
+            StreetName = "Test Way",
+            ZipCode = 80211
+        };
+        
+        var newStreet3 = new Street()
+        {
+            StreetName = "Main Rd",
+            ZipCode = 80210
+        };
+
+        await repository.CreateAsync(newStreet1);
+        await repository.CreateAsync(newStreet2);
+        await repository.CreateAsync(newStreet3);
+
+        var partialSearchString = "zz";
+        // Act
+        var result = await repository.GetByPartialStreetNameAsync(partialSearchString);
+        // Assert
+        var resultList = result.ToList();
+        Assert.That(resultList, Is.Not.Null);
+        Assert.That(resultList, Is.Empty);
+    }
 }
