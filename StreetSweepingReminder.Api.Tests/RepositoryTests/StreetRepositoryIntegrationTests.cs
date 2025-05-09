@@ -154,28 +154,6 @@ public class StreetRepositoryIntegrationTests
     }
 
     [Test]
-    public async Task GetByPartialStreetNameAsync_WhenPartialStreetNameIsEmpty_ShouldReturnEmptyEnumerable()
-    {
-        // Arrange
-        var repository = new StreetRepository(_configuration);
-
-        var newStreet = new Street()
-        {
-            StreetName = "Test Rd",
-            ZipCode = 80212
-        };
-
-        await repository.CreateAsync(newStreet);
-        var searchString = "";
-        // Act
-        var result = await repository.GetByPartialStreetNameAsync(searchString);
-        // Assert
-        var enumerable = result.ToList();
-        Assert.That(enumerable, Is.Not.Null);
-        Assert.That(enumerable.Any, Is.False);
-    }
-
-    [Test]
     public async Task GetByPartialStreetNameAsync_WhenPartialStreetNameIsValid_ShouldReturnEnumerableOfStreets()
     {
         // Arrange
@@ -209,13 +187,16 @@ public class StreetRepositoryIntegrationTests
         // Assert
         var enumerable = result.ToList();
         Assert.That(enumerable, Is.Not.Null);
-        Assert.That(enumerable.Any, Is.True);
-        Assert.That(enumerable, Has.Count.EqualTo(2));
-        var street1 = enumerable[0];
-        Assert.That(street1.StreetName, Is.EqualTo("Test Rd"));
-        Assert.That(street1.ZipCode, Is.EqualTo(80212));
-        var street2 = enumerable[1];
-        Assert.That(street2.StreetName, Is.EqualTo("Test Way"));
-        Assert.That(street2.ZipCode, Is.EqualTo(80211));
+        Assert.Multiple(() =>
+        {
+            Assert.That(enumerable.Any, Is.True);
+            Assert.That(enumerable, Has.Count.EqualTo(2));
+            var street1 = enumerable[0];
+            Assert.That(street1.StreetName, Is.EqualTo("Test Rd"));
+            Assert.That(street1.ZipCode, Is.EqualTo(80212));
+            var street2 = enumerable[1];
+            Assert.That(street2.StreetName, Is.EqualTo("Test Way"));
+            Assert.That(street2.ZipCode, Is.EqualTo(80211));
+        });
     }
 }
