@@ -62,6 +62,8 @@ public class ReminderSchedulerService :
     {
         // Set properties specific to ReminderSchedule just before saving
         entity.IsActive = true;
+        var localDenverTime = DateUtils.ConvertUtcToLocalDenverTime(command);
+        entity.NextNotificationDate = localDenverTime;
     }
 
     protected override async Task<List<DateTime>> CalculateScheduleDates(CreateReminderDto command)

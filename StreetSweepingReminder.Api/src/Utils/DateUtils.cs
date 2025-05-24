@@ -1,3 +1,5 @@
+using StreetSweepingReminder.Api.DTOs;
+
 namespace StreetSweepingReminder.Api.Utils;
 
 public static class DateUtils
@@ -115,5 +117,12 @@ public static class DateUtils
         }
 
         return offset;
+    }
+
+    public static DateTime ConvertUtcToLocalDenverTime(CreateReminderDto command)
+    {
+        const string timeZoneId = "America/Denver";
+        var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        return TimeZoneInfo.ConvertTimeFromUtc(command.ScheduledDateTimeUtc, timeZoneInfo);
     }
 }
